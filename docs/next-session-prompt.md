@@ -6,11 +6,12 @@ section of `docs/design-decisions.md`.)
 
 **Before pasting — setup status:**
 
-1. ~~Create the Sanity account~~ **Done 2026-08-09** — Google login as
-   `rroethle@gmail.com`, free tier; mirrors the Resend pattern (Ryan owns the dev
-   accounts; Randy gets invited in Phase 2 — Google-login-for-the-owner was the §3
-   selection criterion). No project or schema decisions needed up front — the session
-   proposes those and you approve them in a running studio.
+1. ~~Create the Sanity account~~ **Done 2026-08-09** — account under
+   `rroethle@gmail.com`, free tier; mirrors the Resend pattern: everything tests against
+   Ryan's email/account first. Randy gets invited in Phase 2 (Google-login-for-the-owner
+   was the §3 selection criterion — that's about *his* login, not the dev account). No
+   project or schema decisions needed up front — the session proposes those and you
+   approve them in a running studio.
 2. **Nothing goes into `.dev.vars` up front** — the Sanity values don't exist until the
    session creates the project. Expect one interactive step early: the Sanity CLI needs
    a browser login, so when the session asks, run `! npx sanity login` (the `!` prefix
