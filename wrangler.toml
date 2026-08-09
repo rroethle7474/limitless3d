@@ -1,0 +1,5 @@
+# Cloudflare Pages config. Local use for now (`npx wrangler pages dev dist` picks it up);
+# the same file drives the eventual Pages deployment (plan §7 Phase 1b staging).
+name = "limitless3d"
+compatibility_date = "2026-08-01"
+pages_build_output_dir = "dist"

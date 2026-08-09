@@ -16,6 +16,12 @@ pnpm-debug.log*
 .env.production
 .env*.local
 
+# secrets for `wrangler pages dev` (Resend key etc.) — never commit
+.dev.vars
+
+# wrangler local state
+.wrangler/
+
 # editor / os
 .vscode/*
 !.vscode/extensions.json

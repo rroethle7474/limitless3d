@@ -1,0 +1,16 @@
+# Local secrets for `npx wrangler pages dev dist` — copy to `.dev.vars` (gitignored) and
+# fill in the real values. In production these become Cloudflare Pages env vars/secrets.
+
+# Resend API key (https://resend.com/api-keys). Test mode sends from onboarding@resend.dev
+# and only delivers to the account owner's own address.
+RESEND_API_KEY=re_PASTE_KEY_HERE
+
+# Where quote submissions are delivered. Ryan's inbox during Phase 1b; the production
+# address is open question §9.4 in the plan.
+QUOTE_TO_EMAIL=rroethle@gmail.com
+
+# Cloudflare Turnstile secret. This is the official "always passes" TEST secret — safe to
+# commit, useless in production. Swap for the real secret at staging time (plan §7 1b).
+# Pair: the matching test SITE key (1x00000000000000000000AA) is the code default; override
+# it at build time with PUBLIC_TURNSTILE_SITE_KEY.
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
