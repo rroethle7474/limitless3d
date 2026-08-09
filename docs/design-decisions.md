@@ -22,44 +22,53 @@ refine or contradict the plan also get a row in `limitless3d-rebuild-plan.md` §
 | D-019 | 2026-08-09 | Hero copy is **vertically centred** (`.hero { display:flex; align-items:center }`, `padding: 104px 24px 64px`) instead of the prototype's `padding: 22vh 24px 64px`. | Ryan flagged dead space under the hero, and noted the prototype does it too. With a fixed `22vh` top offset inside a `100svh` hero, the copy is only ~300px tall, so every extra pixel of viewport height piles up *below* it. Centring distributes the slack and holds at any height. Under the stacked breakpoint the hero reverts to `align-items: flex-start` so the `47svh` top padding still parks the copy below the object. |
 | D-020 | 2026-08-09 | Hero object placement is made **viewport-safe**: a fourth `narrow` tier, an aspect-aware stacking rule (`max-width: 900px, max-aspect-ratio: 6/5`), and a `fit()` that shrinks then clamps so the object can never leave the frame. | Ryan hit the object clipped on a narrow iPad Pro. The cause is aspect, not width: the prototype's tier x-offsets assume landscape, so on a portrait-ish viewport the visible world-width shrinks while the offset doesn't. Measured, the prototype's own values clip at 1280×800, 1440×900 and iPad landscape too — this was broken well beyond the case that was reported. Verified across 13 viewports from iPhone 15 to 2560×1440: all fit, and the scale-down never has to fire (it is a guarantee, not a routine path). Constants are duplicated in `hero.ts` (`STACK_MAX`/`STACK_ASPECT`) and the Hero.astro media query — **keep them in sync**. |
 | D-021 | 2026-08-09 | **Interior vocabulary is building-block components, not section-owners**: `Section` (rhythm / tint / narrow wrapper) plus `PageHero`, `SectionHead`, `Stats`, `Split`, `FeatureCards`, `Faq`, composed freely per page. `.prose` typography promoted to `global.css`; `PageHero.heading` is a raw-HTML prop; `QuoteSection` gains a `selectedService` prop. | Interior sections mix patterns inside one band (`/about` puts stats + sec-head + fcards in a single tint section), so the homepage's one-component-per-section shape doesn't compose. Astro scoped styles can't reach slotted content, which forces `.prose` (Split's slotted paragraphs, the shipping page's standalone prose) into the global layer — where `.sec-head` already lives. Every snapshot h1 carries `<br>` + one `<em>`, so a verbatim-HTML prop beats a slot for eight pages built from snapshot copy. |
-| D-022 | 2026-08-09 | D-010's cross-site CSS claim, measured on the first interior page: `/3d-scanning` ships 34.1 KB raw / 7.4 KB gz of CSS (28.6 KB shared bundle + 5.6 KB interior components); the homepage's 13.0 KB of bespoke CSS (hero, rail, door, build log) does not load there. JS on the page: two small inline modules (nav/reveal + quote form) — no `three`, no viz, no build-log code. | The prototype serves all 29 KB of CSS plus `site.js` and `hero.js` groundwork on every page. This is the verification D-010 said to make on the first interior page rather than assume. |
+| D-022 | 2026-08-09 | D-010's cross-site CSS claim, measured on the first interior page: `/3d-scanning` ships 34.1 KB raw / 7.4 KB gz of CSS (28.6 KB shared bundle + 5.6 KB interior components); the homepage's 13.0 KB of bespoke CSS (hero, rail, door, build log) does not load there. JS on the page: two small inline modules (nav/reveal + quote form) — no `three`, no viz, no build-log code. | The prototype serves all 29 KB of CSS plus `site.js` and `hero.js` groundwork on every page. This is the verification D-010 said to make on the first interior page rather than assume. **Post-fan-out note:** with nine pages built, Vite re-chunked — one shared bundle (28.6 KB raw / 6.0 KB gz, linked everywhere; includes door/spotlight/testimonial/proof since those now serve 2+ pages each) + homepage-only CSS (5.7 KB file + inlined) + page-local styles inlined per page. Still under the prototype's every-page cost; the per-route property holds. |
+| D-023 | 2026-08-09 | **Interior fan-out executed as planned** (plan §10 orchestration row): seven pages by seven Opus subagents in one working tree, three batches, orchestrator (Fable) reviewing, verifying in-browser, and committing serially. Page-local patterns landed as scoped CSS inside their page file, not components: SpecTable (`/3d-printing`), ReviewCards + Leave-a-review (`/reviews`), contact grid (`/contact`). Orchestrator-made shared edits: BuildLog `entries`/`kicker`/`heading`/`sub` props (gallery's ten-entry spotlight), PageHero CTA `external` flag (shipping's SHOP_URL link, D-011). Accepted one subagent upgrade: `role="img"` on the reviews star rows so their `aria-label`s announce. | The guardrail ("existing components and tokens only; stop and report") held — no subagent touched a shared file or invented an unauthorized pattern. Single-page patterns as page-local scoped CSS keeps them inlined into only that page's HTML and preserves the "promote when a second consumer appears" option. |
 
 ## RESUME HERE — next session
 
-**Phase 1a session 1 is complete: the homepage builds, runs, and has been verified in a
-browser.** `npm install` landed on Astro 5.18.2 / three 0.180 / sharp 0.34.5 / Tailwind 4.3.3.
-`astro check` reports 0 errors, 0 warnings, 0 hints; `astro build` succeeds.
+**Phase 1a sessions 1–2 are complete: the homepage and all eight interior pages build, run,
+and have been verified in a browser.** Session 2 (2026-08-09): stage 1 built `/3d-scanning` by
+hand and froze the interior vocabulary (D-021); stage 2 fanned the other seven pages out to
+Opus subagents (D-023). One commit per page; `astro check` clean (35 files, 0/0/0);
+`astro build` produces all 9 pages; zero hotlinks in `dist/`; every internal link resolves
+except `/privacy` (see open items).
 
-Verified working (2026-08-09, Chrome, ~2048×926 desktop viewport):
+Verified in session 2 (Chrome, desktop viewport, per page):
 
-- Hero WebGL mounts, cycles scan → print → done → dissolve, `?done=1` and `?phase=` lock
-  correctly, caption text updates per phase.
-- All three service-card animations run (point cloud + sweep, self-drawing CAD, nozzle/layers).
-- Build log cycles all six entries with pipeline-optimised images, thumbnails, and metadata.
-- Parts door resolves all 12 wall images with the `rotateY(56deg)` transform applied.
-- Quote form: all seven fields wired, file input reports attachments, submit reaches the
-  success card, TODO warning fires in console. Honeypot hidden.
-- Zero hotlinked images in the DOM; 24 images, none broken.
+- All eight interior pages: structure against the snapshots, image integrity (0 broken,
+  0 external `src`), quote-section copy + per-page `selectedService`, FAQ toggling.
+- Gallery spotlight: 10 slides/thumbs, thumb-click navigation, count + metadata swap, real
+  alt text (D-014).
+- Printing: spec table, PartsDoor reuse; shipping: SHOP_URL CTA in a new tab (D-011);
+  contact: FAQ-after-quote order; reviews: ProofBar reuse, external review CTAs.
+- Mobile (390 px): **`/3d-scanning` only**, via an in-page iframe (window resize still refuses
+  to go below ~2048 CSS px — same tooling limit as session 1; `resize_window` reports success
+  but `innerWidth` doesn't change). Phero stacks art-first, stats 2-up, cards 1-up, burger
+  shows, form single-column.
 
-**Still unverified — do these first:**
+**Still unverified — carry-overs and new:**
 
-1. **Mobile / responsive.** Never checked at any width. The browser window would not resize
-   below a ~2048 CSS-px viewport in this session's tooling, so the 640px and 1024px
-   breakpoints, the burger drawer, and the hero's mobile tier (object above the copy at
-   `padding-top: 47svh`) have **not** been seen. This is the single biggest gap.
-2. **Reduced motion.** The code paths exist and are ported verbatim, but were not exercised.
-3. **`?nogl=1` fallback.** The static SVG lemniscate replacement was not visually confirmed.
-4. **Side-by-side fidelity check** against the live prototype. Everything was checked against
-   `docs/design-reference.md`, not eyeballed next to the real thing.
-5. Generate `apple-touch-icon.png` at 180×180 from `public/favicon.svg` (D-017) — the `<link>`
-   in `Base.astro` 404s until then.
+1. **Mobile for the other seven interior pages and the homepage.** Only scanning has been seen
+   narrow, and only in an iframe. The burger drawer has still never been *operated* at mobile
+   width.
+2. **Reduced motion.** Still unexercised anywhere.
+3. **`?nogl=1` hero fallback.** Still not visually confirmed.
+4. **Side-by-side fidelity check** against the live prototype — all checking so far is against
+   the snapshot/reference, not eyeballed next to the real thing. Now spans nine pages.
+5. **Interior pages in a *focused* (not automation-backgrounded) tab** — reveals and spotlight
+   autoplay were force-verified via DOM class toggles; a human scroll-through is still the real
+   test.
 
-Then: interior pages, per the plan's §0 slicing and the subagent fan-out ruling.
+Then: the homepage FAQ (net-new, the one sanctioned Claude Design task — separate
+conversation), then the polish pass.
 
-**Tooling note for whoever picks this up:** the Chrome automation kept backgrounding the tab
-(`document.hidden === true`), which blanks screenshots and throttles rAF. Symptoms look
-exactly like a rendering bug but are not. `navigate` re-focuses the tab; DOM assertions via
-`javascript_tool` stayed reliable throughout and are the better verification tool here.
+**Tooling note (still true in session 2):** the Chrome automation keeps backgrounding the tab
+(`document.hidden === true`), which stales screenshots and throttles rAF/IntersectionObserver —
+symptoms look like rendering bugs but are not. `navigate` re-focuses; DOM assertions via
+`javascript_tool` stay reliable; `scrollIntoView` needs `behavior:'instant'` because the global
+smooth-scroll rides the throttled rAF. Subagents writing into `src/pages/` while the dev server
+watches can flash a Vite unhandled-rejection overlay (temp-file stat race) — reload recovers.
 
 ## Performance baseline — homepage, first production build (2026-08-09)
 
@@ -88,6 +97,10 @@ Two things worth knowing:
 
 ## Open items
 
+- **`/privacy` is a dead link** in every page's footer. Inherited faithfully from the
+  prototype, which links it and also has no such page. Needs either a real privacy page
+  (no prototype reference — candidate for the Claude Design allowance alongside the FAQ) or
+  dropping the link, before cutover.
 - ~~`apple-touch-icon.png` does not exist yet~~ Generated 2026-08-09, 180×180 from `favicon.svg` via Sharp (closes D-017's open note).
 - **`og-image.jpg` is the prototype's**, carried over as-is. Fine for now; worth regenerating
   if the design shifts.

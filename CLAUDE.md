@@ -14,7 +14,9 @@ keeping the domain and its SEO equity. Rebuild of an approved prototype's design
 
 ## Current status
 
-**Phase 1a — static best-guess build.** Homepage built; interior pages not started.
+**Phase 1a — static best-guess build.** Homepage and all eight interior pages built and
+browser-verified; remaining 1a work is the homepage FAQ (Claude Design, separate session)
+and the polish pass — see the RESUME section of `docs/design-decisions.md`.
 Content is hardcoded (content collections arrive in Phase 1b with the CMS).
 
 Out of scope until told otherwise: Sanity/CMS, Resend, Turnstile, deployment config,
