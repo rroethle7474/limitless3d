@@ -8,12 +8,19 @@
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 
+interface Cta {
+  label: string;
+  href: string;
+  /** Opens in a new tab — only for links leaving the site per D-011 (the parts shop). */
+  external?: boolean;
+}
+
 interface Props {
   crumb: string;
   heading: string;
   lead: string;
-  primary: { label: string; href: string };
-  ghost: { label: string; href: string };
+  primary: Cta;
+  ghost: Cta;
   image: ImageMetadata;
   alt: string;
 }
@@ -29,8 +36,20 @@ const { crumb, heading, lead, primary, ghost, image, alt } = Astro.props;
       <h1 set:html={heading} />
       <p>{lead}</p>
       <div class="hero-ctas">
-        <a class="btn primary" href={primary.href}>{primary.label}</a>
-        <a class="btn ghost" href={ghost.href}>{ghost.label}</a>
+        <a
+          class="btn primary"
+          href={primary.href}
+          {...(primary.external ? { target: '_blank', rel: 'noopener' } : {})}
+        >
+          {primary.label}
+        </a>
+        <a
+          class="btn ghost"
+          href={ghost.href}
+          {...(ghost.external ? { target: '_blank', rel: 'noopener' } : {})}
+        >
+          {ghost.label}
+        </a>
       </div>
     </div>
     <div class="phero-art">

@@ -1,0 +1,85 @@
+---
+import Base from '~/layouts/Base.astro';
+import PageHero from '~/components/PageHero.astro';
+import Section from '~/components/Section.astro';
+import QuoteSection from '~/components/QuoteSection.astro';
+import { SHOP_URL } from '~/data/site';
+
+import customDivider from '~/assets/work/custom-divider.jpg';
+
+const title = 'Shipping and Returns | Limitless 3D';
+const description =
+  'How parts ship from Neenah, Wisconsin, what our return policy is, and what to do if a part does not fit.';
+---
+
+<Base title={title} description={description}>
+  <PageHero
+    crumb="Shipping and Returns"
+    heading="Straight answers<br />before you <em>buy</em>."
+    lead="Everything in the shop is printed to order in our own workshop. Here is exactly how shipping and returns work, in plain language."
+    primary={{ label: 'Back to the shop', href: SHOP_URL, external: true }}
+    ghost={{ label: 'Ask a question', href: '/contact' }}
+    image={customDivider}
+    alt="A 3D printed custom drawer organizer"
+  />
+
+  <Section narrow>
+    <div class="prose reveal">
+      <h2>Shipping</h2>
+      <p>
+        Parts ship from Neenah, Wisconsin. Cost and timing depend on where you are relative to
+        central Wisconsin, and it is calculated at checkout before you pay.
+      </p>
+      <p>
+        Local pickup is welcome. If you are in the Fox Valley and would rather collect the part
+        in person, get in touch and we will arrange it.
+      </p>
+
+      <h2>Returns</h2>
+      <p>
+        Every part is printed to order, which means each one is made specifically for you rather
+        than pulled off a shelf. For that reason <strong>we do not accept returns</strong>.
+      </p>
+      <p>
+        That makes the step before buying the important one. If you are not completely sure the
+        part matches your machine, send us a photo and the model number first and we will tell
+        you honestly whether it fits. We would much rather answer a question than have you buy
+        the wrong thing.
+      </p>
+
+      <h2>If something is wrong with your part</h2>
+      <p>
+        If a part arrives damaged, or it is not the item you ordered, contact us and we will make
+        it right. That is a different situation from a change of mind, and it gets treated
+        differently.
+      </p>
+
+      <h2>Custom work</h2>
+      <p>
+        Scanning, design, and custom printing are quoted per project. You will know the price and
+        the timeline before any work starts, and nothing gets billed that you have not agreed to.
+      </p>
+    </div>
+  </Section>
+
+  <QuoteSection
+    kicker="Still not sure?"
+    heading="Ask before you order."
+    body="Send a photo of the part and the model of your machine. A quick answer now beats a wrong part later."
+    selectedService="Repair or replacement part"
+  />
+</Base>
+
+<style>
+  /* This page is all prose, so it fills the 840px narrow container rather than sitting at
+     the 36rem measure `.prose` uses beside Split's artwork. */
+  .prose {
+    max-width: 100%;
+  }
+
+  /* `.prose h2` carries no top margin — it is normally the first thing in its block. Here
+     four headings stack down one column and need the gap between them. */
+  .prose h2:not(:first-child) {
+    margin-top: 44px;
+  }
+</style>
