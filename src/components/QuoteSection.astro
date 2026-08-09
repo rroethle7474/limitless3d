@@ -1,0 +1,281 @@
+---
+import { BUSINESS } from '~/data/site';
+
+interface Props {
+  kicker?: string;
+  heading?: string;
+  body?: string;
+}
+
+const {
+  kicker = 'Have an idea?',
+  heading = "Let's make it real.",
+  body = 'Tell us what you are picturing, what broke, or what you can no longer buy. You will hear back fast, and you will be treated like family.',
+} = Astro.props;
+---
+
+<section class="quote-sec" id="quote">
+  <div class="glow" aria-hidden="true"></div>
+
+  <div class="wrap quote-grid">
+    <div class="quote-copy reveal">
+      <div class="mono accent">{kicker}</div>
+      <h2>{heading}</h2>
+      <p>{body}</p>
+      <div class="quote-alt">
+        <a href={BUSINESS.phoneHref}>PREFER TO TALK? <b>{BUSINESS.phone}</b></a>
+        <a href={BUSINESS.emailHref}>OR EMAIL <b>{BUSINESS.email.toUpperCase()}</b></a>
+      </div>
+    </div>
+
+    <form class="quote-form reveal" id="quote-form">
+      <div class="row2">
+        <label>Full name<input name="name" required autocomplete="name" /></label>
+        <label>Phone<input name="phone" type="tel" autocomplete="tel" /></label>
+      </div>
+
+      <label>Email<input name="email" type="email" required autocomplete="email" /></label>
+
+      <label>
+        What do you need?
+        <select name="service">
+          <option>3D printing</option>
+          <option>3D scanning</option>
+          <option>3D design</option>
+          <option>Repair or replacement part</option>
+          <option>Not sure yet</option>
+        </select>
+      </label>
+
+      <label>
+        Tell us about it
+        <textarea
+          name="details"
+          placeholder="What are you picturing? A link to a print file is welcome too."></textarea>
+      </label>
+
+      {/* Net-new vs the prototype (D-001) — the highest-value addition for a repair shop. */}
+      <div class="file-field">
+        <label for="quote-photos">Photos of the part <span class="opt">(optional)</span></label>
+        <input
+          id="quote-photos"
+          name="photos"
+          type="file"
+          accept="image/*"
+          multiple
+          capture="environment"
+        />
+        <div class="mono file-note">JPG, PNG or HEIC. Up to 5 photos.</div>
+      </div>
+
+      <div hidden aria-hidden="true">
+        <label>Company website<input name="website" tabindex="-1" autocomplete="off" /></label>
+      </div>
+
+      <button class="btn primary wide" type="submit">Get My Custom Quote</button>
+      <div class="mono form-note">We reply the same day whenever we can.</div>
+    </form>
+  </div>
+</section>
+
+<script>
+  import '~/scripts/quote-form';
+</script>
+
+<style>
+  .quote-sec {
+    position: relative;
+    padding: 110px 0;
+    overflow: hidden;
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(680px 380px at 32% 50%, var(--glow-a), transparent 70%);
+  }
+
+  .quote-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: 52px;
+    align-items: center;
+  }
+
+  .quote-copy h2 {
+    font-size: clamp(2rem, 4vw, 2.9rem);
+    margin: 16px 0 14px;
+  }
+
+  .quote-copy p {
+    color: var(--muted);
+    max-width: 26rem;
+    margin-bottom: 28px;
+  }
+
+  .quote-alt {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .quote-alt a {
+    font-family: var(--font-mono);
+    font-size: .8rem;
+    letter-spacing: .08em;
+    color: var(--muted);
+  }
+
+  .quote-alt a b {
+    color: var(--em-a);
+    font-weight: 500;
+  }
+
+  .quote-alt a:hover {
+    color: var(--text);
+  }
+
+  /* ---- the form card ---- */
+  .quote-form {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+    display: grid;
+    gap: 16px;
+  }
+
+  .quote-form label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: .66rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .quote-form input,
+  .quote-form select,
+  .quote-form textarea {
+    width: 100%;
+    margin-top: 7px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-head);
+    font-size: .95rem;
+    transition: border-color .2s;
+  }
+
+  .quote-form input:focus,
+  .quote-form select:focus,
+  .quote-form textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .quote-form textarea {
+    resize: vertical;
+    min-height: 96px;
+  }
+
+  /* ---- photo upload (net-new) ---- */
+  .file-field .opt {
+    text-transform: none;
+    letter-spacing: normal;
+    font-size: .68rem;
+  }
+
+  .file-field input[type='file'] {
+    padding: 10px 12px;
+    cursor: pointer;
+    font-family: var(--font-head);
+    font-size: .85rem;
+    color: var(--muted);
+  }
+
+  .file-field input[type='file']::file-selector-button {
+    font-family: var(--font-mono);
+    font-size: .66rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    margin-right: 12px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--em-a);
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+
+  .file-field input[type='file']:hover::file-selector-button {
+    border-color: var(--accent);
+    background: var(--panel-2);
+  }
+
+  .file-note {
+    margin-top: 8px;
+    font-size: .6rem;
+  }
+
+  .form-note {
+    text-align: center;
+    font-size: .64rem;
+  }
+
+  /* Success state swapped in by the form script. */
+  :global(.form-ok) {
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+  }
+
+  :global(.form-ok h3) {
+    font-size: 1.3rem;
+    margin: 14px 0 10px;
+  }
+
+  :global(.form-ok p) {
+    color: var(--muted);
+    font-size: .95rem;
+  }
+
+  @media (max-width: 900px) {
+    .quote-grid {
+      grid-template-columns: 1fr;
+      gap: 36px;
+    }
+
+    .quote-copy {
+      text-align: center;
+    }
+
+    .quote-copy p {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .quote-alt {
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .quote-form { padding: 22px; }
+    .row2 { grid-template-columns: 1fr; }
+  }
+</style>

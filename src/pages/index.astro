@@ -1,0 +1,24 @@
+---
+import Base from '~/layouts/Base.astro';
+import Hero from '~/components/Hero.astro';
+import ProofBar from '~/components/ProofBar.astro';
+import ServicesRail from '~/components/ServicesRail.astro';
+import BuildLog from '~/components/BuildLog.astro';
+import Testimonial from '~/components/Testimonial.astro';
+import PartsDoor from '~/components/PartsDoor.astro';
+import QuoteSection from '~/components/QuoteSection.astro';
+
+const title = '3D Printing, Scanning and Design in Neenah, WI | Limitless 3D';
+const description =
+  'Custom 3D printing, metrology grade 3D scanning, and 25 years of professional design experience. Serving Neenah, the Fox Valley, and all of NE Wisconsin.';
+---
+
+<Base title={title} description={description}>
+  <Hero />
+  <ProofBar />
+  <ServicesRail />
+  <BuildLog />
+  <Testimonial />
+  <PartsDoor />
+  <QuoteSection />
+</Base>
