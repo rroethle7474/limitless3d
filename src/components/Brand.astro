@@ -1,0 +1,56 @@
+---
+import { BRAND_PATH } from '~/data/site';
+
+interface Props {
+  /** Appends " LLC" to the wordmark — the footer lockup does this. */
+  legal?: boolean;
+  class?: string;
+  href?: string;
+}
+
+const { legal = false, class: className = '', href = '/' } = Astro.props;
+---
+
+<a class:list={['brand', className]} href={href} aria-label="Limitless 3D home">
+  <svg viewBox="0 0 100 50" fill="none" aria-hidden="true">
+    <path d={BRAND_PATH} stroke="#5E17EB" stroke-width="6" stroke-linecap="round" />
+  </svg>
+  <span>LIMITLESS <b>3D</b>{legal && ' LLC'}</span>
+</a>
+
+<style>
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    flex: none;
+  }
+
+  .brand svg {
+    width: 44px;
+    height: auto;
+    flex: none;
+  }
+
+  .brand :global(b),
+  .brand b {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  @media (max-width: 640px) {
+    .brand {
+      gap: 8px;
+    }
+
+    .brand svg {
+      width: 34px;
+    }
+
+    .brand span {
+      font-size: .85rem;
+    }
+  }
+</style>

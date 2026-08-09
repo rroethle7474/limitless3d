@@ -1,0 +1,212 @@
+---
+import Brand from './Brand.astro';
+import { NAV_LINKS, BUSINESS } from '~/data/site';
+
+const { pathname } = Astro.url;
+const isOn = (href: string) => pathname === href || pathname === `${href}/`;
+---
+
+<nav>
+  <div class="nav-in">
+    <Brand />
+    <div class="nav-links">
+      {
+        NAV_LINKS.map((link) => (
+          <a
+            href={link.href}
+            class:list={{ on: isOn(link.href) }}
+            {...('external' in link && link.external
+              ? { target: '_blank', rel: 'noopener' }
+              : {})}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+      <a class="btn primary small" href="/#quote">Get a Quote</a>
+      <button class="burger" aria-label="Menu" aria-expanded="false" aria-controls="drawer">
+        <i></i><i></i><i></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="scrim" aria-hidden="true"></div>
+
+<aside class="drawer" id="drawer">
+  {
+    NAV_LINKS.map((link) => (
+      <a
+        href={link.href}
+        class:list={{ on: isOn(link.href) }}
+        {...('external' in link && link.external ? { target: '_blank', rel: 'noopener' } : {})}
+      >
+        {link.label}
+      </a>
+    ))
+  }
+  <a class="btn primary" href="/#quote">Get a Quote</a>
+  <div class="dfoot">
+    <a href={BUSINESS.phoneHref}>CALL {BUSINESS.phone}</a>
+    <a href={BUSINESS.emailHref}>EMAIL THE WORKSHOP</a>
+  </div>
+</aside>
+
+<style>
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    backdrop-filter: blur(14px);
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-in {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    font-size: .92rem;
+    color: var(--muted);
+  }
+
+  .nav-links a:hover {
+    color: var(--text);
+  }
+
+  .nav-links a.on {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ---- burger ---- */
+  .burger {
+    display: none;
+    width: 42px;
+    height: 38px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .burger i {
+    position: absolute;
+    left: 11px;
+    right: 11px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: transform .25s ease, opacity .2s ease;
+  }
+
+  .burger i:nth-child(1) { top: 12px; }
+  .burger i:nth-child(2) { top: 18px; }
+  .burger i:nth-child(3) { top: 24px; }
+
+  :global(body.menu-open) .burger i:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  :global(body.menu-open) .burger i:nth-child(2) { opacity: 0; }
+  :global(body.menu-open) .burger i:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  /* ---- drawer ---- */
+  .drawer {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(86vw, 340px);
+    background: var(--panel);
+    border-left: 1px solid var(--line);
+    z-index: 55;
+    transform: translateX(100%);
+    transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+    padding: 88px 26px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+  }
+
+  :global(body.menu-open) .drawer {
+    transform: none;
+  }
+
+  .drawer a {
+    padding: 14px 4px;
+    border-bottom: 1px solid var(--line);
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+
+  .drawer a.on {
+    color: var(--em-a);
+  }
+
+  .drawer .btn {
+    margin-top: 22px;
+  }
+
+  .drawer .dfoot {
+    margin-top: auto;
+    padding-top: 24px;
+  }
+
+  .drawer .dfoot a {
+    border: 0;
+    padding: 6px 0;
+    font-size: .82rem;
+    font-family: var(--font-mono);
+    letter-spacing: .08em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 13, 17, .42);
+    z-index: 54;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+  }
+
+  :global(body.menu-open) .scrim {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (max-width: 1024px) {
+    .nav-links a:not(.btn) { display: none; }
+    .burger { display: block; }
+    .nav-links { gap: 12px; }
+  }
+
+  @media (max-width: 640px) {
+    .nav-in { padding: 12px 16px; }
+    .nav-links .btn.small {
+      padding: 9px 15px;
+      font-size: .82rem;
+      white-space: nowrap;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .nav-links .btn.small { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .drawer { transition: none; }
+  }
+</style>

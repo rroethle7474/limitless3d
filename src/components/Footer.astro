@@ -1,0 +1,206 @@
+---
+import Brand from './Brand.astro';
+import { BUSINESS, SOCIAL, FOOTER_LINKS } from '~/data/site';
+
+const socials = [
+  {
+    href: SOCIAL.instagram,
+    label: 'Instagram',
+    path: 'M12 2.2c3.2 0 3.6 0 4.9.1 1.2.1 1.8.3 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.7.1 4.9s0 3.6-.1 4.9c-.1 1.2-.3 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.7.1-4.9.1s-3.6 0-4.9-.1c-1.2-.1-1.8-.3-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.9c.1-1.2.3-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.8.1-1 0-1.5.2-1.9.3-.4.2-.7.4-1 .6-.2.3-.4.6-.6 1-.1.4-.3.9-.3 1.9-.1 1.3-.1 1.7-.1 4.8s0 3.5.1 4.8c0 1 .2 1.5.3 1.9.2.4.4.7.6 1 .3.2.6.4 1 .6.4.1.9.3 1.9.3 1.3.1 1.7.1 4.8.1s3.5 0 4.8-.1c1 0 1.5-.2 1.9-.3.4-.2.7-.4 1-.6.2-.3.4-.6.6-1 .1-.4.3-.9.3-1.9.1-1.3.1-1.7.1-4.8s0-3.5-.1-4.8c0-1-.2-1.5-.3-1.9-.2-.4-.4-.7-.6-1-.3-.2-.6-.4-1-.6-.4-.1-.9-.3-1.9-.3-1.3-.1-1.7-.1-4.8-.1zm0 3.1a4.9 4.9 0 110 9.8 4.9 4.9 0 010-9.8zm0 8a3.1 3.1 0 100-6.2 3.1 3.1 0 000 6.2zm6.3-8.2a1.15 1.15 0 11-2.3 0 1.15 1.15 0 012.3 0z',
+  },
+  {
+    href: SOCIAL.facebook,
+    label: 'Facebook',
+    path: 'M22 12a10 10 0 10-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.4h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0022 12z',
+  },
+  {
+    href: SOCIAL.etsy,
+    label: 'Etsy shop',
+    path: 'M9.2 4.6c0-.3.1-.4.4-.4h8.6c.4 0 .5.1.6.5l.5 3.1h-.7c-.6-2-1.1-2.3-2.9-2.3h-3.4c-.6 0-.8.2-.8.6v5.1h2.9c1.4 0 1.7-.4 1.9-1.6h.7v4.4h-.7c-.2-1.3-.5-1.6-1.9-1.6h-2.9v5.3c0 .6.3.8 1 .8h3.6c1.8 0 2.5-.6 3.1-2.7h.7l-.6 3.3c-.1.4-.2.5-.6.5H4.9v-.7l1.3-.2c.9-.2 1.1-.4 1.1-1.2V6.5c0-.8-.2-1-1.1-1.2l-1.3-.2V4.4h4.3z',
+  },
+];
+
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-about">
+        <Brand legal />
+        <p>
+          A small family shop in Neenah, Wisconsin. 3D scanning, design, and printing, with
+          twenty-five years of professional design experience behind every part.
+        </p>
+        <div class="socials">
+          {
+            socials.map((s) => (
+              <a href={s.href} target="_blank" rel="noopener" aria-label={s.label} title={s.label}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d={s.path} />
+                </svg>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <div>
+        <h4>Services</h4>
+        {FOOTER_LINKS.services.map((l) => <a href={l.href}>{l.label}</a>)}
+      </div>
+
+      <div>
+        <h4>Shop and contact</h4>
+        {
+          FOOTER_LINKS.shopAndContact.map((l) => (
+            <a
+              href={l.href}
+              {...('external' in l && l.external ? { target: '_blank', rel: 'noopener' } : {})}
+            >
+              {l.label}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="foot-bottom">
+      <div class="mono">
+        {BUSINESS.address.locality}, {BUSINESS.address.region} &middot;
+        <a href={BUSINESS.phoneHref}>{BUSINESS.phone}</a> &middot;
+        <a href={BUSINESS.emailHref}>{BUSINESS.email}</a>
+      </div>
+      <div class="mono">
+        <a href="/privacy">Privacy</a> &middot;
+        <a href="/shipping-and-returns">Shipping and returns</a> &middot; &copy; {year}
+        {BUSINESS.legalName}
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 56px 0 44px;
+    background: var(--panel-2);
+  }
+
+  .foot-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 36px;
+    margin-bottom: 40px;
+  }
+
+  .foot-grid h4 {
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+
+  .foot-grid a {
+    display: block;
+    color: var(--muted);
+    font-size: .93rem;
+    padding: 5px 0;
+  }
+
+  .foot-grid a:hover {
+    color: var(--em-a);
+  }
+
+  .foot-about p {
+    color: var(--muted);
+    font-size: .92rem;
+    max-width: 26rem;
+    margin-top: 14px;
+  }
+
+  .socials {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .socials a {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    padding: 0;
+    transition: border-color .2s, transform .2s, background .2s;
+  }
+
+  .socials a:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    background: #fff;
+  }
+
+  .socials svg {
+    width: 19px;
+    height: 19px;
+    fill: var(--muted);
+    transition: fill .2s;
+  }
+
+  .socials a:hover svg {
+    fill: var(--accent);
+  }
+
+  .foot-bottom {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+
+  /* The bottom bar's inline links opt out of the column-link block styling. */
+  .foot-bottom a {
+    display: inline;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  .foot-bottom a:hover {
+    color: var(--em-a);
+  }
+
+  @media (max-width: 820px) {
+    .foot-grid {
+      grid-template-columns: 1fr;
+      gap: 28px;
+      text-align: center;
+    }
+
+    .foot-about p {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .socials {
+      justify-content: center;
+    }
+
+    .foot-bottom {
+      justify-content: center;
+      text-align: center;
+    }
+
+    .foot-about :global(.brand) {
+      justify-content: center;
+    }
+  }
+</style>

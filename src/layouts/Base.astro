@@ -1,0 +1,96 @@
+---
+import '~/styles/global.css';
+import Nav from '~/components/Nav.astro';
+import Footer from '~/components/Footer.astro';
+import { BUSINESS, SOCIAL } from '~/data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Absolute or site-relative OG image. Defaults to the shared social card. */
+  ogImage?: string;
+  /** Staging deploys set this until cutover (plan §5.6). */
+  noindex?: boolean;
+}
+
+const { title, description, ogImage = '/og-image.jpg', noindex = false } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImageUrl = new URL(ogImage, Astro.site).href;
+
+// Sitewide structured data. Plan §5.5 upgrades this to LocalBusiness plus per-service
+// Service schema; this ProfessionalService block is the prototype's baseline, kept intact.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: BUSINESS.legalName,
+  description: '3D scanning, 3D design, and 3D printing services in Neenah, Wisconsin.',
+  url: Astro.site?.href.replace(/\/$/, ''),
+  telephone: '+1-920-360-7543',
+  email: BUSINESS.email,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: BUSINESS.address.locality,
+    addressRegion: BUSINESS.address.region,
+    postalCode: BUSINESS.address.postalCode,
+    addressCountry: BUSINESS.address.country,
+  },
+  areaServed: [
+    ...BUSINESS.areaServed.map((name) => ({ '@type': 'City', name })),
+    { '@type': 'State', name: BUSINESS.areaServedState },
+  ],
+  priceRange: '$$',
+  sameAs: [SOCIAL.instagram, SOCIAL.facebook, SOCIAL.etsy],
+};
+---
+
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={BUSINESS.legalName} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <meta name="theme-color" content="#F6F4EE" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <link
+      rel="preload"
+      href="/fonts/SpaceGrotesk-600-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      import '~/scripts/site';
+    </script>
+  </body>
+</html>
