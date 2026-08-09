@@ -1,0 +1,189 @@
+---
+import Base from '~/layouts/Base.astro';
+import PageHero from '~/components/PageHero.astro';
+import ProofBar from '~/components/ProofBar.astro';
+import Section from '~/components/Section.astro';
+import SectionHead from '~/components/SectionHead.astro';
+import FeatureCards from '~/components/FeatureCards.astro';
+import QuoteSection from '~/components/QuoteSection.astro';
+import { SOCIAL } from '~/data/site';
+
+import skiBoot from '~/assets/work/ski-boot.jpg';
+
+const title = 'Customer Reviews | Limitless 3D, Neenah WI';
+const description =
+  'What customers say about working with Randy at Limitless 3D in Neenah, Wisconsin. Fair pricing, fast responses, and parts that fit.';
+
+/** Where the two "Leave a review" buttons point. Etsy is the shop URL from site.ts. */
+const GOOGLE_REVIEW_URL = 'https://www.google.com/search?q=Limitless+3D+Neenah+WI';
+
+const reviews = [
+  {
+    quote:
+      '“Randy was incredible to work with. He is very easy to work with, has fair pricing, and you can tell he loves what he does. I would recommend him to absolutely anyone.”',
+    who: 'Verified customer · fountain nozzle design',
+  },
+  {
+    quote:
+      '“Dispatched on time, tracking every step, and questions answered fast. That is what Etsy Star Seller status is measured on, and it is held across more than 500 reviews.”',
+    who: 'Etsy shop record · four years selling',
+  },
+];
+
+const expectations = [
+  {
+    icon: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+    title: 'A fast, human reply',
+    body: 'You will hear back quickly, from the person who will actually do the work.',
+  },
+  {
+    icon: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/>',
+    title: 'No smoke and mirrors',
+    body: 'If we cannot do something, we say so instead of dragging it out. Your time is money.',
+  },
+  {
+    icon: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/>',
+    title: 'Treated like family',
+    body: 'This is a small family business. You are not a ticket number in a queue.',
+  },
+  {
+    icon: '<path d="M3 15l12-12 6 6-12 12H3v-6zM8 10l2 2M11 7l2 2"/>',
+    title: 'Industrial grade deliverables',
+    body: 'Professional results, whether the job is one bracket or a production run.',
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <PageHero
+    crumb="Reviews"
+    heading="4.8 stars from<br />over <em>500</em> customers."
+    lead="Four years on Etsy, more than three thousand orders shipped, and Star Seller recognition for on time delivery and quick replies. The parts speak for themselves."
+    primary={{ label: 'Get a Quote', href: '/#quote' }}
+    ghost={{ label: 'Read all the reviews', href: SOCIAL.etsyShop }}
+    image={skiBoot}
+    alt="A repaired ski boot with a 3D printed replacement part"
+  />
+
+  <ProofBar />
+
+  <Section id="word">
+    <SectionHead
+      kicker="In their words"
+      heading="What customers say"
+      sub="Every review here came from a real project. We would rather show you a few true things than a wall of noise."
+    />
+    <div class="rcards">
+      {
+        reviews.map((r) => (
+          <div class="rcard reveal">
+            <span class="stars" role="img" aria-label="Five out of five">★★★★★</span>
+            <blockquote>{r.quote}</blockquote>
+            <div class="who">{r.who}</div>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section tint>
+    <SectionHead
+      kicker="Why people come back"
+      heading="What you can expect, every time"
+      sub="These are our commitments, not customer quotes. Hold us to them."
+    />
+    <FeatureCards cards={expectations} two />
+  </Section>
+
+  <Section narrow>
+    <div class="leave reveal">
+      <div class="mono accent">Worked with us?</div>
+      <h2>Leave a review</h2>
+      <p>
+        It genuinely helps a small shop, and it helps the next person decide. A sentence is
+        plenty.
+      </p>
+      <div class="leave-ctas">
+        <a class="btn primary" href={SOCIAL.etsyShop} target="_blank" rel="noopener">
+          Leave a review on Etsy
+        </a>
+        <a class="btn ghost" href={GOOGLE_REVIEW_URL} target="_blank" rel="noopener">
+          Review us on Google
+        </a>
+      </div>
+    </div>
+  </Section>
+
+  <QuoteSection />
+</Base>
+
+<style>
+  /* ---- review cards (`.rcards`) — only this page uses them ---- */
+  .rcards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .rcard {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+    text-align: center;
+  }
+
+  .rcard .stars {
+    display: block;
+    color: var(--em-a);
+    letter-spacing: .28em;
+    font-size: .85rem;
+    margin-bottom: 14px;
+  }
+
+  .rcard blockquote {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .rcard .who {
+    font-family: var(--font-mono);
+    font-size: .66rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  @media (max-width: 820px) {
+    .rcards {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ---- leave a review ----
+     The prototype styles this block inline; the values are its own. The CTA row is the
+     prototype's `.hero-ctas` rule, centred — including its 38px trailing margin. */
+  .leave {
+    text-align: center;
+  }
+
+  .leave h2 {
+    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    margin: 14px 0 14px;
+  }
+
+  .leave p {
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .leave-ctas {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 38px;
+  }
+</style>
