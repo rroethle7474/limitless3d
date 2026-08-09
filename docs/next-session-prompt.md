@@ -6,15 +6,15 @@ section of `docs/design-decisions.md`.)
 
 **Before pasting — setup status:**
 
-1. **Create the Sanity account first**: sanity.io, sign in with Google as
-   `rroethle@gmail.com` — mirrors the Resend pattern (Ryan owns the dev accounts; Randy
-   gets invited in Phase 2, and Google-login-for-the-owner was the §3 selection
-   criterion). Free tier. No project or schema decisions needed up front — the session
+1. ~~Create the Sanity account~~ **Done 2026-08-09** — Google login as
+   `rroethle@gmail.com`, free tier; mirrors the Resend pattern (Ryan owns the dev
+   accounts; Randy gets invited in Phase 2 — Google-login-for-the-owner was the §3
+   selection criterion). No project or schema decisions needed up front — the session
    proposes those and you approve them in a running studio.
-2. **Account created 2026-08-09** (Google, `rroethle@gmail.com`). Nothing goes into
-   `.dev.vars` up front — the Sanity values don't exist until the session creates the
-   project. Expect one interactive step early: the Sanity CLI needs a browser login, so
-   when the session asks, run `! npx sanity login` (the `!` prefix runs it in-session).
+2. **Nothing goes into `.dev.vars` up front** — the Sanity values don't exist until the
+   session creates the project. Expect one interactive step early: the Sanity CLI needs
+   a browser login, so when the session asks, run `! npx sanity login` (the `!` prefix
+   runs it in-session).
 3. **Tokens are secrets, same drill as the Resend key**: when the session needs a write
    token (quote-submission storage, late in the session), you create it at
    sanity.io/manage and paste it into `.dev.vars` yourself — never into the repo or the
