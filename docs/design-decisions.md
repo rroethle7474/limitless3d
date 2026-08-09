@@ -63,8 +63,10 @@ Verified in session 2 (Chrome, desktop viewport, per page):
    autoplay were force-verified via DOM class toggles; a human scroll-through is still the real
    test.
 
-Then: the polish pass. (The homepage FAQ was deferred to Phase 2 on 2026-08-09 — its content
-needs Randy's input; see the plan's §9.6 and §10.)
+**Next session (agreed 2026-08-09): Phase 1b kickoff — the quote-form backend, end to end,
+validated to Ryan's inbox. The kickoff prompt is `docs/next-session-prompt.md`.** The 1a
+polish pass (items 1–5 above) is still owed and runs as its own later session. (The homepage
+FAQ was deferred to Phase 2 — its content needs Randy's input; see the plan's §9.6 and §10.)
 
 **Tooling note (still true in session 2):** the Chrome automation keeps backgrounding the tab
 (`document.hidden === true`), which stales screenshots and throttles rAF/IntersectionObserver —

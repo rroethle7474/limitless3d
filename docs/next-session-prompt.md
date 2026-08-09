@@ -1,101 +1,112 @@
-# Session 2 kickoff prompt
+# Session 3 kickoff prompt — Phase 1b entry: the quote form, end to end
 
-Copy the block below into a fresh Claude Code session to start the interior-pages work.
+Copy the block below into a fresh Claude Code session to start the wire-up phase.
 
-**Before pasting — two setup steps for you, Ryan:**
+**Before pasting — setup steps for you, Ryan (10 minutes, one account):**
 
-1. `/model` → **Fable 5** for this session. Fable orchestrates; it does not build the pages.
-2. That's it. The prompt below instructs the orchestrator to spawn every page-building
-   subagent on **Opus** (`model: "opus"` on each Agent call). This must be explicit in the
-   prompt because **subagents inherit the parent session's model by default** — a Fable
-   orchestrator that spawns subagents without the override runs them all on Fable, which
-   burns tokens at Fable rates for mechanical page-porting work that Opus handles fine.
+1. **Create a Resend account at resend.com — sign up with `rroethle@gmail.com`.**
+   The signup address matters: until a sending domain is verified, Resend only delivers to
+   the account owner's own email. That restriction *is* our validation loop — every test
+   submission lands in your inbox and nowhere else. Do **not** add or verify a domain yet
+   (that's cutover-prep work, after DNS moves to Cloudflare).
+2. In Resend: **API Keys → Create API key** ("Sending access" permission is enough). Keep it
+   somewhere you can paste from when the session asks for it. It goes into a git-ignored
+   `.dev.vars` file, never into the repo or the chat if you can avoid it — pasting into a
+   local file yourself is best.
+3. **No Cloudflare account needed yet.** Turnstile has official always-pass test keys that
+   work locally, and `wrangler` runs Pages Functions on your machine without a login. Real
+   Turnstile keys and the Pages project come with the staging deploy, later in 1b.
+4. `/model` → **Opus is sufficient** for this session — it's a single-agent build with no
+   fan-out. Pick Fable if you want maximum scrutiny on the spam/validation decisions, but
+   nothing here needs orchestration.
 
 ---
 
 ```
 Read CLAUDE.md, then docs/design-decisions.md (start at "RESUME HERE"), then
-limitless3d-rebuild-plan.md §0 and §6. docs/design-reference.md §6 has the
-section order for every interior page, and docs/prototype-snapshot/ has the raw
-HTML for all of them — use it for verbatim copy rather than re-fetching the
-prototype.
+limitless3d-rebuild-plan.md §3, §3b, and the Phase 1b bullets in §7. Decisions
+D-005 and D-008 cover the form's current stubbed state.
 
-This is Phase 1a, session 2: the eight interior pages. npm install is done;
-npm run dev works. Confirmed last session: homepage builds, astro check is
-clean, hero WebGL and all animations run.
+This is Phase 1b, session 3 — the first wire-up session. Sessions 1–2 built
+and verified all nine pages; the quote form is UI-complete on every page but
+submission is a stub: src/scripts/quote-form.ts fakes success and logs a TODO.
 
-Model policy for this session: you (the orchestrator) are running on Fable.
-Every subagent you spawn — the stage-2 page builders — must be spawned with
-an explicit model override to Opus (Agent tool parameter model: "opus").
-Do not spawn subagents on the inherited default, which would be Fable. The
-division of labor: Fable reads results, adjudicates "stop and report" cases,
-reviews integration, and talks to me; Opus subagents do the page building.
-Stage 1 (below) is not delegated at all — you build it directly in this
-session, because it defines the component vocabulary everything else consumes.
+THE TASK: make the quote form real, end to end, validated by an actual email
+with photo attachments arriving in Ryan's inbox (rroethle@gmail.com). Ryan
+performs the final validation himself — your job is to get it to the point
+where he submits the form and checks his mail.
 
-Sequencing — this matters, do not skip to the fan-out:
+Architecture — these are constraints, not suggestions:
+- Astro stays `output: 'static'`. The backend is a Cloudflare Pages Function
+  at functions/api/quote.ts in the repo root — no Astro adapter, no SSR.
+- The client script swaps its stub for a multipart FormData POST to
+  /api/quote. Keep the honeypot check, the success card, and every existing
+  degradation behavior exactly as they are.
+- Spam: verify a Turnstile token server-side (siteverify). Use Cloudflare's
+  official test keys locally — site 1x00000000000000000000AA, secret
+  1x0000000000000000000000000000000AA — wired so real keys are an env-var
+  swap at staging time.
+- Email: Resend, from onboarding@resend.dev (test mode), to QUOTE_TO_EMAIL —
+  an env var currently set to Ryan's email; the production address is open
+  question §9.4. Attachments forwarded from the form's photo field.
+- Secrets live in .dev.vars (RESEND_API_KEY, QUOTE_TO_EMAIL, TURNSTILE keys).
+  Add .dev.vars to .gitignore BEFORE creating it. Ryan pastes his own API key
+  into the file. Never commit or echo secrets.
+- Attachment limits are a real design point, not an afterthought: five phone
+  photos can exceed 25 MB raw; check Resend's request-size limit (~40 MB) and
+  add client-side validation (count + per-file size with a clear message)
+  rather than letting big uploads fail opaquely at the API.
+- Dual-write (§3b) is the requirement but Sanity doesn't exist yet: build the
+  storage side as an explicit seam (a function with a logged TODO is fine)
+  and log the deferral as a decision row. The email path must not depend on
+  the storage path succeeding.
 
-STAGE 1 (orchestrator builds directly, serial). The homepage established the
-design system but NOT the interior-page component vocabulary. Build
-/3d-scanning by hand first — it exercises almost the whole remaining set:
-PageHero (.phero + .crumb + .phero-art), Stats, Split/Prose (both
-orientations), FeatureCards (3-up and 6-up), and FAQ. Extract each as a real
-reusable component in src/components/, not page-local markup. Run-and-look per
-section as usual. Commit, and tell me the component list when it's frozen.
+Local test loop: npm run build, then npx wrangler pages dev dist (Pages
+Functions run locally against the built site). Verify a submission end to
+end yourself first — function receives fields + files, Turnstile verifies,
+Resend accepts — then hand off to Ryan for the inbox check. Note wrangler
+serves its own port; the Vite dev server doesn't run the function.
 
-STAGE 2 (subagent fan-out, one working tree — no worktrees, no bus). Once I've
-signed off on stage 1, fan out the remaining seven pages to Opus subagents.
-They're file-disjoint (src/pages/<slug>.astro), so file-level separation is
-enough isolation. Suggested batches: /3d-printing + /3d-design (closest to the
-scanning page, plus SpecTable for printing); then /about + /gallery + /reviews
-(needs ReviewCards); then /contact + /shipping-and-returns.
+Failure behavior follows §3b: if Resend errors, the user sees an honest
+failure state with the phone/email fallback (both are already in the quote
+section copy) — never a fake success.
 
-Guardrail every subagent gets, verbatim: "Use only the existing components and
-tokens. Do not add new tokens, invent new section patterns, or edit shared
-components. If your page needs a pattern that doesn't exist, stop and report it
-instead of building it." You (Fable) adjudicate any of those centrally —
-that's the downscaled CONTRACT-CHANGE rule and it's what keeps eight pages
-consistent.
+Conventions unchanged: run-and-look, small commits, decision rows in
+docs/design-decisions.md (update D-005 when the stub dies), plan §10 rows for
+anything that refines the plan.
 
-Also carried over from session 1:
-- Generate public/apple-touch-icon.png at 180x180 from public/favicon.svg. The
-  <link> in Base.astro 404s until then.
-- Note that STACK_MAX/STACK_ASPECT in src/scripts/hero.ts must stay in sync
-  with the media query in Hero.astro.
+Out of scope this session: Sanity (studio, schema, the dual-write wiring),
+staging deployment and real Turnstile keys, domain verification/SPF/DKIM,
+redirects, Square catalog integration, the Etsy reviews pull, the newsletter
+question, the homepage FAQ, and the 1a polish pass (mobile/reduced-motion/
+fidelity checks — still owed, separate session).
 
-Conventions unchanged: run-and-look with the dev server up, small commits one
-page at a time, copy verbatim from the snapshot, never hotlink an image, best
-guess + a row in docs/design-decisions.md for ambiguous details, plan §10 row
-for anything that refines the plan.
-
-Out of scope, same as before: Sanity/CMS, Resend, Turnstile, deployment config,
-redirects, Square APIs, the shop subdomain, and the homepage FAQ (that one is
-net-new and the only sanctioned Claude Design task — separate conversation).
-
-Start with stage 1.
+Start by reading the current quote-form.ts and QuoteSection.astro, then
+propose the function's request/response contract before writing it.
 ```
 
 ---
 
 ## Notes on using it
 
-**Stage 1 runs on Fable, and that's intentional.** The scanning page is doing double duty —
-it's a deliverable *and* it's where the shared component vocabulary gets designed. That design
-work is exactly what the strongest model is for; the seven pages after it are consumers, which
-is Opus work. Expect stage 1 to take longer than a page "should," and review it more carefully
-than the ones that follow.
+**Why static + a functions/ directory, not an Astro adapter.** The site's reliability posture
+(§3b) rests on the marketing pages being dumb files on a CDN. Cloudflare Pages runs anything
+in `functions/` as edge functions alongside static output with zero build-config change —
+the form gains a backend without the site gaining a runtime. Wrangler runs the same layout
+locally, so the whole loop works before any hosting exists.
 
-**Watch for "stop and report" messages during stage 2.** If a subagent hits a missing pattern,
-that's the system working. The two most likely to surface: `/reviews` needs ReviewCards
-(`.rcards`) and `/3d-printing` needs SpecTable (`.spectable`) — neither appears on the
-scanning page. Letting them surface naturally beats speculatively building components nobody
-has consumed yet; when one is reported, Fable builds it (or delegates it with the same
-guardrail) and re-dispatches the page.
+**The Resend test-mode restriction is the feature, not a workaround.** Until a domain is
+verified, mail goes only to the account owner. Signing up with Ryan's address makes
+misdirected test emails impossible. At cutover prep this flips: verify
+`limitless3ddesign.com` (DNS will be at Cloudflare by then), switch the from-address, and set
+`QUOTE_TO_EMAIL` to Randy's answer to §9.4.
 
-**Why this model split works:** the orchestrator's job here is judgment — reconciling
-subagent output, catching drift from the design system, deciding contract questions. The
-subagents' job is mechanical — porting known HTML/CSS into a frozen component vocabulary with
-the copy already written. Matching model strength to judgment-per-token is the whole point.
+**What "done" looks like:** Ryan fills the form in a browser served by wrangler, attaches a
+photo, submits, and the email — all fields, attachment included — is in his inbox. Plus the
+failure path exercised once (kill the API key, submit, see the honest error with the
+phone/email fallback).
 
-**Cadence reminder** (from the session-1 orchestration ruling): review stays serial — you look
-at pages as they land, one batch at a time. The fan-out parallelizes the build, not the review.
+**Still on the books after this session:** the 1a polish pass (mobile on eight pages, reduced
+motion, `?nogl=1`, prototype side-by-side), then the rest of 1b (Sanity + content migration +
+dual-write closure, staging deploy with noindex). Randy's question list is plan §9.4 and
+§9.6–§9.9.
