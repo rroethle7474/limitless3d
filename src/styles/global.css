@@ -1,0 +1,279 @@
+@import "tailwindcss";
+@import "./fonts.css";
+
+/* ============================================================================
+   DESIGN TOKENS — verbatim from the prototype (docs/design-reference.md §1).
+   These stay as plain custom properties so the dark theme can override them at
+   the :root level; @theme inline below maps them into Tailwind's utility names
+   without freezing the values, so `bg-panel` stays theme-reactive.
+   ========================================================================= */
+:root {
+  --accent: #5E17EB;
+  --accent-deep: #4A12BC;
+  --accent-glow: #B49AFF;
+  --radius: 14px;
+  --maxw: 1180px;
+
+  --bg: #F6F4EE;
+  --panel: #FFFFFF;
+  --panel-2: #EFECE3;
+  --line: #DCD6C9;
+  --text: #191A20;
+  --muted: #565D6D;
+  --faint: #8A8F9C;
+  --em-a: #5E17EB;
+  --em-b: #3D0FA8;
+  --ink: #0B0D11;
+
+  --card-shadow: 0 10px 30px rgba(25, 26, 32, .08);
+  --nav-bg: rgba(246, 244, 238, .86);
+  --glow-a: rgba(94, 23, 235, .09);
+  --glow-b: rgba(94, 23, 235, .05);
+  --door-bg: #ECE8DD;
+  --door-fog: rgba(246, 244, 238, .94);
+}
+
+/* Ported but deliberately unreachable — no toggle ships (decision D-004).
+   Reach it with ?theme=dark for internal preview only. */
+:root[data-theme="dark"] {
+  --bg: #0B0D11;
+  --panel: #12151B;
+  --panel-2: #161A22;
+  --line: #242A36;
+  --text: #E9ECF2;
+  --muted: #9AA3B2;
+  --faint: #6B7484;
+  --em-a: #B49AFF;
+  --em-b: #7B45F5;
+  --card-shadow: none;
+  --nav-bg: rgba(11, 13, 17, .78);
+  --glow-a: rgba(94, 23, 235, .17);
+  --glow-b: rgba(74, 18, 188, .10);
+  --door-bg: #0D0F14;
+  --door-fog: rgba(11, 13, 17, .92);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-accent-glow: var(--accent-glow);
+  --color-em-a: var(--em-a);
+  --color-em-b: var(--em-b);
+  --color-ink: var(--ink);
+  --color-door: var(--door-bg);
+
+  --font-head: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --radius-card: 14px;
+
+  /* Prototype breakpoints, so `max-lg:` etc. line up with the reference CSS. */
+  --breakpoint-sm: 40rem;   /* 640px */
+  --breakpoint-md: 48rem;   /* 768px */
+  --breakpoint-lg: 64rem;   /* 1024px */
+}
+
+/* ============================================================================
+   BASE
+   ========================================================================= */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-head);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+    line-height: 1.14;
+    font-weight: 600;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+/* ============================================================================
+   SEMANTIC UTILITIES
+   Patterns used dozens of times across the site. Expressing these as utility
+   soup at every call site would be noise, not clarity — see the CSS-strategy
+   decision (D-010) in docs/design-decisions.md.
+   ========================================================================= */
+
+@utility wrap {
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+@utility wrap-narrow {
+  max-width: 840px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+/* The uppercase mono kicker above every heading — the signature typographic
+   move of the design (docs/design-reference.md §2). */
+@utility mono {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+@utility tint {
+  background: var(--panel-2);
+  border-block: 1px solid var(--line);
+}
+
+@layer components {
+  .mono.accent {
+    color: var(--em-a);
+  }
+
+  /* ---- buttons ---- */
+  .btn {
+    display: inline-block;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: .95rem;
+    transition: transform .18s ease, box-shadow .18s ease;
+    cursor: pointer;
+    border: 0;
+    font-family: inherit;
+  }
+
+  .btn.primary {
+    background: linear-gradient(135deg, #7B3BFF, var(--accent-deep));
+    color: #fff;
+    box-shadow: 0 4px 24px rgba(94, 23, 235, .35);
+  }
+
+  .btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(94, 23, 235, .5);
+  }
+
+  .btn.ghost {
+    border: 1px solid var(--line);
+    color: var(--text);
+    background: transparent;
+  }
+
+  .btn.ghost:hover {
+    border-color: var(--accent);
+    color: var(--em-a);
+  }
+
+  .btn.small {
+    padding: 9px 18px;
+    font-size: .85rem;
+  }
+
+  .btn.wide {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* ---- section header ---- */
+  .sec-head {
+    max-width: 660px;
+    margin: 0 auto 56px;
+    text-align: center;
+  }
+
+  .sec-head h2 {
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    margin: 14px 0 14px;
+  }
+
+  .sec-head p {
+    color: var(--muted);
+  }
+
+  /* ---- framed photo ----
+     The border and lift hug the image itself, not its padded container, so a
+     product shot on white reads as a matted print. */
+  .framed {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(25, 26, 32, .12);
+    background: var(--panel);
+  }
+
+  :root[data-theme="dark"] .framed {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .5);
+  }
+
+  /* ---- scroll reveal ---- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+
+  .reveal.on {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---- skip link ---- */
+  .skip {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .skip:focus {
+    left: 16px;
+    top: 16px;
+    z-index: 99;
+    background: var(--panel);
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+  }
+}
+
+/* ============================================================================
+   MOTION
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
