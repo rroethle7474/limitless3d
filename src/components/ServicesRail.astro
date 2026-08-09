@@ -1,0 +1,228 @@
+---
+/**
+ * "Scan. Design. Print." — three cards, each with a perpetual animated visual.
+ * Card numbers (01/02/03) are CSS counters, not markup.
+ */
+---
+
+<section id="services" class="tint">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="mono accent">What we do</div>
+      <h2>Scan. Design. Print.</h2>
+      <p>
+        Three services under one roof, one seamless pipeline. Bring a broken part, a sketch, or
+        an idea stuck in your head.
+      </p>
+    </div>
+
+    <div class="rail">
+      <!-- 01 — scanning -->
+      <div class="stagecard reveal">
+        <div class="viz"><canvas id="viz-scan" aria-hidden="true"></canvas></div>
+        <h3>3D Scanning</h3>
+        <p>
+          Millions of measured points capture the exact shape of any object, without markers or
+          scanning spray. From heirlooms to engine parts.
+        </p>
+        <div class="spec">DIMENSIONAL ACCURACY TO 0.02 MM</div>
+        <a class="more" href="/3d-scanning">More on 3D scanning &rarr;</a>
+      </div>
+
+      <!-- 02 — design -->
+      <div class="stagecard reveal">
+        <div class="viz">
+          <svg id="viz-cad" viewBox="0 0 300 190" fill="none" aria-hidden="true">
+            <rect x="70" y="60" width="160" height="70" rx="4" stroke="#5E17EB" stroke-width="1.6" class="draw"></rect>
+            <circle cx="110" cy="95" r="14" stroke="#B49AFF" stroke-width="1.2" class="draw"></circle>
+            <circle cx="190" cy="95" r="14" stroke="#B49AFF" stroke-width="1.2" class="draw"></circle>
+            <path d="M70 44 h160" stroke="#8A8F9C" stroke-width="1" class="draw"></path>
+            <path d="M70 40v8M230 40v8" stroke="#8A8F9C" stroke-width="1" class="draw"></path>
+            <text x="150" y="38" fill="#565D6D" font-family="IBM Plex Mono" font-size="10" text-anchor="middle">6.000</text>
+            <path d="M246 60 v70" stroke="#8A8F9C" stroke-width="1" class="draw"></path>
+            <path d="M242 60h8M242 130h8" stroke="#8A8F9C" stroke-width="1" class="draw"></path>
+            <text x="262" y="99" fill="#565D6D" font-family="IBM Plex Mono" font-size="10">1.75</text>
+            <text x="110" y="152" fill="#8A8F9C" font-family="IBM Plex Mono" font-size="9" text-anchor="middle">&#8960;.250 2 PLCS</text>
+          </svg>
+        </div>
+        <h3>3D Design</h3>
+        <p>
+          Twenty-five years of professional CAD work turns the scan, the sketch, or the idea in
+          your head into a real engineering model.
+        </p>
+        <div class="spec">MEASURE TWICE. CUT ONCE.</div>
+        <a class="more" href="/3d-design">More on 3D design &rarr;</a>
+      </div>
+
+      <!-- 03 — printing -->
+      <div class="stagecard reveal">
+        <div class="viz" id="viz-print" aria-hidden="true">
+          <div class="layers">
+            {Array.from({ length: 18 }).map(() => <i />)}
+          </div>
+          <div class="nozzle"></div>
+        </div>
+        <h3>3D Printing</h3>
+        <p>
+          Built layer by layer in the material that fits the job, from economical PLA to
+          functional ABS and nylon. In your hands in days, not weeks.
+        </p>
+        <div class="spec">PLA &middot; ABS &middot; NYLON &middot; RESIN</div>
+        <a class="more" href="/3d-printing">More on 3D printing &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '~/scripts/service-viz';
+</script>
+
+<style>
+  section {
+    padding: 96px 0;
+  }
+
+  .rail {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    counter-reset: step;
+  }
+
+  .stagecard {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stagecard .viz {
+    height: 190px;
+    border-radius: 10px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    margin-bottom: 22px;
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+
+  .stagecard h3 {
+    font-size: 1.15rem;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  /* The 01 / 02 / 03 numerals are generated, so the markup stays semantic. */
+  .stagecard h3::before {
+    counter-increment: step;
+    content: "0" counter(step);
+    display: block;
+    font-family: var(--font-mono);
+    font-size: .7rem;
+    letter-spacing: .2em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .stagecard p {
+    color: var(--muted);
+    font-size: .92rem;
+    text-align: center;
+  }
+
+  .stagecard .spec {
+    margin-top: 16px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: .7rem;
+    letter-spacing: .1em;
+    color: var(--em-a);
+  }
+
+  .stagecard .more {
+    margin-top: 18px;
+    text-align: center;
+    font-size: .86rem;
+    font-weight: 600;
+    color: var(--em-a);
+  }
+
+  .stagecard .more:hover {
+    text-decoration: underline;
+  }
+
+  .viz :global(canvas),
+  .viz :global(svg) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .layers {
+    position: absolute;
+    inset: auto 22% 18% 22%;
+    height: 64%;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 2px;
+  }
+
+  .layers :global(i) {
+    display: block;
+    height: 5px;
+    background: linear-gradient(90deg, var(--accent-deep), var(--accent));
+    border-radius: 1px;
+    opacity: 0;
+    transform: scaleX(.4);
+    transform-origin: left;
+  }
+
+  .nozzle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--em-a);
+    box-shadow: 0 0 16px var(--accent), 0 0 4px var(--em-a);
+    left: 0;
+    top: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .nozzle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    width: 2px;
+    height: 44px;
+    transform: translateX(-50%);
+    background: linear-gradient(to top, var(--em-a), transparent);
+  }
+
+  @media (max-width: 820px) {
+    .rail {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .stagecard {
+      padding: 24px;
+    }
+
+    .stagecard .viz {
+      height: 158px;
+      margin-bottom: 18px;
+    }
+  }
+</style>

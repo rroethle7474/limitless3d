@@ -1,0 +1,74 @@
+---
+import { STATS, SOCIAL } from '~/data/site';
+---
+
+<div class="proof">
+  <div class="wrap proof-in reveal">
+    {
+      STATS.map((s) => (
+        <div class="proof-item">
+          <b>{s.value}</b>
+          <span>{s.label}</span>
+        </div>
+      ))
+    }
+  </div>
+  <div class="center">
+    <a class="proof-link mono" href={SOCIAL.etsyShop} target="_blank" rel="noopener">
+      READ THE REVIEWS ON ETSY &rarr;
+    </a>
+  </div>
+</div>
+
+<style>
+  .proof {
+    background: var(--panel);
+    border-block: 1px solid var(--line);
+    padding: 44px 0 34px;
+  }
+
+  .proof-in {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    text-align: center;
+    margin-bottom: 22px;
+  }
+
+  .proof-item b {
+    display: block;
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    font-weight: 700;
+    color: var(--em-a);
+    line-height: 1.1;
+    letter-spacing: -.01em;
+  }
+
+  .proof-item span {
+    font-family: var(--font-mono);
+    font-size: .64rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .center {
+    text-align: center;
+  }
+
+  .proof-link {
+    color: var(--muted);
+    font-size: .68rem;
+  }
+
+  .proof-link:hover {
+    color: var(--em-a);
+  }
+
+  @media (max-width: 700px) {
+    .proof-in {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 26px;
+    }
+  }
+</style>
