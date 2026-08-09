@@ -84,7 +84,10 @@ Principle: scope ruthlessly. Only the things the owner will actually change are 
 Proposed collections (confirm with him):
 
 1. **Gallery / build log entries** — photo(s), title, one-line description, optional longer story. Each entry doubles as fresh content for SEO.
-2. **Testimonials / reviews** — quote, attribution, source (Google/Etsy).
+2. **Testimonials / reviews** — quote, attribution, source (Google/Etsy). Optionally seeded
+   and refreshed automatically from the Etsy API (2026-08-09 investigation, §10): build-time
+   `getReviewsByShop` pull with a 5★ filter for the featured pool, while the proof bar keeps
+   the truthful aggregate; this collection stays the owner's curation/override either way.
 3. **Homepage stats** — review count, orders shipped, rating (the numbers change; the layout doesn't).
 4. **Business info** — hours, phone, email, service-area copy.
 5. **Service page copy** — headline + body text per service (scanning / design / printing), photos.
@@ -176,6 +179,9 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 7. Square API credentials: when can Ryan create/supply the Square application credentials the
    catalog integration needs (now pre-cutover scope, §2)? And once catalog pages are live on
    the main site, does the subdomain Square store remain as a fallback or get retired?
+8. Etsy reviews auto-pull (§10, 2026-08-09): does Randy want it, and will he register an Etsy
+   developer app / API key from the shop account (plus supply the shop id)? Blocks the
+   build-time reviews module; manual curation via the §4.2 collection is the fallback.
 
 ## 10. Decision Log
 
@@ -195,3 +201,4 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 | 2026-08-09 | Scaffold landed: Astro 5 static + Tailwind v4 + Sharp + `three`, TypeScript strict, no UI framework or islands. `CLAUDE.md` at root carries conventions, session slicing, and the orchestration ruling. Homepage written section-by-section. **Not yet verified in a browser** — `npm install` was blocked by ~67 KB/s throughput on a mobile hotspot and deferred to real bandwidth. |
 | 2026-08-09 | **Homepage FAQ deferred out of Phase 1a** (Ryan). The §6 improvement stands, but its content — materials, turnaround, ballpark pricing — is owner facts, and Randy's input isn't available yet. Revisit at Phase 2 alongside owner review; the open question moves to §9.6. Phase 1a's remaining scope is the polish pass only. With the FAQ deferred, no Claude Design use remains in Phase 1a (its other sanctioned use is Phase 2 variant exploration). |
 | 2026-08-09 | **Square catalog integration promoted to pre-cutover scope** (Ryan): shoppers should browse products without leaving the site, so §2's phase-two option — product pages from the Catalog API + Square-hosted checkout links — happens before go-live rather than after. iframe embedding ruled out (checkout frame-blocking, partitioned cookies). Commerce/inventory/payments still never migrate (D-002's core holds); only the catalog UI moves in-house. Interim state during the build stays the `SHOP_URL` link-out. Prototype `/shop` + one `/parts/*` PDP captured into the snapshot as the design reference (D-024) while the Vercel deployment is still up. Gated on §9.7 (credentials; subdomain-fallback question). |
+| 2026-08-09 | **Etsy reviews auto-pull investigated** (Ryan asked; findings for Randy). Prototype hardcodes all three review quotes — nothing is pulled from Etsy. Square Online has no native Etsy-review integration; third-party embed widgets (SociableKit/Common Ninja/Elfsight) rejected — external JS/iframes against the performance budget and self-host rules. The viable path is Etsy Open API v3 `getReviewsByShop` (API-key auth; returns rating + text, no reviewer display name — matching the design's "Verified customer · project" attribution style) fetched **at build time** with scheduled rebuilds: zero client JS, reviews indexed for SEO, §3b stale-not-down failure mode. Recommended shape: hybrid — auto-refresh the proof-bar aggregate (the numbers are what rot) + a 5★-filtered featured pool with §4.2 owner curation as override. 5★-only framing note: keep the truthful 4.8/500+ aggregate displayed beside curated quotes (FTC 2024 review rule targets suppressed subsets presented as *the* reviews; aggregate-plus-highlights is the clean pattern). Not yet committed scope — gated on Randy's go and an Etsy developer key (§9.8); would land in Phase 1b with the other wire-up. |
