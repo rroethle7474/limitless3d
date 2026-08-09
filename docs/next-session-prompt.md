@@ -1,110 +1,113 @@
-# Session 3 kickoff prompt — Phase 1b entry: the quote form, end to end
+# Session 4 kickoff prompt — Phase 1b: Sanity, the CMS wire-up
 
-Copy the block below into a fresh Claude Code session to start the wire-up phase.
+Copy the block below into a fresh Claude Code session. (The session-3 prompt this file used
+to hold is done — quote backend shipped and inbox-validated 2026-08-09; see the RESUME
+section of `docs/design-decisions.md`.)
 
-**Before pasting — setup status (updated 2026-08-09):**
+**Before pasting — setup status:**
 
-1. ~~Create a Resend account~~ **Done — Ryan has the account and the API key in hand.**
-   (Signed up with `rroethle@gmail.com`, which matters: until a sending domain is verified,
-   Resend only delivers to the account owner's own email — that restriction *is* our
-   validation loop. No domain added or verified yet, deliberately.)
-2. When the session creates the git-ignored `.dev.vars` file, **Ryan pastes the key into it
-   himself** — it never goes into the repo or the chat.
-3. **No Cloudflare account needed yet.** Turnstile has official always-pass test keys that
-   work locally, and `wrangler` runs Pages Functions on your machine without a login. Real
-   Turnstile keys and the Pages project come with the staging deploy, later in 1b.
-4. `/model` → **Opus is sufficient** for this session — it's a single-agent build with no
-   fan-out. Pick Fable if you want maximum scrutiny on the spam/validation decisions, but
-   nothing here needs orchestration.
+1. **Create the Sanity account first**: sanity.io, sign in with Google as
+   `rroethle@gmail.com` — mirrors the Resend pattern (Ryan owns the dev accounts; Randy
+   gets invited in Phase 2, and Google-login-for-the-owner was the §3 selection
+   criterion). Free tier. No project or schema decisions needed up front — the session
+   proposes those and you approve them in a running studio.
+2. **Tokens are secrets, same drill as the Resend key**: when the session needs a write
+   token (quote-submission storage), you create it at sanity.io/manage and paste it into
+   `.dev.vars` yourself — never into the repo or the chat.
+3. `/model` → **Opus is sufficient** — single-agent schema + integration work. Pick Fable
+   if you want extra scrutiny on the content-model and PII decisions.
 
 ---
 
 ```
 Read CLAUDE.md, then docs/design-decisions.md (start at "RESUME HERE"), then
-limitless3d-rebuild-plan.md §3, §3b, and the Phase 1b bullets in §7. Decisions
-D-005 and D-008 cover the form's current stubbed state.
+limitless3d-rebuild-plan.md §4 (content model), §3b, and the Phase 1b bullets
+in §7. Decisions D-026/D-027 define the quote backend contract and the open
+storage seam this session closes.
 
-This is Phase 1b, session 3 — the first wire-up session. Sessions 1–2 built
-and verified all nine pages; the quote form is UI-complete on every page but
-submission is a stub: src/scripts/quote-form.ts fakes success and logs a TODO.
+This is Phase 1b, session 4. Session 3 shipped the quote backend (Pages
+Function + Turnstile + Resend; delivery validated to Ryan's inbox). Content
+is still hardcoded everywhere; Sanity doesn't exist yet.
 
-THE TASK: make the quote form real, end to end, validated by an actual email
-with photo attachments arriving in Ryan's inbox (rroethle@gmail.com). Ryan
-performs the final validation himself — your job is to get it to the point
-where he submits the form and checks his mail.
+THE TASK: stand up Sanity per plan §4, migrate the hardcoded content into
+it, wire the site to build from it, and close the D-027 storage seam so
+quote submissions are dual-written (email + stored document).
 
-Architecture — these are constraints, not suggestions:
-- Astro stays `output: 'static'`. The backend is a Cloudflare Pages Function
-  at functions/api/quote.ts in the repo root — no Astro adapter, no SSR.
-- The client script swaps its stub for a multipart FormData POST to
-  /api/quote. Keep the honeypot check, the success card, and every existing
-  degradation behavior exactly as they are.
-- Spam: verify a Turnstile token server-side (siteverify). Use Cloudflare's
-  official test keys locally — site 1x00000000000000000000AA, secret
-  1x0000000000000000000000000000000AA — wired so real keys are an env-var
-  swap at staging time.
-- Email: Resend, from onboarding@resend.dev (test mode), to QUOTE_TO_EMAIL —
-  an env var currently set to Ryan's email; the production address is open
-  question §9.4. Attachments forwarded from the form's photo field.
-- Secrets live in .dev.vars (RESEND_API_KEY, QUOTE_TO_EMAIL, TURNSTILE keys).
-  Add .dev.vars to .gitignore BEFORE creating it. Ryan already has his Resend
-  API key — create the file with a placeholder, then stop and ask him to
-  paste the key in himself before testing. Never commit or echo secrets.
-- Attachment limits are a real design point, not an afterthought: five phone
-  photos can exceed 25 MB raw; check Resend's request-size limit (~40 MB) and
-  add client-side validation (count + per-file size with a clear message)
-  rather than letting big uploads fail opaquely at the API.
-- Dual-write (§3b) is the requirement but Sanity doesn't exist yet: build the
-  storage side as an explicit seam (a function with a logged TODO is fine)
-  and log the deferral as a decision row. The email path must not depend on
-  the storage path succeeding.
+Shape of the work — constraints first:
+- The site stays static. Sanity content is fetched AT BUILD TIME only; no
+  client-side Sanity JS ships. Webhook-triggered rebuilds arrive with the
+  staging deploy, not this session.
+- The studio lives in the repo (its own workspace dir) and runs locally for
+  now; hosting it comes with staging.
+- Content model is §4's five collections, scoped ruthlessly — layout stays
+  in code. Propose the schema first, get it approved, then build.
+- src/data/site.ts is the designed CMS seam (CLAUDE.md): migrating business
+  facts should be a change of import, not a hunt through templates. Same
+  for STATS.
+- Seed programmatically from the hardcoded data where sane (one-off script
+  with @sanity/client), by hand where not. Verbatim copy stays verbatim;
+  log anything that changes.
+- Images: gallery/build-log photos are meant to become owner-managed via
+  Sanity's image CDN (§6), but the Astro/Sharp pipeline is the site's
+  single biggest performance win (see the 1a baseline). Decide deliberately
+  — Sanity CDN with a proper srcset story vs. keeping repo assets until
+  Phase 2 — and log it as a decision row either way.
+- Closing D-027: the Pages Function writes each submission as a Sanity
+  document (project id / dataset / token via env, .dev.vars locally). The
+  isolation contract in functions/api/quote.ts holds: storage failure must
+  never block or fail the email. CRITICAL check before writing any PII:
+  public Sanity datasets are world-readable. Verify the free tier gives a
+  private dataset or an equivalent that keeps submissions unreadable
+  without a token; if it does not, stop and present options rather than
+  shipping a PII leak.
+- Secrets stay in .dev.vars (gitignored, established pattern). Ryan pastes
+  tokens himself. Never commit or echo secrets.
 
-Local test loop: npm run build, then npx wrangler pages dev dist (Pages
-Functions run locally against the built site). Verify a submission end to
-end yourself first — function receives fields + files, Turnstile verifies,
-Resend accepts — then hand off to Ryan for the inbox check. Note wrangler
-serves its own port; the Vite dev server doesn't run the function.
+Validation loop: a local studio Ryan can click through; content migrated;
+npm run build pulls from Sanity and the built site is equivalent to the
+current hardcoded build (diff dist/ HTML where practical — the copy is
+supposed to survive the migration byte-for-byte); then a quote submission
+through wrangler lands BOTH the email and a visible document in the studio.
+Run-and-look at each stage; hand off for review at the same boundaries as
+always.
 
-Failure behavior follows §3b: if Resend errors, the user sees an honest
-failure state with the phone/email fallback (both are already in the quote
-section copy) — never a fake success.
+Conventions unchanged: small commits, decision rows in
+docs/design-decisions.md (close D-027's row when the seam fills), plan §10
+rows for anything that refines the plan.
 
-Conventions unchanged: run-and-look, small commits, decision rows in
-docs/design-decisions.md (update D-005 when the stub dies), plan §10 rows for
-anything that refines the plan.
+Out of scope this session: staging deployment and deploy-hook rebuilds,
+real Turnstile keys, domain verification/SPF/DKIM, Square catalog, the Etsy
+reviews pull, the newsletter question, the homepage FAQ, and the 1a polish
+pass (still owed, separate session). If context runs long, the clean
+boundary is: schema + studio + gallery/build-log migrated end to end +
+D-027 closed; remaining collections carry to session 5.
 
-Out of scope this session: Sanity (studio, schema, the dual-write wiring),
-staging deployment and real Turnstile keys, domain verification/SPF/DKIM,
-redirects, Square catalog integration, the Etsy reviews pull, the newsletter
-question, the homepage FAQ, and the 1a polish pass (mobile/reduced-motion/
-fidelity checks — still owed, separate session).
-
-Start by reading the current quote-form.ts and QuoteSection.astro, then
-propose the function's request/response contract before writing it.
+Start by reading src/data/site.ts and the components that consume it, then
+propose the schema — collection by collection, field types, and which
+existing file feeds each — before creating anything.
 ```
 
 ---
 
 ## Notes on using it
 
-**Why static + a functions/ directory, not an Astro adapter.** The site's reliability posture
-(§3b) rests on the marketing pages being dumb files on a CDN. Cloudflare Pages runs anything
-in `functions/` as edge functions alongside static output with zero build-config change —
-the form gains a backend without the site gaining a runtime. Wrangler runs the same layout
-locally, so the whole loop works before any hosting exists.
+**Why build-time fetch, no runtime.** §3b's stale-not-down property depends on it: if
+Sanity is ever unreachable, the previous deploy keeps serving. A client-side CMS dependency
+would trade that away for nothing this site needs.
 
-**The Resend test-mode restriction is the feature, not a workaround.** Until a domain is
-verified, mail goes only to the account owner. Signing up with Ryan's address makes
-misdirected test emails impossible. At cutover prep this flips: verify
-`limitless3ddesign.com` (DNS will be at Cloudflare by then), switch the from-address, and set
-`QUOTE_TO_EMAIL` to Randy's answer to §9.4.
+**The schema is being designed for one moment**: Phase 2's acceptance test, where Randy adds
+a gallery entry himself in the editor. Few fields, obvious names, nothing clever — if the
+schema needs explaining, it failed. TinaCMS is the named fallback if he struggles (§3).
 
-**What "done" looks like:** Ryan fills the form in a browser served by wrangler, attaches a
-photo, submits, and the email — all fields, attachment included — is in his inbox. Plus the
-failure path exercised once (kill the API key, submit, see the honest error with the
-phone/email fallback).
+**The PII check is not optional.** Quote submissions carry names, emails, phone numbers, and
+photos. Public Sanity datasets serve documents to anyone who knows the project id. Whatever
+the free tier allows, the bar is: submissions unreadable without a token, or they don't get
+stored — the email path already works alone (that was D-027's isolation contract).
 
-**Still on the books after this session:** the 1a polish pass (mobile on eight pages, reduced
-motion, `?nogl=1`, prototype side-by-side), then the rest of 1b (Sanity + content migration +
-dual-write closure, staging deploy with noindex). Randy's question list is plan §9.4 and
-§9.6–§9.9.
+**What "done" looks like:** Randy-proof studio running locally; the built site renders from
+Sanity with no visible change; one form submission produces an email *and* a studio-visible
+document; decision rows written; D-027 closed.
+
+**Still on the books after this session:** staging deploy (real Turnstile keys, noindex,
+deploy hook → rebuild-on-publish), the 1a polish pass, Square catalog (gated on §9.7
+credentials), and Randy's question list (§9.4, §9.6–§9.9).
