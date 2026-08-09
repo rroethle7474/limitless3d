@@ -25,6 +25,10 @@
   --em-b: #3D0FA8;
   --ink: #0B0D11;
 
+  /* Net-new, not from the prototype (which had no failure states): quote-form
+     errors (D-028). Contrast-checked against --panel. */
+  --err: #B42318;
+
   --card-shadow: 0 10px 30px rgba(25, 26, 32, .08);
   --nav-bg: rgba(246, 244, 238, .86);
   --glow-a: rgba(94, 23, 235, .09);
@@ -45,6 +49,7 @@
   --faint: #6B7484;
   --em-a: #B49AFF;
   --em-b: #7B45F5;
+  --err: #F97066;
   --card-shadow: none;
   --nav-bg: rgba(11, 13, 17, .78);
   --glow-a: rgba(94, 23, 235, .17);
@@ -66,6 +71,7 @@
   --color-accent-glow: var(--accent-glow);
   --color-em-a: var(--em-a);
   --color-em-b: var(--em-b);
+  --color-err: var(--err);
   --color-ink: var(--ink);
   --color-door: var(--door-bg);
 

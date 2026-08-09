@@ -23,6 +23,15 @@ const SERVICES = [
   'Repair or replacement part',
   'Not sure yet',
 ];
+
+/**
+ * Cloudflare's official always-passing TEST key is the default, so the form
+ * works locally with zero setup. Staging/production swap in the real key by
+ * setting PUBLIC_TURNSTILE_SITE_KEY at build time (inlined — the site is
+ * static). The matching secret lives in .dev.vars / Pages env.
+ */
+const TURNSTILE_SITE_KEY =
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
 ---
 
 <section class="quote-sec" id="quote">
@@ -80,6 +89,12 @@ const SERVICES = [
       </div>
 
       <button class="btn primary wide" type="submit">Get My Custom Quote</button>
+
+      {/* Turnstile mounts here (quote-form.ts lazy-loads it near the fold and
+          drops the token input inside). Hidden while empty so the grid gap
+          doesn't double before the widget exists. */}
+      <div class="turnstile-slot" data-sitekey={TURNSTILE_SITE_KEY}></div>
+
       <div class="mono form-note">We reply the same day whenever we can.</div>
     </form>
   </div>
@@ -236,6 +251,21 @@ const SERVICES = [
     font-size: .6rem;
   }
 
+  .file-note.err {
+    color: var(--err);
+  }
+
+  /* ---- Turnstile ---- */
+  .turnstile-slot {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* No doubled grid gap before the widget renders into it. */
+  .turnstile-slot:empty {
+    display: none;
+  }
+
   .form-note {
     text-align: center;
     font-size: .64rem;
@@ -259,6 +289,32 @@ const SERVICES = [
   :global(.form-ok p) {
     color: var(--muted);
     font-size: .95rem;
+  }
+
+  /* Failure state inserted by the form script (plan §3b: honest error + the
+     phone/email fallback, form kept intact for retry). */
+  :global(.form-err) {
+    border: 1px solid var(--err);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: .85rem;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  :global(.form-err b) {
+    color: var(--err);
+    font-weight: 600;
+  }
+
+  :global(.form-err a) {
+    color: var(--em-a);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  :global(.form-err a:hover) {
+    text-decoration: underline;
   }
 
   @media (max-width: 900px) {
