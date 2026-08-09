@@ -78,7 +78,21 @@ const jsonLd = {
       crossorigin
     />
 
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    {/*
+      Scroll reveals start at opacity 0 and are turned on by an IntersectionObserver. If the
+      script never runs, that content would stay invisible forever — so opt out entirely when
+      JS is unavailable. Failures should degrade, not hide the page (plan §3b).
+    */}
+    <noscript>
+      <style>
+        .reveal {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      </style>
+    </noscript>
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
 
   <body>
