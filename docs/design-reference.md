@@ -336,8 +336,12 @@ photo, 4:3) and close with the shared `.quote-sec`. Copy lives in the snapshot H
 | `/contact` | Contact Limitless 3D \| Neenah, WI \| 920-360-7543 | contact-grid (cblocks + map-card "Neenah and the Fox Valley") → quote → sec-head "Quick answers" + faq |
 | `/shipping-and-returns` | Shipping and Returns \| Limitless 3D | wrap-narrow prose: Shipping / Returns / If something is wrong with your part / Custom work → quote |
 
-The prototype also has a `/shop` page (product grid + PDP; `.shopbar`, `.pgrid`, `.pcard`,
-`.pdp*` styles are all in `site.css`). **We are not rebuilding it** — see decision D-002.
+The prototype also has a `/shop` page (category filter bar + product grid; `.shopbar`,
+`.pgrid`, `.pcard`) and per-product `/parts/<slug>` PDP pages (`.pdp*`) — all styles in
+`site.css`. Not part of the static build (D-002), but as of 2026-08-09 the catalog UI is
+planned **pre-cutover** via Square's Catalog API (plan §2, §10; decisions D-024) —
+`shop.html` and `parts-pdp-example.html` are captured in the snapshot as its design
+reference. Both hotlink Square CDN images; reference only, never shipped.
 
 ---
 

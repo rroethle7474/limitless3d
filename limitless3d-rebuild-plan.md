@@ -45,7 +45,7 @@ Hard constraints:
 
 Why this architecture: rankings and conversion are won on the marketing pages, which is where design freedom and structured data matter. Commerce is where migration risk lives — so we don't migrate it. The owner's daily workflow (orders, shipping labels, customer messages) doesn't change at all.
 
-Phase-two option (not required for launch): render product pages on the main site via Square's Catalog API with Square-hosted checkout links (Checkout API / Payment Links). Card data never touches the custom site; Square's PCI compliance covers the hosted checkout page.
+Phase-two option, **now planned before cutover** (2026-08-09, §10): render product pages on the main site via Square's Catalog API with Square-hosted checkout links (Checkout API / Payment Links), so shoppers browse without leaving the site and only hop to Square for payment. Card data never touches the custom site; Square's PCI compliance covers the hosted checkout page. The subdomain link-out remains the interim state during the build; whether the subdomain store stays as a fallback after integration is an open question (§9.7).
 
 ## 3. Tech Stack
 
@@ -133,7 +133,7 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 - Stand up Sanity with the §4 content model; migrate hardcoded content into it.
 - Implement the quote form backend (Pages Function + Resend + Turnstile + dual-write per §3b).
 - Stand up the demo/staging deployment (noindex, access-protected). Ryan owns hosting setup; Cloudflare Pages remains the recommended target.
-- Square integration beyond a plain shop link (phase-two Catalog/Checkout option in §2) waits until Ryan supplies Square OAuth/app credentials.
+- Square catalog integration (§2) is now pre-cutover scope (2026-08-09, §10): product pages rendered from the Catalog API with Square-hosted checkout links, using the prototype's shop design as reference (snapshot: `shop.html` + `parts-pdp-example.html`). Still gated on Ryan supplying Square OAuth/app credentials; sequenced after the CMS wire-up.
 
 **Phase 2 — Review & iterate with owner**
 - Walk him through the staging site *and* the Sanity editor; have him add a gallery entry himself as the acceptance test.
@@ -153,6 +153,7 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 ## 8. Cutover Checklist (launch day)
 
 - [ ] `shop.` subdomain connected in Square and checkout tested with a real card (then refunded)
+- [ ] Catalog pages on the main site render live Square data; one product bought end-to-end through a hosted checkout link (then refunded)
 - [ ] Full 301 map deployed and spot-checked (old URLs → new, `/s/shop` → shop subdomain)
 - [ ] noindex removed from production deploy; robots.txt and sitemap.xml live
 - [ ] Sitemap submitted in Search Console
@@ -172,6 +173,9 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 6. Homepage FAQ content (§6): what materials does Randy want to lead with, what turnaround
    does he promise, and is he willing to state ballpark pricing publicly? Blocks the deferred
    FAQ section.
+7. Square API credentials: when can Ryan create/supply the Square application credentials the
+   catalog integration needs (now pre-cutover scope, §2)? And once catalog pages are live on
+   the main site, does the subdomain Square store remain as a fallback or get retired?
 
 ## 10. Decision Log
 
@@ -190,3 +194,4 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 | 2026-08-09 | **Stack detail — styling is a hybrid** (decision D-010): prototype tokens wired into Tailwind v4 `@theme inline`, utilities for layout/spacing/type, hand-written scoped CSS for bespoke visuals. Refines the "Astro + Tailwind" row above; the 3D transforms, CSS counters and keyframes do not map to utilities, and the hybrid ships less CSS per route than the prototype does. |
 | 2026-08-09 | Scaffold landed: Astro 5 static + Tailwind v4 + Sharp + `three`, TypeScript strict, no UI framework or islands. `CLAUDE.md` at root carries conventions, session slicing, and the orchestration ruling. Homepage written section-by-section. **Not yet verified in a browser** — `npm install` was blocked by ~67 KB/s throughput on a mobile hotspot and deferred to real bandwidth. |
 | 2026-08-09 | **Homepage FAQ deferred out of Phase 1a** (Ryan). The §6 improvement stands, but its content — materials, turnaround, ballpark pricing — is owner facts, and Randy's input isn't available yet. Revisit at Phase 2 alongside owner review; the open question moves to §9.6. Phase 1a's remaining scope is the polish pass only. With the FAQ deferred, no Claude Design use remains in Phase 1a (its other sanctioned use is Phase 2 variant exploration). |
+| 2026-08-09 | **Square catalog integration promoted to pre-cutover scope** (Ryan): shoppers should browse products without leaving the site, so §2's phase-two option — product pages from the Catalog API + Square-hosted checkout links — happens before go-live rather than after. iframe embedding ruled out (checkout frame-blocking, partitioned cookies). Commerce/inventory/payments still never migrate (D-002's core holds); only the catalog UI moves in-house. Interim state during the build stays the `SHOP_URL` link-out. Prototype `/shop` + one `/parts/*` PDP captured into the snapshot as the design reference (D-024) while the Vercel deployment is still up. Gated on §9.7 (credentials; subdomain-fallback question). |
