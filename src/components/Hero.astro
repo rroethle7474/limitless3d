@@ -1,0 +1,220 @@
+---
+/**
+ * Home hero — full-viewport, with the WebGL brand mark free-floating beside the copy.
+ * The 3D scene lives in ~/scripts/hero.ts and is loaded lazily; see the script below.
+ */
+---
+
+<header class="hero" id="hero">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <canvas
+    id="hero-canvas"
+    aria-label="A 3D model of the Limitless 3D mark being scanned and printed"></canvas>
+  <div class="obj-caption" id="obj-caption">SCANNING&hellip; <b>0%</b></div>
+
+  <div class="hero-in">
+    <div class="hero-copy">
+      <div class="mono accent">Limitless 3D &middot; Neenah, Wisconsin</div>
+      <h1>From idea<br />to <em>object.</em></h1>
+      <p class="lead">
+        3D scanning, design, and printing under one roof in the Fox&nbsp;Valley. Twenty-five years
+        of professional design experience behind every&nbsp;part.
+      </p>
+      <div class="hero-ctas">
+        <a class="btn primary" href="#quote">Get a Quote</a>
+        <a class="btn ghost" href="#work">See the Work</a>
+      </div>
+      <div class="chips">
+        <span class="chip">Accuracy <b>0.02 mm</b></span>
+        <span class="chip">Filament + resin <b>printing</b></span>
+        <span class="chip"><b>25 yrs</b> design experience</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  /**
+   * Nothing 3D touches the critical path: wait for idle, then for the hero to be near the
+   * viewport, then pull in three + the scene as one dynamic chunk.
+   */
+  const el = document.getElementById('hero');
+  if (el) {
+    let done = false;
+    const go = () => {
+      if (done) return;
+      done = true;
+      import('~/scripts/hero').then((m) => m.initHero());
+    };
+    const arm = () => {
+      if (!('IntersectionObserver' in window)) return go();
+      const io = new IntersectionObserver(
+        (e) => {
+          if (e[0]!.isIntersecting) {
+            io.disconnect();
+            go();
+          }
+        },
+        { rootMargin: '300px' },
+      );
+      io.observe(el);
+    };
+    const idle = () =>
+      'requestIdleCallback' in window
+        ? requestIdleCallback(arm, { timeout: 1200 })
+        : setTimeout(arm, 200);
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', idle);
+    else idle();
+  }
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(820px 560px at 70% 40%, var(--glow-a), transparent 65%),
+      radial-gradient(560px 420px at 16% 86%, var(--glow-b), transparent 60%);
+  }
+
+  #hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+    touch-action: pan-y;
+    z-index: 1;
+  }
+
+  #hero-canvas:active {
+    cursor: grabbing;
+  }
+
+  .hero-in {
+    position: relative;
+    z-index: 2;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 22vh 24px 64px;
+    pointer-events: none;
+  }
+
+  /* Let drags reach the canvas everywhere except on the actual controls. */
+  .hero-in a {
+    pointer-events: auto;
+  }
+
+  .hero-copy {
+    max-width: 560px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.6rem, 5.2vw, 4.2rem);
+    margin: 18px 0 20px;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(100deg, var(--em-a), var(--em-b));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero p.lead {
+    color: var(--muted);
+    font-size: 1.12rem;
+    max-width: 32rem;
+    margin-bottom: 32px;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 38px;
+  }
+
+  .chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    letter-spacing: .08em;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 14px;
+  }
+
+  .chip b {
+    color: var(--em-a);
+    font-weight: 500;
+  }
+
+  .obj-caption {
+    position: absolute;
+    z-index: 2;
+    right: 11%;
+    bottom: 15vh;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    letter-spacing: .16em;
+    color: var(--faint);
+    pointer-events: none;
+    min-width: 230px;
+  }
+
+  .obj-caption :global(b) {
+    color: var(--em-a);
+    font-weight: 500;
+  }
+
+  @media (max-width: 1024px) {
+    .obj-caption { right: 6%; }
+  }
+
+  @media (max-width: 640px) {
+    .hero-in {
+      padding-top: 47svh;
+      padding-bottom: 56px;
+    }
+
+    .hero-copy {
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .hero p.lead {
+      font-size: 1.02rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-ctas { justify-content: center; }
+    .chips { justify-content: center; }
+
+    .obj-caption {
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: auto;
+      top: calc(43svh - 20px);
+      min-width: 260px;
+    }
+  }
+</style>
