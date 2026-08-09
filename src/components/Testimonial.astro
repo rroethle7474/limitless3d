@@ -1,0 +1,45 @@
+---
+/**
+ * Single-quote band between the build log and the parts shop.
+ * TODO(phase-1b): sourced from the "Testimonials / reviews" collection (plan §4.2).
+ */
+---
+
+<div class="quoteband">
+  <div class="wrap reveal">
+    <div class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+    <blockquote>
+      &ldquo;Randy was incredible to work with. Fair pricing, and
+      <em>you can tell he loves what he does.</em>&rdquo;
+    </blockquote>
+    <div class="mono">Verified customer &middot; fountain nozzle project</div>
+  </div>
+</div>
+
+<style>
+  .quoteband {
+    background: var(--panel);
+    border-block: 1px solid var(--line);
+    padding: 80px 0;
+    text-align: center;
+  }
+
+  .quoteband blockquote {
+    font-size: clamp(1.25rem, 2.6vw, 1.7rem);
+    font-weight: 500;
+    max-width: 44rem;
+    margin: 18px auto 20px;
+    line-height: 1.4;
+  }
+
+  .quoteband blockquote em {
+    font-style: normal;
+    color: var(--em-a);
+  }
+
+  .stars {
+    color: var(--em-a);
+    letter-spacing: .28em;
+    font-size: 1rem;
+  }
+</style>

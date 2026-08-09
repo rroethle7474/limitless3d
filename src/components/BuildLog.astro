@@ -1,0 +1,258 @@
+---
+import { Image } from 'astro:assets';
+import { SHOWCASE } from '~/data/showcase';
+---
+
+<section id="work">
+  <div class="sec-head reveal">
+    <div class="mono accent">The build log</div>
+    <h2>Made in the workshop</h2>
+    <p>Real parts, repairs, and ideas that have come through the door.</p>
+  </div>
+
+  <div class="wrap reveal">
+    <div class="show-stage" id="show-stage">
+      {
+        SHOWCASE.map((w, i) => (
+          <Image
+            src={w.img}
+            alt={w.alt}
+            widths={[640, 960, 1280]}
+            sizes="(max-width: 1180px) 92vw, 1080px"
+            loading={i === 0 ? 'eager' : 'lazy'}
+            data-slide
+            data-kicker={w.kicker}
+            data-title={w.title}
+            data-sub={w.sub}
+          />
+        ))
+      }
+
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+
+      <div class="show-sweep" id="show-sweep" aria-hidden="true"></div>
+      <div class="show-count" id="show-count">01 / {String(SHOWCASE.length).padStart(2, '0')}</div>
+
+      <div class="show-meta">
+        <div class="mono" id="show-kicker"></div>
+        <div class="show-title" id="show-title"></div>
+        <div class="mono" id="show-sub"></div>
+      </div>
+    </div>
+
+    <div class="show-thumbs" id="show-thumbs">
+      {
+        SHOWCASE.map((w) => (
+          <button aria-label={w.title}>
+            <Image src={w.img} alt="" width={164} height={120} loading="lazy" />
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  import '~/scripts/build-log';
+</script>
+
+<style>
+  section {
+    padding: 96px 0;
+  }
+
+  @keyframes kb {
+    from { top: 45%; }
+    to { top: 43.4%; }
+  }
+
+  .show-stage {
+    position: relative;
+    height: min(560px, 58vw);
+    border-radius: 18px;
+    overflow: hidden;
+    background: radial-gradient(70% 70% at 50% 42%, #1b2030, var(--ink));
+    box-shadow: 0 24px 70px rgba(25, 26, 32, .22);
+  }
+
+  .show-stage :global(img[data-slide]) {
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    max-width: calc(100% - 56px);
+    max-height: calc(100% - 132px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 10px;
+    box-shadow: 0 18px 46px rgba(0, 0, 0, .55);
+    opacity: 0;
+    transition: opacity .8s ease;
+  }
+
+  .show-stage :global(img[data-slide].on) {
+    opacity: 1;
+    animation: kb 11s ease-in-out infinite alternate;
+  }
+
+  /* Bottom-up scrim so the caption stays legible over any photo. */
+  .show-stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(6, 7, 10, .86) 0%,
+      rgba(6, 7, 10, .3) 22%,
+      transparent 42%
+    );
+    pointer-events: none;
+  }
+
+  .corner {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border: 2px solid var(--accent-glow);
+    opacity: .9;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .corner.tl { top: 16px; left: 16px; border-right: 0; border-bottom: 0; border-top-left-radius: 6px; }
+  .corner.tr { top: 16px; right: 16px; border-left: 0; border-bottom: 0; border-top-right-radius: 6px; }
+  .corner.bl { bottom: 16px; left: 16px; border-right: 0; border-top: 0; border-bottom-left-radius: 6px; }
+  .corner.br { bottom: 16px; right: 16px; border-left: 0; border-top: 0; border-bottom-right-radius: 6px; }
+
+  .show-sweep {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--accent-glow);
+    box-shadow: 0 0 22px 4px rgba(94, 23, 235, .55);
+    z-index: 2;
+    left: -1%;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .show-sweep.go {
+    animation: showsweep 1s ease-out forwards;
+  }
+
+  @keyframes showsweep {
+    0% { left: -1%; opacity: .95; }
+    100% { left: 101%; opacity: 0; }
+  }
+
+  .show-meta {
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    bottom: 24px;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .show-meta .mono {
+    color: rgba(233, 236, 242, .66);
+  }
+
+  .show-title {
+    color: #fff;
+    font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+    font-weight: 600;
+    margin: 6px 0 4px;
+    line-height: 1.2;
+  }
+
+  .show-count {
+    position: absolute;
+    top: 20px;
+    right: 54px;
+    z-index: 3;
+    font-family: var(--font-mono);
+    font-size: .72rem;
+    letter-spacing: .18em;
+    color: rgba(233, 236, 242, .75);
+  }
+
+  .show-thumbs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .show-thumbs button {
+    width: 82px;
+    height: 60px;
+    border-radius: 9px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    padding: 0;
+    cursor: pointer;
+    background: var(--panel);
+    opacity: .5;
+    filter: saturate(.6);
+    transition: opacity .25s, filter .25s, border-color .25s, transform .25s;
+  }
+
+  .show-thumbs button :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: var(--panel-2);
+  }
+
+  .show-thumbs button.on {
+    opacity: 1;
+    filter: none;
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+
+  .show-thumbs button:hover {
+    opacity: 1;
+    filter: none;
+  }
+
+  @media (max-width: 640px) {
+    .show-stage {
+      height: 78vw;
+      border-radius: 14px;
+    }
+
+    .show-stage :global(img[data-slide]) {
+      max-width: calc(100% - 32px);
+      max-height: calc(100% - 118px);
+    }
+
+    .show-meta {
+      left: 18px;
+      right: 18px;
+      bottom: 16px;
+    }
+
+    .show-thumbs { gap: 9px; }
+
+    .show-thumbs button {
+      width: 58px;
+      height: 44px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .show-stage :global(img[data-slide].on) {
+      animation: none;
+    }
+  }
+</style>
