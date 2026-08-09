@@ -84,6 +84,18 @@ its listener PID orphans `workerd`, which keeps the port half-alive and hangs re
 kill the process tree from the `npx` root (`taskkill /F /T`), then check nothing still
 listens on 8788.
 
+**Phase 1b session 4 (2026-08-09): Sanity schema designed and approved — nothing built.**
+The session hit its limit after research + proposal. Ryan approved: free tier (Growth
+considered and declined — for this shop it's a $30/mo private-datasets purchase once Randy
+has a seat), submissions stored as `drafts.`-prefixed docs in the public dataset (the
+dot-in-`_id` rule keeps them token-gated; Publish action removed for the type), gallery +
+service photos move to Sanity (Astro optimizes authorized remote images at build, so the
+Sharp pipeline survives), headlines/FAQs/cards/enum stay in code. **The full approved spec,
+verified facts (with dates), and implementation gotchas live in
+`docs/next-session-prompt.md` — session 5 is pure execution of it.** No decision rows were
+logged; they land with the work. D-027 remains open. A Sanity account exists
+(rroethle@gmail.com, free tier); no project, no studio, no repo code changes.
+
 **Next up in Phase 1b** (plan §7): Sanity (content model §4, closes the D-027 seam), then
 staging deployment (real Turnstile keys, noindex), then Square catalog (gated on §9.7
 credentials). The 1a polish pass (items 1–5 above) is still owed and runs as its own later
