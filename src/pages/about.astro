@@ -1,0 +1,123 @@
+---
+import Base from '~/layouts/Base.astro';
+import PageHero from '~/components/PageHero.astro';
+import Section from '~/components/Section.astro';
+import SectionHead from '~/components/SectionHead.astro';
+import Stats from '~/components/Stats.astro';
+import Split from '~/components/Split.astro';
+import FeatureCards from '~/components/FeatureCards.astro';
+import Testimonial from '~/components/Testimonial.astro';
+import QuoteSection from '~/components/QuoteSection.astro';
+
+import displayStand from '~/assets/work/display-stand.jpg';
+import pondNozzle from '~/assets/work/pond-nozzle.jpg';
+import workshop01 from '~/assets/work/workshop-01.jpg';
+
+const title = 'About Limitless 3D | Small Family Shop in Neenah, WI';
+const description =
+  'Limitless 3D is a small family business in Neenah, Wisconsin, run by a designer with 25 years in consulting engineering. Individuals to large corporations welcome.';
+
+const stats = [
+  { value: '25 yrs', label: 'Design experience' },
+  { value: '0.02 mm', label: 'Scanning accuracy' },
+  { value: '60+', label: 'Parts in the shop' },
+  { value: 'NE WI', label: 'Service area' },
+];
+
+const equipment = [
+  {
+    icon: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',
+    title: 'Self tracking 3D scanner',
+    body: 'Metrology grade capture with no markers and no spray, accurate to 0.02 mm.',
+  },
+  {
+    icon: '<path d="M4 8h16M4 8l8-5 8 5M4 8v9l8 5 8-5V8M12 13v9M4 8l8 5 8-5"/>',
+    title: 'Filament printers',
+    body: 'Multiple machines and build sizes, running PLA, ABS, and nylon for functional parts.',
+  },
+  {
+    icon: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/>',
+    title: 'Resin printers',
+    body: 'For fine detail and smooth surfaces where layer lines would ruin the piece.',
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <PageHero
+    crumb="About"
+    heading="A designer, a workshop,<br />and <em>25 years</em> of habits."
+    lead="Limitless 3D is a small family business in Neenah, Wisconsin. Individuals and large corporations are equally welcome, and both get the same answer to the same question."
+    primary={{ label: 'Start a Project', href: '/#quote' }}
+    ghost={{ label: 'See the work', href: '/gallery' }}
+    image={displayStand}
+    alt="A 3D printed part resting on its engineering drawing"
+  />
+
+  <Section>
+    <Split
+      kicker="Randy, owner"
+      heading="Where the standards come from"
+      image={pondNozzle}
+      alt="Finished pond fountain nozzles designed and printed in the workshop"
+    >
+      <p>
+        Twenty-five years in consulting engineering, grinding out hundreds of detailed plans for
+        civil and mechanical firms, teaches you what matters. Mostly it teaches you that details
+        are the job.
+      </p>
+      <p>
+        Every project here gets treated as if it were one of our own, on the same rule that
+        governed all those drawings: <strong>measure twice, cut once</strong>. That is why parts
+        fit, and why quotes hold.
+      </p>
+      <p>
+        3D design was a lifelong interest before it was a business. It still is. That tends to
+        show up in the work.
+      </p>
+    </Split>
+
+    <Split
+      rev
+      kicker="How it feels to work with us"
+      heading="A small shop, on purpose"
+      image={workshop01}
+      alt="Detailed resin print produced in the workshop"
+    >
+      <p>
+        We are a small family business in northeast Wisconsin, and we like it that way. You will
+        get fast, responsive service and no smoke and mirrors.
+      </p>
+      <p>
+        If there is something we cannot do, we will tell you rather than pretend and drag you
+        along, because your time is money. When we do take the work, everything that leaves here
+        is professional grade.
+      </p>
+      <p>
+        You will be treated like family. That is not a slogan, it is just how a shop this size
+        works.
+      </p>
+    </Split>
+  </Section>
+
+  <Section tint>
+    <Stats items={stats} />
+  </Section>
+
+  <Section>
+    <SectionHead
+      kicker="The equipment"
+      heading="Newest technology, competitive prices"
+      sub="Good tools are how a small shop delivers industrial grade work at prices that make sense."
+    />
+    <FeatureCards cards={equipment} />
+  </Section>
+
+  <Testimonial />
+
+  <QuoteSection
+    kicker="Say hello"
+    heading="Tell us what you are working on."
+    body="Individuals, small businesses, and large corporations all get the same straight answer. Ask us anything."
+  />
+</Base>
