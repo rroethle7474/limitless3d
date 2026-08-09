@@ -1,0 +1,186 @@
+---
+/**
+ * Interior-page hero (`.phero`): crumb + h1 + lead + two CTAs beside a framed 4:3 photo.
+ * All eight interior pages share this exact structure. `heading` is raw HTML because
+ * every page's h1 carries a `<br>` and one accent `<em>` — copy it verbatim from the
+ * snapshot.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+  crumb: string;
+  heading: string;
+  lead: string;
+  primary: { label: string; href: string };
+  ghost: { label: string; href: string };
+  image: ImageMetadata;
+  alt: string;
+}
+
+const { crumb, heading, lead, primary, ghost, image, alt } = Astro.props;
+---
+
+<header class="phero">
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="phero-in">
+    <div>
+      <div class="crumb"><a href="/">Home</a> / <span>{crumb}</span></div>
+      <h1 set:html={heading} />
+      <p>{lead}</p>
+      <div class="hero-ctas">
+        <a class="btn primary" href={primary.href}>{primary.label}</a>
+        <a class="btn ghost" href={ghost.href}>{ghost.label}</a>
+      </div>
+    </div>
+    <div class="phero-art">
+      <Image
+        class="framed"
+        src={image}
+        alt={alt}
+        widths={[480, 800, 1200]}
+        sizes="(max-width: 900px) 92vw, 430px"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <div class="corner tl"></div>
+      <div class="corner br"></div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .phero {
+    position: relative;
+    padding: 190px 0 76px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(760px 420px at 74% 30%, var(--glow-a), transparent 66%);
+  }
+
+  .phero-in {
+    position: relative;
+    z-index: 2;
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1.15fr .85fr;
+    gap: 44px;
+    align-items: center;
+  }
+
+  .crumb {
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .crumb a:hover {
+    color: var(--em-a);
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+    margin: 16px 0 18px;
+  }
+
+  h1 :global(em) {
+    font-style: normal;
+    color: var(--em-a);
+  }
+
+  .phero p {
+    color: var(--muted);
+    font-size: 1.08rem;
+    max-width: 34rem;
+    margin-bottom: 28px;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 38px;
+  }
+
+  .phero-art {
+    position: relative;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    aspect-ratio: 4 / 3;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+  }
+
+  .phero-art :global(img) {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--accent);
+    opacity: .4;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .corner.tl {
+    top: 14px;
+    left: 14px;
+    border-right: 0;
+    border-bottom: 0;
+    border-top-left-radius: 6px;
+  }
+
+  .corner.br {
+    bottom: 14px;
+    right: 14px;
+    border-left: 0;
+    border-top: 0;
+    border-bottom-right-radius: 6px;
+  }
+
+  @media (max-width: 900px) {
+    .phero {
+      padding: 150px 0 60px;
+    }
+
+    .phero-in {
+      grid-template-columns: 1fr;
+      gap: 30px;
+      text-align: center;
+    }
+
+    .phero p {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-ctas {
+      justify-content: center;
+    }
+
+    .phero-art {
+      order: -1;
+      aspect-ratio: 16 / 10;
+    }
+  }
+</style>

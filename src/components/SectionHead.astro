@@ -1,0 +1,19 @@
+---
+/**
+ * The kicker + h2 + optional sub that opens nearly every section. Markup only —
+ * `.sec-head` and `.mono` styling is global.
+ */
+interface Props {
+  kicker: string;
+  heading: string;
+  sub?: string;
+}
+
+const { kicker, heading, sub } = Astro.props;
+---
+
+<div class="sec-head reveal">
+  <div class="mono accent">{kicker}</div>
+  <h2>{heading}</h2>
+  {sub && <p>{sub}</p>}
+</div>

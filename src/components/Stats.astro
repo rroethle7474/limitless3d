@@ -1,0 +1,54 @@
+---
+/**
+ * The 4-up stat strip (2-up under 700px). Values and labels come from the page;
+ * the homepage's ProofBar is the same idea with its own panel treatment.
+ */
+interface Props {
+  items: readonly { value: string; label: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="stats">
+  {
+    items.map((s) => (
+      <div class="stat reveal">
+        <b>{s.value}</b>
+        <span>{s.label}</span>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    text-align: center;
+  }
+
+  .stat b {
+    display: block;
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--em-a);
+    line-height: 1.1;
+  }
+
+  .stat span {
+    font-family: var(--font-mono);
+    font-size: .66rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  @media (max-width: 700px) {
+    .stats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 26px;
+    }
+  }
+</style>

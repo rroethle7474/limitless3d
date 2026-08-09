@@ -5,13 +5,24 @@ interface Props {
   kicker?: string;
   heading?: string;
   body?: string;
+  /** Preselects the matching entry in the "What do you need?" select (interior pages). */
+  selectedService?: string;
 }
 
 const {
   kicker = 'Have an idea?',
   heading = "Let's make it real.",
   body = 'Tell us what you are picturing, what broke, or what you can no longer buy. You will hear back fast, and you will be treated like family.',
+  selectedService,
 } = Astro.props;
+
+const SERVICES = [
+  '3D printing',
+  '3D scanning',
+  '3D design',
+  'Repair or replacement part',
+  'Not sure yet',
+];
 ---
 
 <section class="quote-sec" id="quote">
@@ -39,11 +50,7 @@ const {
       <label>
         What do you need?
         <select name="service">
-          <option>3D printing</option>
-          <option>3D scanning</option>
-          <option>3D design</option>
-          <option>Repair or replacement part</option>
-          <option>Not sure yet</option>
+          {SERVICES.map((s) => <option selected={s === selectedService}>{s}</option>)}
         </select>
       </label>
 

@@ -1,0 +1,26 @@
+---
+/**
+ * Interior-page section wrapper: the shared 96px rhythm, optional tint band, optional
+ * narrow (840px) container. Pages compose SectionHead / Stats / Split / FeatureCards /
+ * Faq inside it. The homepage's section-owning components keep their own wrappers.
+ */
+interface Props {
+  tint?: boolean;
+  narrow?: boolean;
+  id?: string;
+}
+
+const { tint = false, narrow = false, id } = Astro.props;
+---
+
+<section class:list={{ tint }} {id}>
+  <div class={narrow ? 'wrap-narrow' : 'wrap'}>
+    <slot />
+  </div>
+</section>
+
+<style>
+  section {
+    padding: 96px 0;
+  }
+</style>

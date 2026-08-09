@@ -234,6 +234,68 @@
     box-shadow: 0 6px 18px rgba(0, 0, 0, .5);
   }
 
+  /* ---- prose (interior pages) ----
+     Body typography for Split's slotted paragraphs and the shipping page's
+     standalone text. Global because slotted content can't be reached by a
+     component's scoped styles. */
+  .prose {
+    max-width: 36rem;
+  }
+
+  .prose p {
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+
+  .prose p:last-child {
+    margin-bottom: 0;
+  }
+
+  .prose h2 {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    margin-bottom: 16px;
+  }
+
+  .prose h3 {
+    font-size: 1.2rem;
+    margin: 26px 0 10px;
+  }
+
+  .prose strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .prose ul {
+    list-style: none;
+    margin: 18px 0;
+  }
+
+  .prose li {
+    color: var(--muted);
+    padding-left: 26px;
+    position: relative;
+    margin-bottom: 11px;
+  }
+
+  .prose li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: .62em;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: rotate(45deg);
+  }
+
+  @media (max-width: 900px) {
+    .prose {
+      max-width: 100%;
+    }
+  }
+
   /* ---- scroll reveal ---- */
   .reveal {
     opacity: 0;

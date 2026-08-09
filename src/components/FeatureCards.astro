@@ -1,0 +1,85 @@
+---
+/**
+ * Icon feature cards: 3-up by default (any multiple of three wraps into rows),
+ * 2-up with `two`. Both stack under 900px. `icon` is the inner SVG markup of a
+ * 24×24 stroke-drawn icon, copied verbatim from the snapshot; `body` may carry
+ * inline markup.
+ */
+interface Props {
+  cards: readonly { icon: string; title: string; body: string }[];
+  two?: boolean;
+}
+
+const { cards, two = false } = Astro.props;
+---
+
+<div class:list={['fcards', { two }]}>
+  {
+    cards.map((c) => (
+      <div class="fcard reveal">
+        <div class="ic">
+          <svg viewBox="0 0 24 24" aria-hidden="true" set:html={c.icon} />
+        </div>
+        <h3>{c.title}</h3>
+        <p set:html={c.body} />
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .fcards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .fcards.two {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .fcard {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 30px 26px;
+    box-shadow: var(--card-shadow);
+    text-align: center;
+  }
+
+  .ic {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: rgba(94, 23, 235, .1);
+    border: 1px solid rgba(94, 23, 235, .28);
+    margin: 0 auto 18px;
+  }
+
+  .ic svg {
+    width: 23px;
+    height: 23px;
+    stroke: var(--em-a);
+    fill: none;
+    stroke-width: 1.6;
+  }
+
+  .fcard h3 {
+    font-size: 1.1rem;
+    margin-bottom: 9px;
+  }
+
+  .fcard p {
+    color: var(--muted);
+    font-size: .93rem;
+  }
+
+  @media (max-width: 900px) {
+    .fcards,
+    .fcards.two {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
