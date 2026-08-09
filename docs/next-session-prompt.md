@@ -11,10 +11,15 @@ section of `docs/design-decisions.md`.)
    gets invited in Phase 2, and Google-login-for-the-owner was the §3 selection
    criterion). Free tier. No project or schema decisions needed up front — the session
    proposes those and you approve them in a running studio.
-2. **Tokens are secrets, same drill as the Resend key**: when the session needs a write
-   token (quote-submission storage), you create it at sanity.io/manage and paste it into
-   `.dev.vars` yourself — never into the repo or the chat.
-3. `/model` → **Opus is sufficient** — single-agent schema + integration work. Pick Fable
+2. **Account created 2026-08-09** (Google, `rroethle@gmail.com`). Nothing goes into
+   `.dev.vars` up front — the Sanity values don't exist until the session creates the
+   project. Expect one interactive step early: the Sanity CLI needs a browser login, so
+   when the session asks, run `! npx sanity login` (the `!` prefix runs it in-session).
+3. **Tokens are secrets, same drill as the Resend key**: when the session needs a write
+   token (quote-submission storage, late in the session), you create it at
+   sanity.io/manage and paste it into `.dev.vars` yourself — never into the repo or the
+   chat. The project id and dataset name are not secrets and can live in code.
+4. `/model` → **Opus is sufficient** — single-agent schema + integration work. Pick Fable
    if you want extra scrutiny on the content-model and PII decisions.
 
 ---
