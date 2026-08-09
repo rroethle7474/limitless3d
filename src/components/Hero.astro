@@ -74,6 +74,11 @@
     position: relative;
     min-height: 100svh;
     overflow: hidden;
+    /* Centre the copy rather than pinning it with a vh top-padding. The prototype used
+       `padding: 22vh` on .hero-in, which on a tall viewport puts a fixed gap above the copy
+       and dumps ALL the remaining height below it as dead space (D-019). */
+    display: flex;
+    align-items: center;
   }
 
   .hero-glow {
@@ -102,9 +107,11 @@
   .hero-in {
     position: relative;
     z-index: 2;
+    width: 100%;
     max-width: var(--maxw);
     margin: 0 auto;
-    padding: 22vh 24px 64px;
+    /* Top padding clears the fixed nav; the rest of the spacing comes from centring. */
+    padding: 104px 24px 64px;
     pointer-events: none;
   }
 
@@ -184,11 +191,33 @@
     font-weight: 500;
   }
 
+  /* Injected by hero.ts when WebGL is unavailable. Global because Astro's scoped
+     attributes are not applied to runtime-inserted nodes. */
+  .hero :global(.hero-fallback) {
+    position: absolute;
+    z-index: 1;
+    right: 8%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: min(42vw, 520px);
+    filter: drop-shadow(0 0 46px rgba(94, 23, 235, .4));
+  }
+
   @media (max-width: 1024px) {
     .obj-caption { right: 6%; }
   }
 
-  @media (max-width: 640px) {
+  /* Stacked layout: object above, copy below, everything centred.
+     The prototype switched to side-by-side at 640px, which leaves portrait tablets and
+     narrow desktop windows too cramped — the copy runs under the object and the object
+     itself gets clipped. The aspect clause catches portrait tablets that are wide enough to
+     pass a width test (a 1024x1366 iPad) but far too narrow to sit anything beside the copy.
+     Must match STACK_MAX / STACK_ASPECT in ~/scripts/hero.ts (D-020). */
+  @media (max-width: 900px), (max-aspect-ratio: 6/5) {
+    .hero {
+      align-items: flex-start;
+    }
+
     .hero-in {
       padding-top: 47svh;
       padding-bottom: 56px;
@@ -216,5 +245,18 @@
       top: calc(43svh - 20px);
       min-width: 260px;
     }
+
+    /* Stacked: the mark sits above the copy, centred, like the real object does. */
+    .hero :global(.hero-fallback) {
+      right: auto;
+      left: 50%;
+      top: 24svh;
+      transform: translate(-50%, -50%);
+      width: min(64vw, 420px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero p.lead { font-size: 1.02rem; }
   }
 </style>

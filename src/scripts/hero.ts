@@ -40,7 +40,7 @@ import {
   WebGLRenderer,
 } from 'three';
 
-type Tier = 'mobile' | 'tablet' | 'desktop';
+type Tier = 'mobile' | 'narrow' | 'tablet' | 'desktop';
 
 export function initHero(): void {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -51,13 +51,17 @@ export function initHero(): void {
   const caption = document.getElementById('obj-caption');
   if (!canvas || !heroEl) return;
 
-  /** No WebGL, or ?nogl=1 — drop a static brand mark in place of the canvas. */
+  /**
+   * No WebGL, or ?nogl=1 — drop a static brand mark in place of the canvas.
+   * Positioning lives in Hero.astro's stylesheet (`.hero-fallback`) so it follows the same
+   * breakpoints as the real scene instead of being frozen in an inline style.
+   */
   function fallback() {
     canvas?.remove();
     caption?.remove();
     heroEl!.insertAdjacentHTML(
       'beforeend',
-      '<svg viewBox="0 0 100 50" fill="none" aria-hidden="true" style="position:absolute;z-index:1;right:6%;top:26%;width:min(44vw,560px);filter:drop-shadow(0 0 46px rgba(94,23,235,.4))">' +
+      '<svg class="hero-fallback" viewBox="0 0 100 50" fill="none" aria-hidden="true">' +
         '<path d="M50 25 C42 8, 16 8, 12 25 C8 42, 34 42, 50 25 C66 8, 92 8, 88 25 C84 42, 58 42, 50 25 Z" stroke="#5E17EB" stroke-width="6" stroke-linecap="round"/></svg>',
     );
   }
@@ -301,23 +305,75 @@ export function initHero(): void {
   }
   applySceneTheme();
 
-  /* ---- per-tier placement so the free object works on every device ---- */
+  /* ---- per-tier placement so the free object works on every device ----
+     `mobile` and `narrow` both stack the object ABOVE the copy (see the matching CSS
+     breakpoint in Hero.astro); `tablet` and `desktop` sit it beside the copy. The prototype
+     had only three tiers and switched to side-by-side at 640px, which clips the object on
+     portrait tablets — see clampX below and decision D-020. */
   const LAY: Record<Tier, { x: number; y: number; s: number; camZ: number }> = {
     mobile: { x: 0, y: 1.42, s: 0.44, camZ: 10.4 },
+    narrow: { x: 0, y: 1.34, s: 0.62, camZ: 9.6 },
     tablet: { x: 1.15, y: 0.15, s: 0.86, camZ: 8.8 },
     desktop: { x: 1.85, y: 0.05, s: 1, camZ: 8.4 },
   };
-  const tierFor = (w: number): Tier => (w <= 640 ? 'mobile' : w <= 1024 ? 'tablet' : 'desktop');
+
+  /**
+   * Must match the stacked-layout media query in Hero.astro:
+   *   @media (max-width: 900px), (max-aspect-ratio: 6/5)
+   * The aspect clause is what catches portrait tablets — a 1024x1366 iPad is wide enough to
+   * pass a width test but far too narrow, in world units, to sit the object beside the copy.
+   */
+  const STACK_MAX = 900;
+  const STACK_ASPECT = 1.2;
+
+  const isStacked = () =>
+    window.innerWidth <= STACK_MAX || window.innerWidth / window.innerHeight <= STACK_ASPECT;
+
+  const tierFor = (w: number): Tier =>
+    isStacked() ? (w <= 640 ? 'mobile' : 'narrow') : w <= 1024 ? 'tablet' : 'desktop';
+
   let tier: Tier | null = null;
+  let layoutX = 0;
+
+  /** Half the world-space width visible at z = 0, given the current camera and aspect. */
+  function visibleHalfWidth(): number {
+    const halfH = camera.position.z * Math.tan(((camera.fov / 2) * Math.PI) / 180);
+    return halfH * camera.aspect;
+  }
+
+  const OBJ_HALF = 2.45; // lemniscate half-span (a = 2.15) plus max tube radius
+  const PARALLAX = 0.35;
+
+  /**
+   * Keep the object inside the frame at any viewport, whatever the tier asked for.
+   *
+   * Two steps, because clamping the offset alone is not enough: on a tall narrow viewport the
+   * object can be wider than the entire visible frame, so it clips even when centred. Shrink
+   * first if it cannot fit, then slide it as far right as the remaining room allows.
+   */
+  function fit(baseX: number, baseScale: number): { x: number; s: number } {
+    const halfW = visibleHalfWidth();
+    const room = halfW - PARALLAX;
+    const s = OBJ_HALF * baseScale > room ? Math.max(0.28, room / OBJ_HALF) : baseScale;
+    const maxX = halfW - OBJ_HALF * s - PARALLAX;
+    return { x: Math.min(baseX, Math.max(0, maxX)), s };
+  }
 
   function applyLayout() {
     const t = tierFor(window.innerWidth);
-    if (t === tier) return;
-    tier = t;
-    const L = LAY[t];
-    rig.position.set(L.x, L.y, 0);
-    rig.scale.setScalar(L.s);
-    camera.position.z = L.camZ;
+    if (t !== tier) {
+      tier = t;
+      camera.position.z = LAY[t].camZ;
+      camera.updateProjectionMatrix();
+      rig.position.y = LAY[t].y;
+    }
+    // Recomputed on every resize, not just tier changes — aspect can shift without the tier
+    // changing at all (rotating a tablet, dragging a window narrower).
+    const L = LAY[tier];
+    const { x, s } = fit(L.x, L.s);
+    layoutX = x;
+    rig.position.x = x;
+    rig.scale.setScalar(s);
   }
 
   function resize() {
@@ -492,7 +548,7 @@ export function initHero(): void {
       }
     }
 
-    rig.position.x = LAY[tier!].x + parX * 0.35;
+    rig.position.x = layoutX + parX * 0.35;
     rig.position.y = LAY[tier!].y - parY * 0.22;
     applyPhase();
 
