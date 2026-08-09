@@ -1,0 +1,189 @@
+---
+import Base from '~/layouts/Base.astro';
+import PageHero from '~/components/PageHero.astro';
+import Section from '~/components/Section.astro';
+import SectionHead from '~/components/SectionHead.astro';
+import Stats from '~/components/Stats.astro';
+import Split from '~/components/Split.astro';
+import FeatureCards from '~/components/FeatureCards.astro';
+import Faq from '~/components/Faq.astro';
+import QuoteSection from '~/components/QuoteSection.astro';
+
+import pondNozzle2 from '~/assets/work/pond-nozzle-2.jpg';
+import heirloom from '~/assets/work/heirloom.jpg';
+import workshop01 from '~/assets/work/workshop-01.jpg';
+
+const title = '3D Scanning Services | 0.02 mm Accuracy | Limitless 3D, Neenah WI';
+const description =
+  'Metrology grade 3D scanning with no markers and no scanning spray. Reverse engineer a part, copy an object you cannot replace, or turn anything physical into a file.';
+
+const stats = [
+  { value: '0.02 mm', label: 'Dimensional accuracy' },
+  { value: 'No markers', label: 'None needed on your part' },
+  { value: 'Small to large', label: 'Objects of any size' },
+  { value: '25 yrs', label: 'Engineering experience' },
+];
+
+const uses = [
+  {
+    icon: '<path d="M14.7 6.3a4 4 0 105.4 5.4l-9.6 9.6a2.5 2.5 0 01-3.5-3.5l9.6-9.6z"/><circle cx="17.5" cy="6.5" r="0"/>',
+    title: 'Reverse engineering',
+    body: 'An existing part becomes an accurate model you can modify, improve, or manufacture again. Ideal when the original drawings are long gone.',
+  },
+  {
+    icon: '<path d="M3 7l9-4 9 4v10l-9 4-9-4V7zM3 7l9 4 9-4M12 11v10"/>',
+    title: 'Parts nobody sells anymore',
+    body: 'Discontinued, obsolete, or out of production. We capture the one you have before it breaks completely.',
+  },
+  {
+    icon: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/>',
+    title: 'Restoration and heirlooms',
+    body: 'Antiques, instruments, and family pieces get documented and reproduced without being altered or taken apart.',
+  },
+  {
+    icon: '<path d="M3 15l12-12 6 6-12 12H3v-6zM8 10l2 2M11 7l2 2"/>',
+    title: 'Complex shapes',
+    body: 'Curves, organic forms, and castings that no set of calipers is going to describe correctly.',
+  },
+  {
+    icon: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/>',
+    title: 'Checking what you made',
+    body: 'Compare the part in your hand against the model it came from, and see where it drifted.',
+  },
+  {
+    icon: '<path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5zM14 3v5h5"/>',
+    title: 'Files you can keep',
+    body: 'Standard formats on request, so the model is yours to use with any shop, not just ours.',
+  },
+];
+
+const pipeline = [
+  {
+    icon: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',
+    title: 'We capture it',
+    body: 'You bring the object to Neenah, or we come to it when it cannot travel. The scan happens without touching or coating the piece.',
+  },
+  {
+    icon: '<path d="M3 21l7-7M14 4l6 6-9 9H5v-6l9-9zM13 5l6 6"/>',
+    title: 'We clean it up',
+    body: 'Raw scan data becomes a real model with true dimensions, sharp edges where they belong, and repairs where the original was worn.',
+  },
+  {
+    icon: '<path d="M4 8h16M4 8l8-5 8 5M4 8v9l8 5 8-5V8M12 13v9M4 8l8 5 8-5"/>',
+    title: 'We make it real',
+    body: 'Print it here in the material that suits the job, or take your file elsewhere. Your call, either way.',
+  },
+];
+
+const faq = [
+  {
+    q: 'Do you need to put stickers or spray on my part?',
+    a: 'No. Our self tracking scanner works without markers and without scanning spray, so nothing is applied to your object. That is what makes it safe for antiques and finished surfaces.',
+  },
+  {
+    q: 'How accurate is it really?',
+    a: 'Dimensional accuracy of 0.02 mm in X, Y, and Z. For most mechanical work that is far tighter than the tolerance the part actually needs, which is the point.',
+  },
+  {
+    q: 'What can you scan?',
+    a: 'Objects from small to large. Very small, highly detailed items and large assemblies both get handled, though the approach changes. Tell us what it is and we will tell you honestly if it suits scanning.',
+  },
+  {
+    q: 'Can I get the file, or do you keep it?',
+    a: 'You can have the file. Standard formats are available on request so you are never locked in.',
+  },
+  {
+    q: 'What does a scan cost?',
+    a: 'It depends on size, complexity, and how clean the result has to be, so we quote per job. Rates are competitive and there are no surprises after the fact.',
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <PageHero
+    crumb="3D Scanning"
+    heading="Capture any object,<br /><em>exactly</em> as it is."
+    lead="Our newest scanning system gives metrology grade accuracy without markers and without scanning spray. If it exists, we can turn it into a file you can use."
+    primary={{ label: 'Get a Scanning Quote', href: '#quote' }}
+    ghost={{ label: 'What it is used for', href: '#uses' }}
+    image={pondNozzle2}
+    alt="Close view of a 3D printed fountain nozzle"
+  />
+
+  <Section tint>
+    <Stats items={stats} />
+  </Section>
+
+  <Section>
+    <Split
+      kicker="Metrology grade"
+      heading="Accurate scans, not just pretty ones"
+      image={heirloom}
+      alt="Antique concertina, a delicate object suited to marker free scanning"
+    >
+      <p>
+        Plenty of scanners produce something that looks right. We measure. Our system holds
+        dimensional accuracy to <strong>0.02 mm</strong> in every axis, which is the difference
+        between a picture of your part and a file you can build from.
+      </p>
+      <p>
+        The newest addition to the workshop is a self tracking scanner, so there are no
+        stickers, no markers, and no chalky spray on the object we are capturing. That matters
+        when the thing in your hands is old, delicate, or the only one left.
+      </p>
+      <p>
+        Rates are competitive, and the deliverables are ones you can hand to an engineer with
+        confidence.
+      </p>
+    </Split>
+
+    <Split
+      rev
+      kicker="The hard ones"
+      heading="Some jobs take a steady hand"
+      image={workshop01}
+      alt="Finely detailed resin print of a sculpted figure"
+    >
+      <p>
+        Scanning a rare piece is rarely one and done. A turn of the century street lamp we
+        digitized took multiple detailed sessions, a steady hand, and a fair amount of
+        determination before the data was clean enough to build from.
+      </p>
+      <p>
+        That is the part most people do not see, and it is exactly why the file you get back is
+        worth having. Complex geometry, deep recesses, and reflective surfaces all get handled
+        rather than glossed over.
+      </p>
+    </Split>
+  </Section>
+
+  <Section tint id="uses">
+    <SectionHead
+      kicker="What people scan"
+      heading="Reasons a scan solves the problem"
+      sub="Anything you cannot buy, cannot measure by hand, or cannot risk losing."
+    />
+    <FeatureCards cards={uses} />
+  </Section>
+
+  <Section>
+    <SectionHead
+      kicker="How it goes"
+      heading="Scan to finished part, all in one shop"
+      sub="Most customers do not want a file. They want the object. We can take it the whole way."
+    />
+    <FeatureCards cards={pipeline} />
+  </Section>
+
+  <Section>
+    <SectionHead kicker="Common questions" heading="Good to know" />
+    <Faq items={faq} />
+  </Section>
+
+  <QuoteSection
+    kicker="Bring us the object"
+    heading="Let us scan it."
+    body="Tell us what needs capturing and what you want to do with it afterward. If scanning is not the right answer, we will say so."
+    selectedService="3D scanning"
+  />
+</Base>
