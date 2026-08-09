@@ -1,0 +1,28 @@
+{
+  "name": "limitless3d",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Limitless 3D LLC — marketing site (Astro, static output)",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "sync": "astro sync"
+  },
+  "dependencies": {
+    "astro": "^5",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/sitemap": "^3",
+    "@tailwindcss/vite": "^4",
+    "@types/three": "^0.180.0",
+    "sharp": "^0.34.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
