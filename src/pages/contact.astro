@@ -1,0 +1,161 @@
+---
+import Base from '~/layouts/Base.astro';
+import PageHero from '~/components/PageHero.astro';
+import Section from '~/components/Section.astro';
+import SectionHead from '~/components/SectionHead.astro';
+import Faq from '~/components/Faq.astro';
+import QuoteSection from '~/components/QuoteSection.astro';
+import { BUSINESS, SOCIAL } from '~/data/site';
+
+import rcCars from '~/assets/work/rc-cars.jpg';
+
+const title = 'Contact Limitless 3D | Neenah, WI | 920-360-7543';
+const description =
+  'Call 920-360-7543 or email limitless3ddesign@gmail.com. Limitless 3D serves Neenah, the Fox Valley, and all of northeast Wisconsin, and ships parts nationwide.';
+
+const faq = [
+  {
+    q: 'How fast will I hear back?',
+    a: 'Usually the same day. This is a small shop, so messages go straight to the person doing the work.',
+  },
+  {
+    q: 'Can I drop something off?',
+    a: 'Yes. We are in Neenah and happy to look at the object in person. Get in touch first so we know you are coming.',
+  },
+  {
+    q: 'Do you ship?',
+    a: 'Parts from the shop ship nationwide. For custom work, you can ship the original to us and we will ship it back with the new part.',
+  },
+  {
+    q: 'Do you take on big jobs?',
+    a: 'We work with individuals through to large corporations. Tell us the scope and we will tell you honestly whether we are the right shop.',
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <PageHero
+    crumb="Contact"
+    heading="Talk to the person<br />who does the <em>work</em>."
+    lead="No phone tree and no account manager. Call, email, or send the form and you are talking to the workshop."
+    primary={{ label: `Call ${BUSINESS.phone}`, href: BUSINESS.phoneHref }}
+    ghost={{ label: 'Send a message', href: '#quote' }}
+    image={rcCars}
+    alt="Two 3D printed RC car bodies"
+  />
+
+  <Section>
+    <div class="contact-grid">
+      <div class="reveal">
+        <div class="cblock">
+          <div class="mono accent">Phone</div>
+          <a href={BUSINESS.phoneHref}>{BUSINESS.phone}</a>
+        </div>
+        <div class="cblock">
+          <div class="mono accent">Email</div>
+          <a href={BUSINESS.emailHref}>{BUSINESS.email}</a>
+        </div>
+        <div class="cblock">
+          <div class="mono accent">Where we are</div>
+          <p>
+            Neenah, Wisconsin. We serve the Fox Valley and all of northeast Wisconsin in person,
+            and ship parts nationwide.
+          </p>
+        </div>
+        <div class="cblock">
+          <div class="mono accent">Also find us</div>
+          <a href={SOCIAL.instagram} target="_blank" rel="noopener">Instagram</a>
+          <a href={SOCIAL.facebook} target="_blank" rel="noopener">Facebook</a>
+          <a href={SOCIAL.etsy} target="_blank" rel="noopener">Etsy shop</a>
+        </div>
+      </div>
+
+      <div class="map-card reveal">
+        <div class="mono accent">Service area</div>
+        <h3>Neenah and the Fox Valley</h3>
+        <p class="area">
+          Appleton, Oshkosh, Menasha, Green Bay, and the surrounding communities. Drop off in
+          person, or ship it to us and we will ship it back.
+        </p>
+        <div class="mono">PARTS SHIPPED NATIONWIDE</div>
+      </div>
+    </div>
+  </Section>
+
+  <QuoteSection
+    kicker="Send it over"
+    heading="Tell us about the project."
+    body="The more you tell us, the better the first answer will be. A photo of the broken part is worth a paragraph."
+  />
+
+  <Section>
+    <SectionHead kicker="Before you write" heading="Quick answers" />
+    <Faq items={faq} />
+  </Section>
+</Base>
+
+<style>
+  /* Page-local: this two-column contact layout appears nowhere else on the site.
+     Ported verbatim from the prototype's contact block, site.css lines 397–405. */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: .9fr 1.1fr;
+    gap: 52px;
+    align-items: start;
+  }
+
+  .cblock {
+    margin-bottom: 30px;
+  }
+
+  .cblock .mono {
+    margin-bottom: 8px;
+  }
+
+  .cblock a,
+  .cblock p {
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+
+  .cblock a:hover {
+    color: var(--em-a);
+  }
+
+  .cblock p {
+    color: var(--muted);
+  }
+
+  .map-card {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: var(--card-shadow);
+    background: var(--panel);
+    padding: 30px;
+    text-align: center;
+  }
+
+  .map-card h3 {
+    font-size: 1.3rem;
+    margin: 12px 0 4px;
+  }
+
+  .map-card .area {
+    font-size: 1.02rem;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+
+  /* The closing "shipped nationwide" line — the only non-accent mono in the card. */
+  .map-card .mono:not(.accent) {
+    margin-top: 22px;
+  }
+
+  @media (max-width: 900px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: 34px;
+    }
+  }
+</style>
