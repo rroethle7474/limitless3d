@@ -2,17 +2,14 @@
 
 Copy the block below into a fresh Claude Code session to start the wire-up phase.
 
-**Before pasting — setup steps for you, Ryan (10 minutes, one account):**
+**Before pasting — setup status (updated 2026-08-09):**
 
-1. **Create a Resend account at resend.com — sign up with `rroethle@gmail.com`.**
-   The signup address matters: until a sending domain is verified, Resend only delivers to
-   the account owner's own email. That restriction *is* our validation loop — every test
-   submission lands in your inbox and nowhere else. Do **not** add or verify a domain yet
-   (that's cutover-prep work, after DNS moves to Cloudflare).
-2. In Resend: **API Keys → Create API key** ("Sending access" permission is enough). Keep it
-   somewhere you can paste from when the session asks for it. It goes into a git-ignored
-   `.dev.vars` file, never into the repo or the chat if you can avoid it — pasting into a
-   local file yourself is best.
+1. ~~Create a Resend account~~ **Done — Ryan has the account and the API key in hand.**
+   (Signed up with `rroethle@gmail.com`, which matters: until a sending domain is verified,
+   Resend only delivers to the account owner's own email — that restriction *is* our
+   validation loop. No domain added or verified yet, deliberately.)
+2. When the session creates the git-ignored `.dev.vars` file, **Ryan pastes the key into it
+   himself** — it never goes into the repo or the chat.
 3. **No Cloudflare account needed yet.** Turnstile has official always-pass test keys that
    work locally, and `wrangler` runs Pages Functions on your machine without a login. Real
    Turnstile keys and the Pages project come with the staging deploy, later in 1b.
@@ -50,8 +47,9 @@ Architecture — these are constraints, not suggestions:
   an env var currently set to Ryan's email; the production address is open
   question §9.4. Attachments forwarded from the form's photo field.
 - Secrets live in .dev.vars (RESEND_API_KEY, QUOTE_TO_EMAIL, TURNSTILE keys).
-  Add .dev.vars to .gitignore BEFORE creating it. Ryan pastes his own API key
-  into the file. Never commit or echo secrets.
+  Add .dev.vars to .gitignore BEFORE creating it. Ryan already has his Resend
+  API key — create the file with a placeholder, then stop and ask him to
+  paste the key in himself before testing. Never commit or echo secrets.
 - Attachment limits are a real design point, not an afterthought: five phone
   photos can exceed 25 MB raw; check Resend's request-size limit (~40 MB) and
   add client-side validation (count + per-file size with a clear message)
