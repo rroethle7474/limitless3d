@@ -22,34 +22,40 @@ refine or contradict the plan also get a row in `limitless3d-rebuild-plan.md` §
 
 ## RESUME HERE — next session
 
-**Session 1 ended with the homepage fully written but never rendered.** `npm install` could
-not complete (see the session note below), so the run-and-look review never happened. Nothing
-below is a known defect — it is the verification that is owed.
+**Phase 1a session 1 is complete: the homepage builds, runs, and has been verified in a
+browser.** `npm install` landed on Astro 5.18.2 / three 0.180 / sharp 0.34.5 / Tailwind 4.3.3.
+`astro check` reports 0 errors, 0 warnings, 0 hints; `astro build` succeeds.
 
-Ordered steps:
+Verified working (2026-08-09, Chrome, ~2048×926 desktop viewport):
 
-1. `npm install` — nothing else works until this lands. Confirm `astro`, `three`, `sharp`,
-   `@tailwindcss/vite` are all present.
-2. `npm run check` — clears the two type errors that are purely install artefacts
-   (`Cannot find module 'three'`, `astro/tsconfigs/strict not found`).
-3. `npm run dev`, then walk the homepage **section by section, top to bottom**, against
-   `docs/design-reference.md` §5 and the live prototype. Expect to fix things — this is the
-   first time any of it renders.
-4. Specific things to check first, because they are the most likely to be wrong:
-   - **Hero**: does the WebGL scene mount, cycle all four phases, and place correctly at all
-     three responsive tiers? Try `?phase=print`, `?done=1`, `?nogl=1`, and reduced-motion.
-   - **Parts door**: the `import.meta.glob` was corrected late to a relative path — confirm
-     all 12 images actually resolve and the walls render in order.
-   - **Build-log spotlight**: six stacked images crossfading by class is a deviation from the
-     prototype (D-012) and has never run.
-   - **Scoped-style leakage**: several components rely on `:global()` inside Astro scoped
-     styles (`body.menu-open` in Nav, `img[data-slide]` in BuildLog, `.brand b`). Astro's
-     scoping rules are the likeliest source of silent visual breakage.
-   - **Astro config**: `image.responsiveStyles` and `image.layout` need a recent Astro 5
-     minor. If the installed version rejects them, drop those two lines.
+- Hero WebGL mounts, cycles scan → print → done → dissolve, `?done=1` and `?phase=` lock
+  correctly, caption text updates per phase.
+- All three service-card animations run (point cloud + sweep, self-drawing CAD, nozzle/layers).
+- Build log cycles all six entries with pipeline-optimised images, thumbnails, and metadata.
+- Parts door resolves all 12 wall images with the `rotateY(56deg)` transform applied.
+- Quote form: all seven fields wired, file input reports attachments, submit reaches the
+  success card, TODO warning fires in console. Honeypot hidden.
+- Zero hotlinked images in the DOM; 24 images, none broken.
+
+**Still unverified — do these first:**
+
+1. **Mobile / responsive.** Never checked at any width. The browser window would not resize
+   below a ~2048 CSS-px viewport in this session's tooling, so the 640px and 1024px
+   breakpoints, the burger drawer, and the hero's mobile tier (object above the copy at
+   `padding-top: 47svh`) have **not** been seen. This is the single biggest gap.
+2. **Reduced motion.** The code paths exist and are ported verbatim, but were not exercised.
+3. **`?nogl=1` fallback.** The static SVG lemniscate replacement was not visually confirmed.
+4. **Side-by-side fidelity check** against the live prototype. Everything was checked against
+   `docs/design-reference.md`, not eyeballed next to the real thing.
 5. Generate `apple-touch-icon.png` at 180×180 from `public/favicon.svg` (D-017) — the `<link>`
    in `Base.astro` 404s until then.
-6. Only once the homepage is signed off: interior pages, per the plan's §0 slicing.
+
+Then: interior pages, per the plan's §0 slicing and the subagent fan-out ruling.
+
+**Tooling note for whoever picks this up:** the Chrome automation kept backgrounding the tab
+(`document.hidden === true`), which blanks screenshots and throttles rAF. Symptoms look
+exactly like a rendering bug but are not. `navigate` re-focuses the tab; DOM assertions via
+`javascript_tool` stayed reliable throughout and are the better verification tool here.
 
 ## Performance baseline — homepage, first production build (2026-08-09)
 
