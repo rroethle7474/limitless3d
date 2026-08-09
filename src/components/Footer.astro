@@ -71,8 +71,10 @@ const year = new Date().getFullYear();
         <a href={BUSINESS.phoneHref}>{BUSINESS.phone}</a> &middot;
         <a href={BUSINESS.emailHref}>{BUSINESS.email}</a>
       </div>
+      {/* The prototype links /privacy here, but no such page exists anywhere — the link is a
+          vestige of the original Square site's newsletter section (reCAPTCHA disclosure),
+          which the prototype dropped. Removed rather than shipped dead (D-025). */}
       <div class="mono">
-        <a href="/privacy">Privacy</a> &middot;
         <a href="/shipping-and-returns">Shipping and returns</a> &middot; &copy; {year}
         {BUSINESS.legalName}
       </div>

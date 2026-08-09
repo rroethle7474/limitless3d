@@ -316,7 +316,8 @@ every part."* + three 42px social tiles (Instagram, Facebook, Etsy — inline SV
 Col 2 `Services`: 3D Scanning · 3D Printing · 3D Design · Gallery
 Col 3 `Shop and contact`: Parts Shop · Reviews · About · Contact · Shipping and returns
 Bottom bar: `Neenah, WI · 920-360-7543 · limitless3ddesign@gmail.com` /
-`Privacy · Shipping and returns · © 2026 Limitless 3D LLC`
+`Privacy · Shipping and returns · © 2026 Limitless 3D LLC` — **we ship without the Privacy
+link** (dead in the prototype; D-025)
 
 ---
 

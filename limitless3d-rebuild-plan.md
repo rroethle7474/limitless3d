@@ -182,6 +182,10 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 8. Etsy reviews auto-pull (§10, 2026-08-09): does Randy want it, and will he register an Etsy
    developer app / API key from the shop account (plus supply the shop id)? Blocks the
    build-time reviews module; manual curation via the §4.2 collection is the fallback.
+9. Newsletter signup: the original site's "Stay in the Loop" email-signup section was dropped
+   by the prototype (its reCAPTCHA disclosure was the source of the now-removed footer
+   Privacy link, D-025). Does Randy want it back? If yes: pick a provider, rebuild the
+   section, and write a real privacy page the footer can link.
 
 ## 10. Decision Log
 

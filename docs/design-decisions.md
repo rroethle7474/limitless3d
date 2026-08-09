@@ -26,6 +26,8 @@ refine or contradict the plan also get a row in `limitless3d-rebuild-plan.md` §
 | D-023 | 2026-08-09 | **Interior fan-out executed as planned** (plan §10 orchestration row): seven pages by seven Opus subagents in one working tree, three batches, orchestrator (Fable) reviewing, verifying in-browser, and committing serially. Page-local patterns landed as scoped CSS inside their page file, not components: SpecTable (`/3d-printing`), ReviewCards + Leave-a-review (`/reviews`), contact grid (`/contact`). Orchestrator-made shared edits: BuildLog `entries`/`kicker`/`heading`/`sub` props (gallery's ten-entry spotlight), PageHero CTA `external` flag (shipping's SHOP_URL link, D-011). Accepted one subagent upgrade: `role="img"` on the reviews star rows so their `aria-label`s announce. | The guardrail ("existing components and tokens only; stop and report") held — no subagent touched a shared file or invented an unauthorized pattern. Single-page patterns as page-local scoped CSS keeps them inlined into only that page's HTML and preserves the "promote when a second consumer appears" option. |
 | D-024 | 2026-08-09 | **Square catalog integration promoted to pre-cutover scope** (Ryan), and the prototype's shop design captured for it: `docs/prototype-snapshot/shop.html` (filter bar + product grid, cards linking to `/parts/<slug>`) and `parts-pdp-example.html` (one exemplar PDP: sticky gallery, price, stock, buy, trust rows). Both hotlink Square CDN product images — reference only, never shipped. The build's interim state is unchanged: every Parts Shop link stays the `SHOP_URL` link-out (D-011). | Ryan wants shoppers kept on the site pre-launch. iframe embedding ruled out (checkout sends frame-blocking headers; iframe cookie partitioning breaks carts). D-002's core survives — catalog UI moves in-house, commerce/inventory/payments never do. Captured now because the Vercel prototype won't necessarily outlive the phase that needs it; the shop page was the one page the original snapshot deliberately skipped. |
 
+| D-025 | 2026-08-09 | **Footer "Privacy" link removed** (Ryan). Every prototype page links `/privacy`, but no such page exists anywhere. Verified origin: the original Square site's "Stay in the Loop" newsletter section carries a reCAPTCHA disclosure referencing Google's privacy policy/terms; the prototype dropped that section (no newsletter, no reCAPTCHA, no Google-policy text anywhere in the snapshot) but left the vestigial footer link on all eleven pages. | Shipping a dead link helps nobody. Whether the newsletter signup (and therefore a real privacy page) returns is on Ryan's validation list with Randy — plan §9.9. If it comes back, so does the link, pointing at a real page. |
+
 ## RESUME HERE — next session
 
 **Phase 1a sessions 1–2 are complete: the homepage and all eight interior pages build, run,
@@ -98,10 +100,9 @@ Two things worth knowing:
 
 ## Open items
 
-- **`/privacy` is a dead link** in every page's footer. Inherited faithfully from the
-  prototype, which links it and also has no such page. Needs either a real privacy page
-  (no prototype reference — candidate for the Claude Design allowance alongside the FAQ) or
-  dropping the link, before cutover.
+- ~~`/privacy` is a dead link in every page's footer~~ Removed 2026-08-09 (D-025) — it was a
+  vestige of the original site's newsletter section, which the prototype dropped. Newsletter
+  + privacy-page question is with Randy (plan §9.9).
 - ~~`apple-touch-icon.png` does not exist yet~~ Generated 2026-08-09, 180×180 from `favicon.svg` via Sharp (closes D-017's open note).
 - **`og-image.jpg` is the prototype's**, carried over as-is. Fine for now; worth regenerating
   if the design shifts.
