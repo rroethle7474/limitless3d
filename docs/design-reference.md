@@ -486,7 +486,7 @@ What we are **not** copying, and why. Cross-referenced to `docs/design-decisions
 | D-002 | `/shop` is a full product catalogue on-site | Nav/footer "Parts Shop" links out to `shop.limitless3ddesign.com` | Plan §2 — commerce stays on Square |
 | D-003 | Hotlinks 12 photos from `cdn6.editmysite.com` | Self-hosted through Astro's image pipeline | Plan §6 |
 | D-004 | Dark theme exists but is unreachable | Port the tokens, keep it unreachable for now | Not in scope; revisit post-launch |
-| D-005 | Form posts `/api/quote`, falls back to `mailto:` | UI only, stubbed with a TODO | Phase 1a scope; backend is Phase 1b |
+| D-005 | Form posts `/api/quote`, falls back to `mailto:` | **Live since 2026-08-09** (Phase 1b): multipart POST to a Pages Function at `/api/quote` — Turnstile + Resend, contract in D-026. No `mailto:` fallback; failures show an honest error with the phone/email links instead | A `mailto:` "fallback" silently drops the attachments and depends on a configured mail client — the visible failure card is the honest version of the same escape hatch |
 | D-006 | No FAQ on the homepage | FAQ planned, **deferred to Phase 2** — content needs the owner's input (plan §9.6, §10 2026-08-09) | Plan §6. Net-new → the one place Claude Design is sanctioned (plan §0) |
 | D-007 | Copy is hardcoded | Hardcoded now, CMS-driven in Phase 1b | Plan §7 |
 | D-008 | `data-to="chris+limitless@growwithkoda.co"` on the form | Removed | Prototype author's address |
