@@ -1,0 +1,127 @@
+---
+import Base from '~/layouts/Base.astro';
+import PageHero from '~/components/PageHero.astro';
+import Section from '~/components/Section.astro';
+import SectionHead from '~/components/SectionHead.astro';
+import Split from '~/components/Split.astro';
+import FeatureCards from '~/components/FeatureCards.astro';
+import Faq from '~/components/Faq.astro';
+import QuoteSection from '~/components/QuoteSection.astro';
+
+import displayStand from '~/assets/work/display-stand.jpg';
+import nozzleCad from '~/assets/work/nozzle-cad.jpg';
+import pondNozzle from '~/assets/work/pond-nozzle.jpg';
+
+const title = '3D Design and CAD Services | 25 Years Experience | Limitless 3D';
+const description =
+  'Professional 3D design and CAD in Neenah, WI. Twenty-five years drafting for civil and mechanical engineering firms, applied to your part, prototype, or product idea.';
+
+const starts = [
+  {
+    icon: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/>',
+    title: 'An idea in your head',
+    body: 'We turn a description or a napkin sketch into a model you can look at, change, and then hold.',
+  },
+  {
+    icon: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',
+    title: 'An existing part',
+    body: 'A scan becomes a clean model, so a part with no drawings can be made again.',
+  },
+  {
+    icon: '<path d="M14.7 6.3a4 4 0 105.4 5.4l-9.6 9.6a2.5 2.5 0 01-3.5-3.5l9.6-9.6z"/><circle cx="17.5" cy="6.5" r="0"/>',
+    title: 'A part that failed',
+    body: 'We model the original, then strengthen the spot where it broke instead of reproducing the flaw.',
+  },
+  {
+    icon: '<path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5zM14 3v5h5"/>',
+    title: 'Something to hand off',
+    body: 'Dimensioned drawings and standard file formats, ready for whoever builds it next.',
+  },
+];
+
+const faq = [
+  {
+    q: 'I only have a rough idea. Is that enough?',
+    a: 'Yes. Most projects start that way. A conversation and a few questions usually get us to something we can draw.',
+  },
+  {
+    q: 'Do I own the design when it is done?',
+    a: 'The model is for your project. Standard file formats are available on request.',
+  },
+  {
+    q: 'Can you improve a part rather than copy it?',
+    a: 'That is usually the better plan. If a part broke in the same place twice, copying it exactly just delays the next failure.',
+  },
+  {
+    q: 'Do you design for printing only?',
+    a: 'No. Printing is one way to make a part. The model can be built for whatever process suits it.',
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <PageHero
+    crumb="3D Design"
+    heading="You describe it.<br />We <em>draw</em> it properly."
+    lead="Twenty-five years of professional design work for civil and mechanical engineering firms, now pointed at your project. If you have an idea, we can do the heavy lifting."
+    primary={{ label: 'Talk About Your Idea', href: '#quote' }}
+    ghost={{ label: 'Start from a scan', href: '/3d-scanning' }}
+    image={displayStand}
+    alt="A 3D printed display stand resting on its engineering drawing"
+  />
+
+  <Section>
+    <Split
+      kicker="How we work"
+      heading="Details, details, details"
+      image={nozzleCad}
+      alt="CAD model of a pond fountain nozzle"
+    >
+      <p>
+        Twenty-five years in the consulting engineering world means hundreds of detailed plans
+        for civil and mechanical firms, and the habits that come with them. Those habits are the
+        reason your part fits the first time.
+      </p>
+      <p>
+        Every project that comes through the door gets treated like one of our own, on the old
+        rule of <strong>measure twice, cut once</strong>. Getting it right on the screen is far
+        cheaper than getting it wrong in material.
+      </p>
+    </Split>
+
+    <Split
+      rev
+      kicker="Cutting edge tools"
+      heading="The software has kept up. So have we."
+      image={pondNozzle}
+      alt="Finished 3D printed pond fountain nozzle"
+    >
+      <p>
+        Autodesk tools have changed a lot over twenty-five years, and we have used most versions
+        along the way. That means modern modeling when a project calls for it, and none of the
+        guesswork when a drawing has to be read by somebody else.
+      </p>
+      <p>
+        Bring a sketch on paper, a photo, a broken original, or a description you have been
+        carrying around for years. Any of those is a starting point.
+      </p>
+    </Split>
+  </Section>
+
+  <Section tint>
+    <SectionHead kicker="What design covers" heading="Four ways a project usually starts" />
+    <FeatureCards cards={starts} two />
+  </Section>
+
+  <Section>
+    <SectionHead kicker="Common questions" heading="Good to know" />
+    <Faq items={faq} />
+  </Section>
+
+  <QuoteSection
+    kicker="Have an idea?"
+    heading="Let us draw it up."
+    body="Describe what you are picturing. If it is easier to show us, send a photo of the sketch or the original part."
+    selectedService="3D design"
+  />
+</Base>
