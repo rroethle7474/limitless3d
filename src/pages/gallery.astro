@@ -1,0 +1,110 @@
+---
+import Base from '~/layouts/Base.astro';
+import PageHero from '~/components/PageHero.astro';
+import Section from '~/components/Section.astro';
+import SectionHead from '~/components/SectionHead.astro';
+import BuildLog from '~/components/BuildLog.astro';
+import FeatureCards from '~/components/FeatureCards.astro';
+import Testimonial from '~/components/Testimonial.astro';
+import QuoteSection from '~/components/QuoteSection.astro';
+
+import { SHOWCASE, type ShowcaseEntry } from '~/data/showcase';
+
+import pondNozzle from '~/assets/work/pond-nozzle.jpg';
+import pondNozzle2 from '~/assets/work/pond-nozzle-2.jpg';
+import displayStand from '~/assets/work/display-stand.jpg';
+import workshop01 from '~/assets/work/workshop-01.jpg';
+import workshop02 from '~/assets/work/workshop-02.jpg';
+
+const title = 'Project Gallery | Real 3D Printed Parts and Repairs | Limitless 3D';
+const description =
+  'A look at real work from the Limitless 3D workshop in Neenah, WI. Commissioned parts, repairs, restorations, prototypes, and hobby builds.';
+
+// The gallery spotlight is the homepage's six entries plus four more, in the prototype's order.
+// Alt text is ours, not the prototype's (D-014).
+const GALLERY: ShowcaseEntry[] = [
+  ...SHOWCASE,
+  {
+    img: displayStand,
+    kicker: 'PROTOTYPE',
+    title: 'Display stand',
+    sub: 'FROM DRAWING TO PART',
+    alt: 'A black printed display stand resting on the dimensioned drawing it was made from',
+  },
+  {
+    img: workshop01,
+    kicker: 'RESIN DETAIL',
+    title: 'Sculpted figure',
+    sub: 'PRINTED IN RESIN',
+    alt: 'A classical figure sculpture printed in white resin, down to the folds of the dress',
+  },
+  {
+    img: workshop02,
+    kicker: 'RESIN DETAIL',
+    title: 'Textured vase',
+    sub: 'FINE LAYER FINISH',
+    alt: 'A translucent printed vase covered in a finely ridged, woven surface texture',
+  },
+  {
+    img: pondNozzle2,
+    kicker: 'ENGINEERED PART',
+    title: 'Nozzle underside',
+    sub: 'FUNCTION FIRST',
+    alt: 'The threaded underside of the fountain nozzle, with its orange O-ring seated in the groove',
+  },
+];
+
+const pattern = [
+  {
+    icon: '<path d="M14.7 6.3a4 4 0 105.4 5.4l-9.6 9.6a2.5 2.5 0 01-3.5-3.5l9.6-9.6z"/><circle cx="17.5" cy="6.5" r="0"/>',
+    title: 'The part that killed the whole machine',
+    body: 'A cracked tray, a missing lid, a snapped clip. The rest of the thing was fine.',
+  },
+  {
+    icon: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/>',
+    title: 'The thing that did not exist',
+    body: 'A commissioned nozzle, a fixture, a storage insert cut to the exact drawer.',
+  },
+  {
+    icon: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/>',
+    title: 'The one that could not be replaced',
+    body: 'Instruments and antiques, captured and reproduced without harming the original.',
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <PageHero
+    crumb="Gallery"
+    heading="Everything here was<br />somebody’s <em>problem</em> first."
+    lead="Commissioned parts, repairs, restorations, prototypes, and a fair amount of fun. Most of these started with someone saying they could not buy it anywhere."
+    primary={{ label: 'Browse the work', href: '#work' }}
+    ghost={{ label: 'Start your project', href: '/#quote' }}
+    image={pondNozzle}
+    alt="A 3D printed pond fountain nozzle on a workbench"
+  />
+
+  <BuildLog
+    entries={GALLERY}
+    kicker="The build log"
+    heading="Ten projects, start to finish"
+    sub="Tap a thumbnail to jump to a project, or let it run."
+  />
+
+  <Section tint>
+    <SectionHead
+      kicker="The pattern"
+      heading="What most of these have in common"
+      sub="They were not available, not affordable, or not made anymore."
+    />
+    <FeatureCards cards={pattern} />
+  </Section>
+
+  <Testimonial />
+
+  <QuoteSection
+    kicker="Your turn"
+    heading="What are you trying to make?"
+    body="If it is broken, discontinued, or still only in your head, it belongs on this page next."
+  />
+</Base>
