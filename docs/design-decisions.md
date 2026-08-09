@@ -19,20 +19,50 @@ refine or contradict the plan also get a row in `limitless3d-rebuild-plan.md` §
 | D-016 | 2026-08-09 | Parts-wall images renamed `part-01`…`part-12` in wall order, with the original CDN ids preserved in `src/assets/parts/SOURCES.md`. | They are decorative (`aria-hidden`, `alt=""`) and carry no semantic content, so positional names are honest. The mapping is kept so they can be re-identified if they ever become real shop content. |
 | D-017 | 2026-08-09 | `favicon.svg` regenerated from the brand path rather than copying the prototype's PNGs. | Scales cleanly, one file, no binary in the repo. **Open:** `apple-touch-icon.png` is referenced in `Base.astro` but not yet generated — needs Sharp, which needs a completed `npm install`. |
 
+## RESUME HERE — next session
+
+**Session 1 ended with the homepage fully written but never rendered.** `npm install` could
+not complete (see the session note below), so the run-and-look review never happened. Nothing
+below is a known defect — it is the verification that is owed.
+
+Ordered steps:
+
+1. `npm install` — nothing else works until this lands. Confirm `astro`, `three`, `sharp`,
+   `@tailwindcss/vite` are all present.
+2. `npm run check` — clears the two type errors that are purely install artefacts
+   (`Cannot find module 'three'`, `astro/tsconfigs/strict not found`).
+3. `npm run dev`, then walk the homepage **section by section, top to bottom**, against
+   `docs/design-reference.md` §5 and the live prototype. Expect to fix things — this is the
+   first time any of it renders.
+4. Specific things to check first, because they are the most likely to be wrong:
+   - **Hero**: does the WebGL scene mount, cycle all four phases, and place correctly at all
+     three responsive tiers? Try `?phase=print`, `?done=1`, `?nogl=1`, and reduced-motion.
+   - **Parts door**: the `import.meta.glob` was corrected late to a relative path — confirm
+     all 12 images actually resolve and the walls render in order.
+   - **Build-log spotlight**: six stacked images crossfading by class is a deviation from the
+     prototype (D-012) and has never run.
+   - **Scoped-style leakage**: several components rely on `:global()` inside Astro scoped
+     styles (`body.menu-open` in Nav, `img[data-slide]` in BuildLog, `.brand b`). Astro's
+     scoping rules are the likeliest source of silent visual breakage.
+   - **Astro config**: `image.responsiveStyles` and `image.layout` need a recent Astro 5
+     minor. If the installed version rejects them, drop those two lines.
+5. Generate `apple-touch-icon.png` at 180×180 from `public/favicon.svg` (D-017) — the `<link>`
+   in `Base.astro` 404s until then.
+6. Only once the homepage is signed off: interior pages, per the plan's §0 slicing.
+
 ## Open items
 
-- **`apple-touch-icon.png` does not exist yet** (see D-017). The `<link>` in `Base.astro` will
-  404 until it's generated. Generate at 180×180 from `public/favicon.svg`.
-- **Nothing in this session has been rendered in a browser.** `npm install` could not complete
-  (see the session note below), so every section is written but unverified. First task next
-  session: install, run `npm run dev`, and review section by section.
+- **`apple-touch-icon.png` does not exist yet** (D-017).
 - **`og-image.jpg` is the prototype's**, carried over as-is. Fine for now; worth regenerating
   if the design shifts.
+- **Homepage FAQ** (D-006) is not built — it is net-new with no prototype reference, and the
+  one place Claude Design is sanctioned (plan §0).
 
 ## Session notes
 
 **2026-08-09 — npm install blocked by network.** The machine was on a mobile hotspot during a
-storm. Throughput to `registry.npmjs.org` measured ~67 KB/s (the `astro` packument alone is
-8.95 MB and took 133 s). Two install attempts were abandoned rather than burn mobile data;
-Ryan will install on real bandwidth. All source is written and ready — the first command next
-session is `npm install`.
+storm. Throughput to `registry.npmjs.org` measured ~67 KB/s — the `astro` packument alone is
+8.95 MB and took 133 s, and a full install would have run for hours while burning mobile data.
+Two attempts were killed deliberately rather than let them run. Diagnosis is recorded here so
+nobody re-investigates it: the registry was reachable and healthy, the connection was not.
+All source was written and committed; the first command next session is `npm install`.
