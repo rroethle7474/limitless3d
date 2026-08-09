@@ -1,0 +1,219 @@
+---
+import Base from '~/layouts/Base.astro';
+import PageHero from '~/components/PageHero.astro';
+import Section from '~/components/Section.astro';
+import SectionHead from '~/components/SectionHead.astro';
+import Split from '~/components/Split.astro';
+import FeatureCards from '~/components/FeatureCards.astro';
+import Faq from '~/components/Faq.astro';
+import PartsDoor from '~/components/PartsDoor.astro';
+import QuoteSection from '~/components/QuoteSection.astro';
+
+import workshop02 from '~/assets/work/workshop-02.jpg';
+import rcCars from '~/assets/work/rc-cars.jpg';
+
+const title = 'Custom 3D Printing in the Fox Valley | Limitless 3D, Neenah WI';
+const description =
+  'Filament and resin 3D printing in Neenah, Wisconsin. Functional parts in ABS and nylon, display pieces in PLA and resin, prototypes, and company swag. Days, not weeks.';
+
+const why = [
+  {
+    icon: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+    title: 'Fast and local',
+    body: 'Being here in the Fox Valley means quick turnarounds and a real conversation about your part, not a support ticket.',
+  },
+  {
+    icon: '<path d="M3 15l12-12 6 6-12 12H3v-6zM8 10l2 2M11 7l2 2"/>',
+    title: 'Proof of concept',
+    body: 'Have an idea on paper but no way to hold it? Bring the sketch and we will make it tangible. We can help with the design too.',
+  },
+  {
+    icon: '<path d="M20 8H4v13h16V8zM2 8h20v4H2zM12 8v13M12 8S9 3 7 5s5 3 5 3zM12 8s3-5 5-3-5 3-5 3z"/>',
+    title: 'Company swag',
+    body: 'Set your business apart with something printed, useful, and impossible to get anywhere else.',
+  },
+];
+
+const materials = [
+  {
+    material: 'PLA',
+    bestFor: 'Display pieces, gifts, prototypes',
+    why: 'The economical choice, with a huge range of colors and finishes.',
+  },
+  {
+    material: 'ABS',
+    bestFor: 'Functional parts',
+    why: 'Tougher and more heat tolerant, for parts that have a job to do.',
+  },
+  {
+    material: 'Nylon',
+    bestFor: 'Wear surfaces and moving parts',
+    why: 'Durable and resilient where things rub, flex, or take repeated load.',
+  },
+  {
+    material: 'TPE',
+    bestFor: 'Flexible parts',
+    why: 'A rubber like material for anything that needs to grip, cushion, or bend.',
+  },
+  {
+    material: 'Resin',
+    bestFor: 'Fine detail and smooth surfaces',
+    why: 'For small parts and detailed models where layer lines would spoil it.',
+  },
+];
+
+const faq = [
+  {
+    q: 'How long does a print take?',
+    a: 'Days rather than weeks for most jobs. The real answer depends on size, material, and how many you need, so we will give you a timeline with the quote.',
+  },
+  {
+    q: 'What does printing cost?',
+    a: 'If you bring a finished file, printing is billed at a reasonable hourly rate. If the part needs designing first, that gets quoted alongside it.',
+  },
+  {
+    q: 'Can you match a color?',
+    a: 'We stock a wide range of colors and finishes in PLA, and we will tell you honestly how close a match is going to get.',
+  },
+  {
+    q: 'Can you print something that has to actually work?',
+    a: 'Yes, and that is the interesting part of the job. Functional parts get printed in ABS or nylon with the orientation and wall thickness chosen for the load.',
+  },
+  {
+    q: 'Do you do small runs?',
+    a: 'One offs and small batches both, whether that is a single replacement part or a box of swag for an event.',
+  },
+];
+---
+
+<Base title={title} description={description}>
+  <PageHero
+    crumb="3D Printing"
+    heading="Printed here.<br />In your hands in <em>days</em>."
+    lead="We are in the Fox Valley, so service is fast and local. Pick the material, the color, the texture, and the strength, and we will make the thing."
+    primary={{ label: 'Get a Printing Quote', href: '#quote' }}
+    ghost={{ label: 'See materials', href: '#materials' }}
+    image={workshop02}
+    alt="Translucent resin printed vase with fine layer detail"
+  />
+
+  <Section>
+    <FeatureCards cards={why} />
+  </Section>
+
+  <Section tint id="materials">
+    <SectionHead
+      kicker="Materials"
+      heading="Pick the material that fits the job"
+      sub="We run both filament and resin printers, so the same shop can make a rugged bracket and a finely detailed display piece."
+    />
+
+    {/* Page-local, not a component: /3d-printing is the only page in the design that has a
+        table (design-reference §4). Styles below are the prototype's `.spectable` rules. */}
+    <div class="table-scroll reveal">
+      <table class="spectable">
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th>Best for</th>
+            <th>Why you would choose it</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            materials.map((m) => (
+              <tr>
+                <td>{m.material}</td>
+                <td>{m.bestFor}</td>
+                <td>{m.why}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </Section>
+
+  <Section>
+    <Split
+      kicker="Print my file"
+      heading="Already have a file? Send it over."
+      image={rcCars}
+      alt="Two 3D printed RC car bodies, one black and one clear"
+    >
+      <p>
+        There are plenty of good print files out there, and Thingiverse alone has more than most
+        people could work through in a lifetime. Find one you want in your hands and send it our
+        way.
+      </p>
+      <p>
+        With the design work already done, printing is billed at a reasonable hourly rate, so
+        this is the cheapest way to get something made properly. We will still check the file
+        over and tell you if it needs a tweak before it prints well.
+      </p>
+      <p>
+        No file and no idea where to start? That happens more often, and it is what the design
+        side of the shop is for.
+      </p>
+    </Split>
+  </Section>
+
+  <Section>
+    <SectionHead kicker="Common questions" heading="Good to know" />
+    <Faq items={faq} />
+  </Section>
+
+  <PartsDoor />
+
+  <QuoteSection
+    kicker="Ready to print?"
+    heading="Tell us what you need."
+    body="Send the file, the sketch, or a photo of the broken part. We will come back with a price and a timeline."
+    selectedService="3D printing"
+  />
+</Base>
+
+<style>
+  .table-scroll {
+    overflow-x: auto;
+    border-radius: var(--radius);
+  }
+
+  .spectable {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .spectable th,
+  .spectable td {
+    padding: 15px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    font-size: .93rem;
+  }
+
+  .spectable th {
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    background: var(--panel-2);
+  }
+
+  .spectable td {
+    color: var(--muted);
+  }
+
+  .spectable td:first-child {
+    font-weight: 600;
+  }
+
+  .spectable tr:last-child td {
+    border-bottom: 0;
+  }
+</style>
