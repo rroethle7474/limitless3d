@@ -74,10 +74,15 @@ Verified locally against `npx wrangler pages dev dist`: curl matrix (fake-200 ho
 run-and-look — Turnstile lazy-load + widget render, client photo validation (count /
 per-file / total, message clears), and a real submit showing the honest failure card with
 the placeholder Resend key (Resend 401 → our 502 → red card, phone/email links, form
-intact). **What remains to call it done: Ryan pastes his real Resend key into `.dev.vars`
-(placeholder on the `RESEND_API_KEY` line), restarts wrangler, submits the form with
-photos, and finds the email in rroethle@gmail.com.** The Vite dev server does not run the
-function — test on the wrangler port.
+intact). **Delivery validated same day:** with Ryan's real key in `.dev.vars`, a full test
+submission (fields + photo attachment) came back `{"ok":true}` and Ryan confirmed the email
+in rroethle@gmail.com. One cosmetic check remains unwalked: the success card after a *real*
+200 has only been reached via curl — a quick form-UI submission would eyeball it (the card
+markup is identical to the stub's, which was reviewed in 1a). The Vite dev server does not
+run the function — test on the wrangler port. Ops note for next time: killing wrangler by
+its listener PID orphans `workerd`, which keeps the port half-alive and hangs requests —
+kill the process tree from the `npx` root (`taskkill /F /T`), then check nothing still
+listens on 8788.
 
 **Next up in Phase 1b** (plan §7): Sanity (content model §4, closes the D-027 seam), then
 staging deployment (real Turnstile keys, noindex), then Square catalog (gated on §9.7

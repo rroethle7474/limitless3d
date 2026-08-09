@@ -136,7 +136,8 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 - Stand up Sanity with the §4 content model; migrate hardcoded content into it.
 - Implement the quote form backend (Pages Function + Resend + Turnstile + dual-write per §3b).
   *Done 2026-08-09 except the dual-write's storage half, which is an explicit seam awaiting
-  Sanity — see §10 and design-decisions D-026/D-027. Awaiting Ryan's inbox validation.*
+  Sanity — see §10 and design-decisions D-026/D-027. Inbox delivery validated by Ryan same
+  day (test submission with photo attachment received at the QUOTE_TO_EMAIL address).*
 - Stand up the demo/staging deployment (noindex, access-protected). Ryan owns hosting setup; Cloudflare Pages remains the recommended target.
 - Square catalog integration (§2) is now pre-cutover scope (2026-08-09, §10): product pages rendered from the Catalog API with Square-hosted checkout links, using the prototype's shop design as reference (snapshot: `shop.html` + `parts-pdp-example.html`). Still gated on Ryan supplying Square OAuth/app credentials; sequenced after the CMS wire-up.
 
