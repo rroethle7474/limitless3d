@@ -1,0 +1,176 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { SHOP_URL } from '~/data/site';
+
+/**
+ * The parts-shop "door": two 3D-rotated walls of printed parts receding toward a centred CTA.
+ *
+ * The wall images are decorative (aria-hidden, empty alt) and render at ~200px, so they are
+ * served at a fraction of their source resolution — the prototype hotlinked these at full
+ * size from the old Square CDN (decision D-003).
+ */
+// NB: import.meta.glob is resolved by Vite at build time and does NOT understand the `~`
+// tsconfig alias — this pattern must stay relative to this file.
+const parts = Object.entries(
+  import.meta.glob<{ default: ImageMetadata }>('../assets/parts/part-*.jpg', {
+    eager: true,
+  }),
+)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, m]) => m.default);
+
+const left = parts.slice(0, 6);
+const right = parts.slice(6, 12);
+---
+
+<section class="door" id="shop-door">
+  <div class="wall left" aria-hidden="true">
+    {
+      left.map((img) => (
+        <div class="witem">
+          <Image src={img} alt="" width={260} height={260} loading="lazy" />
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="wall right" aria-hidden="true">
+    {
+      right.map((img) => (
+        <div class="witem">
+          <Image src={img} alt="" width={260} height={260} loading="lazy" />
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="door-ceil" aria-hidden="true"></div>
+  <div class="door-floor" aria-hidden="true"></div>
+
+  <div class="door-core">
+    <div>
+      <div class="mono accent">The parts shop</div>
+      <h2>The part they stopped making?<br />We print it.</h2>
+      <p>
+        Over 60 replacement parts and originals, designed and printed in the workshop. Shipped
+        nationwide.
+      </p>
+      <a class="btn primary" href={SHOP_URL} target="_blank" rel="noopener">
+        Enter the Parts Shop
+      </a>
+      <div class="mono sub">60+ PARTS &middot; SECURE CHECKOUT &middot; SHIPS NATIONWIDE</div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .door {
+    position: relative;
+    height: 640px;
+    overflow: hidden;
+    background: var(--door-bg);
+    border-block: 1px solid var(--line);
+    perspective: 1150px;
+  }
+
+  .wall {
+    position: absolute;
+    top: 50%;
+    width: min(31vw, 400px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    transform-style: preserve-3d;
+    z-index: 1;
+  }
+
+  .wall.left {
+    left: -40px;
+    transform: translateY(-50%) rotateY(56deg);
+  }
+
+  .wall.right {
+    right: -40px;
+    transform: translateY(-50%) rotateY(-56deg);
+  }
+
+  .witem {
+    background: #fff;
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+  }
+
+  .witem :global(img) {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(25, 26, 32, .12);
+    background: var(--panel);
+  }
+
+  /* Fog top and bottom, plus a radial behind the core, so the walls fade into the page. */
+  .door-floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 38%;
+    background: linear-gradient(to top, var(--door-fog), transparent);
+    z-index: 2;
+  }
+
+  .door-ceil {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 22%;
+    background: linear-gradient(to bottom, var(--door-fog), transparent);
+    z-index: 2;
+  }
+
+  .door-core {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 0 24px;
+    background: radial-gradient(46% 60% at 50% 50%, var(--door-fog) 30%, transparent 100%);
+  }
+
+  .door-core h2 {
+    font-size: clamp(1.9rem, 3.6vw, 2.8rem);
+    margin: 14px 0 12px;
+  }
+
+  .door-core p {
+    color: var(--muted);
+    max-width: 30rem;
+    margin: 0 auto 30px;
+  }
+
+  .door-core .mono.sub {
+    margin-top: 22px;
+    font-size: .66rem;
+  }
+
+  @media (max-width: 640px) {
+    .door { height: 540px; }
+    .wall { width: 44vw; }
+    .wall .witem:nth-child(n + 5) { display: none; }
+    .wall.left { left: -58px; }
+    .wall.right { right: -58px; }
+  }
+</style>
