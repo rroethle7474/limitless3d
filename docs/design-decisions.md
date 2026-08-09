@@ -60,8 +60,8 @@ Verified in session 2 (Chrome, desktop viewport, per page):
    autoplay were force-verified via DOM class toggles; a human scroll-through is still the real
    test.
 
-Then: the homepage FAQ (net-new, the one sanctioned Claude Design task — separate
-conversation), then the polish pass.
+Then: the polish pass. (The homepage FAQ was deferred to Phase 2 on 2026-08-09 — its content
+needs Randy's input; see the plan's §9.6 and §10.)
 
 **Tooling note (still true in session 2):** the Chrome automation keeps backgrounding the tab
 (`document.hidden === true`), which stales screenshots and throttles rAF/IntersectionObserver —
@@ -104,8 +104,9 @@ Two things worth knowing:
 - ~~`apple-touch-icon.png` does not exist yet~~ Generated 2026-08-09, 180×180 from `favicon.svg` via Sharp (closes D-017's open note).
 - **`og-image.jpg` is the prototype's**, carried over as-is. Fine for now; worth regenerating
   if the design shifts.
-- **Homepage FAQ** (D-006) is not built — it is net-new with no prototype reference, and the
-  one place Claude Design is sanctioned (plan §0).
+- **Homepage FAQ** (D-006) — **deferred to Phase 2** (2026-08-09): the content (materials,
+  turnaround, ballpark pricing) is owner facts and Randy's input isn't available yet. Still the
+  one sanctioned Claude Design build when it returns; the content question is plan §9.6.
 
 ## Session notes
 

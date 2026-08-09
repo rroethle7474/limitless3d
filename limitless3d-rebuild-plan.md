@@ -110,6 +110,8 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 - **Build log as a growing collection** — CMS-driven project entries instead of a fixed gallery; each new entry is fresh indexed content and portfolio proof.
 - **Google reviews alongside Etsy stats** — local search leans on Google Business Profile signals.
 - **FAQ section** — materials, turnaround, ballpark pricing; targets long-tail local queries.
+  *Deferred out of Phase 1a (2026-08-09, §10): the answers are owner facts and Randy's input
+  isn't available yet. Revisit at Phase 2, where owner review happens anyway.*
 - **Performance budget** — optimized images, minimal JS; aim for green Core Web Vitals on mobile.
 
 ## 7. Build Phases
@@ -167,6 +169,9 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 3. Shop emphasis: keep pushing the Square parts shop, link out to Etsy (where the 500+ reviews live), or both?
 4. Which email should quote-form submissions go to, and does he want an auto-reply to the customer?
 5. Confirm the §4 editable-collection list with the owner before modeling it in Sanity.
+6. Homepage FAQ content (§6): what materials does Randy want to lead with, what turnaround
+   does he promise, and is he willing to state ballpark pricing publicly? Blocks the deferred
+   FAQ section.
 
 ## 10. Decision Log
 
@@ -184,3 +189,4 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 | 2026-08-09 | **Prototype is a design target, not an implementation spec** (Ryan). Recreate the look; choose the architecture. Performance-motivated deviations are welcome, over-optimizing that costs distinctiveness is not. Applied so far: Astro image pipeline instead of raw multi-MB JPEGs (one source photo is 1.3 MB, rendered at ~200 px); per-route CSS and per-section JS instead of one stylesheet + one bundle on every page; tree-shaken `three` behind a dynamic import instead of a self-hosted full `three.min.js`. Explicitly *not* done: replacing the WebGL hero with a lighter approximation — it is the most distinctive thing on the page; measure before revisiting. |
 | 2026-08-09 | **Stack detail — styling is a hybrid** (decision D-010): prototype tokens wired into Tailwind v4 `@theme inline`, utilities for layout/spacing/type, hand-written scoped CSS for bespoke visuals. Refines the "Astro + Tailwind" row above; the 3D transforms, CSS counters and keyframes do not map to utilities, and the hybrid ships less CSS per route than the prototype does. |
 | 2026-08-09 | Scaffold landed: Astro 5 static + Tailwind v4 + Sharp + `three`, TypeScript strict, no UI framework or islands. `CLAUDE.md` at root carries conventions, session slicing, and the orchestration ruling. Homepage written section-by-section. **Not yet verified in a browser** — `npm install` was blocked by ~67 KB/s throughput on a mobile hotspot and deferred to real bandwidth. |
+| 2026-08-09 | **Homepage FAQ deferred out of Phase 1a** (Ryan). The §6 improvement stands, but its content — materials, turnaround, ballpark pricing — is owner facts, and Randy's input isn't available yet. Revisit at Phase 2 alongside owner review; the open question moves to §9.6. Phase 1a's remaining scope is the polish pass only. With the FAQ deferred, no Claude Design use remains in Phase 1a (its other sanctioned use is Phase 2 variant exploration). |

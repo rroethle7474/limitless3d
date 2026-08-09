@@ -482,7 +482,7 @@ What we are **not** copying, and why. Cross-referenced to `docs/design-decisions
 | D-003 | Hotlinks 12 photos from `cdn6.editmysite.com` | Self-hosted through Astro's image pipeline | Plan §6 |
 | D-004 | Dark theme exists but is unreachable | Port the tokens, keep it unreachable for now | Not in scope; revisit post-launch |
 | D-005 | Form posts `/api/quote`, falls back to `mailto:` | UI only, stubbed with a TODO | Phase 1a scope; backend is Phase 1b |
-| D-006 | No FAQ on the homepage | An FAQ section is planned | Plan §6. Net-new → the one place Claude Design is sanctioned (plan §0) |
+| D-006 | No FAQ on the homepage | FAQ planned, **deferred to Phase 2** — content needs the owner's input (plan §9.6, §10 2026-08-09) | Plan §6. Net-new → the one place Claude Design is sanctioned (plan §0) |
 | D-007 | Copy is hardcoded | Hardcoded now, CMS-driven in Phase 1b | Plan §7 |
 | D-008 | `data-to="chris+limitless@growwithkoda.co"` on the form | Removed | Prototype author's address |
 | D-009 | Vercel Insights script | Dropped | Cloudflare Web Analytics at launch (plan §3) |
