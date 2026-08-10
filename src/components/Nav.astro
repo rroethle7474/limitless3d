@@ -1,6 +1,7 @@
 ---
 import Brand from './Brand.astro';
-import { NAV_LINKS, BUSINESS } from '~/data/site';
+import { BUSINESS } from '~/data/cms';
+import { NAV_LINKS } from '~/data/site';
 
 const { pathname } = Astro.url;
 const isOn = (href: string) => pathname === href || pathname === `${href}/`;

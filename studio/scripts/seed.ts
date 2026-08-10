@@ -261,7 +261,8 @@ async function main() {
     },
   ]
 
-  const docs = [...gallery, ...testimonials, siteStats, businessInfo, ...servicePages]
+  type SeedDoc = {_id: string; _type: string} & Record<string, unknown>
+  const docs: SeedDoc[] = [...gallery, ...testimonials, siteStats, businessInfo, ...servicePages]
 
   console.log(`Writing ${docs.length} documents …`)
   let tx = client.transaction()

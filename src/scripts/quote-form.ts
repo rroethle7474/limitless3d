@@ -16,7 +16,6 @@
  */
 
 import { photoLimitError } from '~/data/quote-limits';
-import { BUSINESS } from '~/data/site';
 
 declare global {
   interface Window {
@@ -123,6 +122,19 @@ if (form) {
     form.replaceWith(ok);
   };
 
+  /* The fallback contact links come from the rendered `.quote-alt` markup —
+     the CMS already put the current phone/email there at build time, and
+     importing the data layer here would drag build-time fetch code into a
+     client bundle. The email's natural casing lives in the mailto: href (the
+     visible text is uppercased). */
+  const altLinks = form
+    .closest('.quote-sec')
+    ?.querySelectorAll<HTMLAnchorElement>('.quote-alt a');
+  const phoneHref = altLinks?.[0]?.getAttribute('href') ?? '';
+  const phoneText = altLinks?.[0]?.querySelector('b')?.textContent ?? '';
+  const emailHref = altLinks?.[1]?.getAttribute('href') ?? '';
+  const emailText = emailHref.replace(/^mailto:/, '');
+
   const showFailure = (message?: string) => {
     btn.disabled = false;
     btn.textContent = btnLabel;
@@ -132,11 +144,13 @@ if (form) {
     const box = document.createElement('div');
     box.className = 'form-err';
     box.setAttribute('role', 'alert');
-    box.innerHTML =
-      `<b>${esc(message ?? "That didn't send.")}</b> ` +
-      'Nothing was lost on your end — try again in a moment, or reach us directly: ' +
-      `<a href="${BUSINESS.phoneHref}">${BUSINESS.phone}</a> or ` +
-      `<a href="${BUSINESS.emailHref}">${BUSINESS.email}</a>.`;
+    const reachUs =
+      phoneHref && emailHref
+        ? ' Nothing was lost on your end — try again in a moment, or reach us directly: ' +
+          `<a href="${phoneHref}">${esc(phoneText)}</a> or ` +
+          `<a href="${emailHref}">${esc(emailText)}</a>.`
+        : ' Nothing was lost on your end — try again in a moment.';
+    box.innerHTML = `<b>${esc(message ?? "That didn't send.")}</b>${reachUs}`;
     btn.before(box);
   };
 

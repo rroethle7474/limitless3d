@@ -1,33 +1,12 @@
 /**
- * Business facts and site-wide constants.
+ * Code-fixed site constants: navigation, social URLs, the shop link, the brand
+ * mark. These are layout/identity, deliberately NOT editable (plan §4:
+ * "everything else is code-fixed").
  *
- * Single source of truth for anything that appears in more than one place (nav, drawer,
- * footer, quote section, JSON-LD). Values are the prototype's, cross-checked as consistent
- * across all nine pages — see docs/design-reference.md §9.
- *
- * Phase 1b: several of these become Sanity fields (plan §4.4 "Business info"). Keeping them
- * here now means that migration is a change of import, not a hunt through templates.
+ * The editable business facts (phone, email, service area) and the proof-bar
+ * STATS moved to Sanity in Phase 1b — import { BUSINESS, STATS } from
+ * '~/data/cms' (build-time fetch; the shapes are unchanged).
  */
-
-export const BUSINESS = {
-  legalName: 'Limitless 3D LLC',
-  shortName: 'Limitless 3D',
-  owner: 'Randy',
-  phone: '920-360-7543',
-  phoneHref: 'tel:19203607543',
-  email: 'limitless3ddesign@gmail.com',
-  get emailHref() {
-    return `mailto:${this.email}`;
-  },
-  address: {
-    locality: 'Neenah',
-    region: 'WI',
-    postalCode: '54956',
-    country: 'US',
-  },
-  areaServed: ['Neenah', 'Appleton', 'Oshkosh', 'Menasha'],
-  areaServedState: 'Wisconsin',
-} as const;
 
 export const SOCIAL = {
   instagram: 'https://www.instagram.com/limitless3ddesign/',
@@ -45,14 +24,6 @@ export const SOCIAL = {
  * Decision D-011.
  */
 export const SHOP_URL = 'https://shop.limitless3ddesign.com';
-
-/** Headline numbers. TODO(phase-1b): becomes the "Homepage stats" collection (plan §4.3). */
-export const STATS = [
-  { value: '★ 4.8', label: 'Average rating' },
-  { value: '500+', label: 'Customer reviews' },
-  { value: '3,000+', label: 'Orders shipped' },
-  { value: 'Star Seller', label: 'Etsy recognition' },
-] as const;
 
 export const NAV_LINKS = [
   { href: '/3d-scanning', label: 'Scanning' },

@@ -5,13 +5,17 @@ import Section from '~/components/Section.astro';
 import SectionHead from '~/components/SectionHead.astro';
 import Faq from '~/components/Faq.astro';
 import QuoteSection from '~/components/QuoteSection.astro';
-import { BUSINESS, SOCIAL } from '~/data/site';
+import { BUSINESS } from '~/data/cms';
+import { SOCIAL } from '~/data/site';
 
 import rcCars from '~/assets/work/rc-cars.jpg';
 
-const title = 'Contact Limitless 3D | Neenah, WI | 920-360-7543';
+/* Interpolated from BUSINESS (identical output today) — hardcoded literals here
+   were the one spot the phone/email could silently drift from the CMS values. */
+const title = `Contact Limitless 3D | Neenah, WI | ${BUSINESS.phone}`;
 const description =
-  'Call 920-360-7543 or email limitless3ddesign@gmail.com. Limitless 3D serves Neenah, the Fox Valley, and all of northeast Wisconsin, and ships parts nationwide.';
+  `Call ${BUSINESS.phone} or email ${BUSINESS.email}. Limitless 3D serves Neenah, the Fox ` +
+  'Valley, and all of northeast Wisconsin, and ships parts nationwide.';
 
 const faq = [
   {
