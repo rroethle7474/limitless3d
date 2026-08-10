@@ -8,9 +8,10 @@ import FeatureCards from '~/components/FeatureCards.astro';
 import Faq from '~/components/Faq.astro';
 import QuoteSection from '~/components/QuoteSection.astro';
 
-import displayStand from '~/assets/work/display-stand.jpg';
-import nozzleCad from '~/assets/work/nozzle-cad.jpg';
-import pondNozzle from '~/assets/work/pond-nozzle.jpg';
+import { SERVICE_COPY } from '~/data/cms';
+
+/* Hero lead + photo and the split sections are owner-editable (plan §4.5). */
+const COPY = SERVICE_COPY.design;
 
 const title = '3D Design and CAD Services | 25 Years Experience | Limitless 3D';
 const description =
@@ -63,49 +64,21 @@ const faq = [
   <PageHero
     crumb="3D Design"
     heading="You describe it.<br />We <em>draw</em> it properly."
-    lead="Twenty-five years of professional design work for civil and mechanical engineering firms, now pointed at your project. If you have an idea, we can do the heavy lifting."
+    lead={COPY.lead}
     primary={{ label: 'Talk About Your Idea', href: '#quote' }}
     ghost={{ label: 'Start from a scan', href: '/3d-scanning' }}
-    image={displayStand}
-    alt="A 3D printed display stand resting on its engineering drawing"
+    image={COPY.heroImage}
+    alt={COPY.heroAlt}
   />
 
   <Section>
-    <Split
-      kicker="How we work"
-      heading="Details, details, details"
-      image={nozzleCad}
-      alt="CAD model of a pond fountain nozzle"
-    >
-      <p>
-        Twenty-five years in the consulting engineering world means hundreds of detailed plans
-        for civil and mechanical firms, and the habits that come with them. Those habits are the
-        reason your part fits the first time.
-      </p>
-      <p>
-        Every project that comes through the door gets treated like one of our own, on the old
-        rule of <strong>measure twice, cut once</strong>. Getting it right on the screen is far
-        cheaper than getting it wrong in material.
-      </p>
-    </Split>
-
-    <Split
-      rev
-      kicker="Cutting edge tools"
-      heading="The software has kept up. So have we."
-      image={pondNozzle}
-      alt="Finished 3D printed pond fountain nozzle"
-    >
-      <p>
-        Autodesk tools have changed a lot over twenty-five years, and we have used most versions
-        along the way. That means modern modeling when a project calls for it, and none of the
-        guesswork when a drawing has to be read by somebody else.
-      </p>
-      <p>
-        Bring a sketch on paper, a photo, a broken original, or a description you have been
-        carrying around for years. Any of those is a starting point.
-      </p>
-    </Split>
+    {
+      COPY.splits.map((s, i) => (
+        <Split kicker={s.kicker} heading={s.heading} rev={i % 2 === 1} image={s.image} alt={s.alt}>
+          <Fragment set:html={s.bodyHtml} />
+        </Split>
+      ))
+    }
   </Section>
 
   <Section tint>

@@ -6,6 +6,7 @@ import Section from '~/components/Section.astro';
 import SectionHead from '~/components/SectionHead.astro';
 import FeatureCards from '~/components/FeatureCards.astro';
 import QuoteSection from '~/components/QuoteSection.astro';
+import { REVIEWS } from '~/data/cms';
 import { SOCIAL } from '~/data/site';
 
 import skiBoot from '~/assets/work/ski-boot.jpg';
@@ -17,18 +18,9 @@ const description =
 /** Where the two "Leave a review" buttons point. Etsy is the shop URL from site.ts. */
 const GOOGLE_REVIEW_URL = 'https://www.google.com/search?q=Limitless+3D+Neenah+WI';
 
-const reviews = [
-  {
-    quote:
-      '“Randy was incredible to work with. He is very easy to work with, has fair pricing, and you can tell he loves what he does. I would recommend him to absolutely anyone.”',
-    who: 'Verified customer · fountain nozzle design',
-  },
-  {
-    quote:
-      '“Dispatched on time, tracking every step, and questions answered fast. That is what Etsy Star Seller status is measured on, and it is held across more than 500 reviews.”',
-    who: 'Etsy shop record · four years selling',
-  },
-];
+/* The cards come from Sanity (every testimonial not flagged for the quote
+   band), in editor-set order. Quotes are stored bare; the template re-adds
+   the “ ” marks. */
 
 const expectations = [
   {
@@ -75,11 +67,11 @@ const expectations = [
     />
     <div class="rcards">
       {
-        reviews.map((r) => (
+        REVIEWS.map((r) => (
           <div class="rcard reveal">
             <span class="stars" role="img" aria-label="Five out of five">★★★★★</span>
-            <blockquote>{r.quote}</blockquote>
-            <div class="who">{r.who}</div>
+            <blockquote>“{r.quote}”</blockquote>
+            <div class="who">{r.attribution}</div>
           </div>
         ))
       }

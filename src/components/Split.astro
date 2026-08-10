@@ -8,15 +8,21 @@
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 
+import { capWidths, type CmsImage } from '~/data/cms';
+
 interface Props {
   kicker: string;
   heading: string;
   rev?: boolean;
-  image: ImageMetadata;
+  /** Local import, or a Sanity-hosted photo (service pages) — both go through Sharp at build. */
+  image: ImageMetadata | CmsImage;
   alt: string;
 }
 
 const { kicker, heading, rev = false, image, alt } = Astro.props;
+
+/* ImageMetadata carries its dimensions; a remote CmsImage must pass them explicitly. */
+const local = 'format' in image;
 ---
 
 <div class:list={['split', { rev }]}>
@@ -26,14 +32,29 @@ const { kicker, heading, rev = false, image, alt } = Astro.props;
     <slot />
   </div>
   <div class="split-art reveal">
-    <Image
-      class="framed"
-      src={image}
-      alt={alt}
-      widths={[520, 800, 1200]}
-      sizes="(max-width: 900px) 92vw, 500px"
-      loading="lazy"
-    />
+    {
+      local ? (
+        <Image
+          class="framed"
+          src={image as ImageMetadata}
+          alt={alt}
+          widths={[520, 800, 1200]}
+          sizes="(max-width: 900px) 92vw, 500px"
+          loading="lazy"
+        />
+      ) : (
+        <Image
+          class="framed"
+          src={image.src}
+          width={image.width}
+          height={image.height}
+          alt={alt}
+          widths={capWidths([520, 800, 1200], image)}
+          sizes="(max-width: 900px) 92vw, 500px"
+          loading="lazy"
+        />
+      )
+    }
   </div>
 </div>
 

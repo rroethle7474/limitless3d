@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { SHOWCASE, type ShowcaseEntry } from '~/data/cms';
+import { capWidths, SHOWCASE, type ShowcaseEntry } from '~/data/cms';
 
 interface Props {
   /** Defaults to the homepage's featured entries; the gallery passes all of them. */
@@ -34,7 +34,7 @@ const {
             width={w.img.width}
             height={w.img.height}
             alt={w.alt}
-            widths={[640, 960, 1280]}
+            widths={capWidths([640, 960, 1280], w.img)}
             sizes="(max-width: 1180px) 92vw, 1080px"
             loading={i === 0 ? 'eager' : 'lazy'}
             data-slide

@@ -9,8 +9,10 @@ import Faq from '~/components/Faq.astro';
 import PartsDoor from '~/components/PartsDoor.astro';
 import QuoteSection from '~/components/QuoteSection.astro';
 
-import workshop02 from '~/assets/work/workshop-02.jpg';
-import rcCars from '~/assets/work/rc-cars.jpg';
+import { SERVICE_COPY } from '~/data/cms';
+
+/* Hero lead + photo and the split section are owner-editable (plan §4.5). */
+const COPY = SERVICE_COPY.printing;
 
 const title = 'Custom 3D Printing in the Fox Valley | Limitless 3D, Neenah WI';
 const description =
@@ -90,11 +92,11 @@ const faq = [
   <PageHero
     crumb="3D Printing"
     heading="Printed here.<br />In your hands in <em>days</em>."
-    lead="We are in the Fox Valley, so service is fast and local. Pick the material, the color, the texture, and the strength, and we will make the thing."
+    lead={COPY.lead}
     primary={{ label: 'Get a Printing Quote', href: '#quote' }}
     ghost={{ label: 'See materials', href: '#materials' }}
-    image={workshop02}
-    alt="Translucent resin printed vase with fine layer detail"
+    image={COPY.heroImage}
+    alt={COPY.heroAlt}
   />
 
   <Section>
@@ -135,27 +137,13 @@ const faq = [
   </Section>
 
   <Section>
-    <Split
-      kicker="Print my file"
-      heading="Already have a file? Send it over."
-      image={rcCars}
-      alt="Two 3D printed RC car bodies, one black and one clear"
-    >
-      <p>
-        There are plenty of good print files out there, and Thingiverse alone has more than most
-        people could work through in a lifetime. Find one you want in your hands and send it our
-        way.
-      </p>
-      <p>
-        With the design work already done, printing is billed at a reasonable hourly rate, so
-        this is the cheapest way to get something made properly. We will still check the file
-        over and tell you if it needs a tweak before it prints well.
-      </p>
-      <p>
-        No file and no idea where to start? That happens more often, and it is what the design
-        side of the shop is for.
-      </p>
-    </Split>
+    {
+      COPY.splits.map((s, i) => (
+        <Split kicker={s.kicker} heading={s.heading} rev={i % 2 === 1} image={s.image} alt={s.alt}>
+          <Fragment set:html={s.bodyHtml} />
+        </Split>
+      ))
+    }
   </Section>
 
   <Section>

@@ -35,6 +35,16 @@ export interface CmsImage {
   height: number;
 }
 
+/**
+ * Astro clamps a LOCAL image's srcset widths to its intrinsic width; for remote
+ * sources it generates whatever is asked, silently upscaling small originals
+ * (caught by the dist diff: a 630px CAD render grew 960w/1280w variants).
+ * Apply the same clamp ourselves wherever a CmsImage feeds `widths`.
+ */
+export const capWidths = (widths: number[], img: CmsImage): number[] => [
+  ...new Set(widths.map((w) => Math.min(w, img.width))),
+];
+
 const IMG_PROJECTION = `{
   "src": asset->url,
   "width": asset->metadata.dimensions.width,

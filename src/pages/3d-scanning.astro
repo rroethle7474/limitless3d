@@ -9,9 +9,10 @@ import FeatureCards from '~/components/FeatureCards.astro';
 import Faq from '~/components/Faq.astro';
 import QuoteSection from '~/components/QuoteSection.astro';
 
-import pondNozzle2 from '~/assets/work/pond-nozzle-2.jpg';
-import heirloom from '~/assets/work/heirloom.jpg';
-import workshop01 from '~/assets/work/workshop-01.jpg';
+import { SERVICE_COPY } from '~/data/cms';
+
+/* Hero lead + photo and the split sections are owner-editable (plan §4.5). */
+const COPY = SERVICE_COPY.scanning;
 
 const title = '3D Scanning Services | 0.02 mm Accuracy | Limitless 3D, Neenah WI';
 const description =
@@ -103,11 +104,11 @@ const faq = [
   <PageHero
     crumb="3D Scanning"
     heading="Capture any object,<br /><em>exactly</em> as it is."
-    lead="Our newest scanning system gives metrology grade accuracy without markers and without scanning spray. If it exists, we can turn it into a file you can use."
+    lead={COPY.lead}
     primary={{ label: 'Get a Scanning Quote', href: '#quote' }}
     ghost={{ label: 'What it is used for', href: '#uses' }}
-    image={pondNozzle2}
-    alt="Close view of a 3D printed fountain nozzle"
+    image={COPY.heroImage}
+    alt={COPY.heroAlt}
   />
 
   <Section tint>
@@ -115,46 +116,13 @@ const faq = [
   </Section>
 
   <Section>
-    <Split
-      kicker="Metrology grade"
-      heading="Accurate scans, not just pretty ones"
-      image={heirloom}
-      alt="Antique concertina, a delicate object suited to marker free scanning"
-    >
-      <p>
-        Plenty of scanners produce something that looks right. We measure. Our system holds
-        dimensional accuracy to <strong>0.02 mm</strong> in every axis, which is the difference
-        between a picture of your part and a file you can build from.
-      </p>
-      <p>
-        The newest addition to the workshop is a self tracking scanner, so there are no
-        stickers, no markers, and no chalky spray on the object we are capturing. That matters
-        when the thing in your hands is old, delicate, or the only one left.
-      </p>
-      <p>
-        Rates are competitive, and the deliverables are ones you can hand to an engineer with
-        confidence.
-      </p>
-    </Split>
-
-    <Split
-      rev
-      kicker="The hard ones"
-      heading="Some jobs take a steady hand"
-      image={workshop01}
-      alt="Finely detailed resin print of a sculpted figure"
-    >
-      <p>
-        Scanning a rare piece is rarely one and done. A turn of the century street lamp we
-        digitized took multiple detailed sessions, a steady hand, and a fair amount of
-        determination before the data was clean enough to build from.
-      </p>
-      <p>
-        That is the part most people do not see, and it is exactly why the file you get back is
-        worth having. Complex geometry, deep recesses, and reflective surfaces all get handled
-        rather than glossed over.
-      </p>
-    </Split>
+    {
+      COPY.splits.map((s, i) => (
+        <Split kicker={s.kicker} heading={s.heading} rev={i % 2 === 1} image={s.image} alt={s.alt}>
+          <Fragment set:html={s.bodyHtml} />
+        </Split>
+      ))
+    }
   </Section>
 
   <Section tint id="uses">

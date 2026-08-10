@@ -1,18 +1,25 @@
 ---
 /**
- * Single-quote band between the build log and the parts shop.
- * TODO(phase-1b): sourced from the "Testimonials / reviews" collection (plan §4.2).
+ * Single-quote band between the build log and the parts shop. Shows the one
+ * testimonial flagged "Use in the big quote band" (plan §4.2); the optional
+ * highlight phrase gets the accent <em>. Quotes are stored without the
+ * surrounding marks — this template adds them.
  */
+import { QUOTE_BAND } from '~/data/cms';
+
+const { quote, highlight, attribution } = QUOTE_BAND;
+const hlAt = highlight ? quote.indexOf(highlight) : -1;
+const before = hlAt >= 0 ? quote.slice(0, hlAt) : quote;
+const after = hlAt >= 0 && highlight ? quote.slice(hlAt + highlight.length) : '';
 ---
 
 <div class="quoteband">
   <div class="wrap reveal">
     <div class="stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
     <blockquote>
-      &ldquo;Randy was incredible to work with. Fair pricing, and
-      <em>you can tell he loves what he does.</em>&rdquo;
+      &ldquo;{before}{hlAt >= 0 && <em>{highlight}</em>}{after}&rdquo;
     </blockquote>
-    <div class="mono">Verified customer &middot; fountain nozzle project</div>
+    <div class="mono">{attribution}</div>
   </div>
 </div>
 
