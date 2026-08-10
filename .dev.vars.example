@@ -14,3 +14,9 @@ QUOTE_TO_EMAIL=rroethle@gmail.com
 # Pair: the matching test SITE key (1x00000000000000000000AA) is the code default; override
 # it at build time with PUBLIC_TURNSTILE_SITE_KEY.
 TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+
+# Sanity write token (sanity.io/manage → project → API → Tokens → Editor permissions).
+# The §3b dual-write's storage half (D-027): each submission is also stored as a private
+# draft document. If unset, the function logs a warning and the email is the only record —
+# storage must never block the email path.
+SANITY_API_TOKEN=sk_PASTE_TOKEN_HERE

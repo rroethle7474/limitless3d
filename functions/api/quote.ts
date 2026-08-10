@@ -18,6 +18,7 @@
  */
 
 import { MAX_TOTAL_MB, MB, photoLimitError } from '../../src/data/quote-limits';
+import { SANITY_API_VERSION, SANITY_DATASET, SANITY_PROJECT_ID } from '../../src/data/sanity-project';
 
 interface Env {
   /** Resend API key (test mode sends from onboarding@resend.dev). */
@@ -26,6 +27,12 @@ interface Env {
   QUOTE_TO_EMAIL: string;
   /** Turnstile secret — the always-passing test key locally, real key at staging. */
   TURNSTILE_SECRET_KEY: string;
+  /**
+   * Sanity write token — the §3b dual-write's storage half (D-027). Optional by
+   * contract: a missing token degrades to email-only with a loud log, never a
+   * failed request.
+   */
+  SANITY_API_TOKEN?: string;
 }
 
 type QuoteError = 'validation' | 'turnstile' | 'email' | 'config';
@@ -137,7 +144,7 @@ export const onRequestPost = async (context: {
   const submission = { name, email, phone, service, details, page, photos };
 
   /* §3b dual-write: storage must never block or fail the email path. */
-  await storeSubmission(submission).catch((err) => {
+  await storeSubmission(env, submission).catch((err) => {
     console.error('[quote] storeSubmission failed (email path continues):', err);
   });
 
@@ -166,17 +173,55 @@ interface Submission {
 }
 
 /**
- * TODO(phase-1b, Sanity): the §3b dual-write's storage half. Every submission
- * should also become a stored record so a mail hiccup can never lose a lead.
- * Sanity doesn't exist yet (schema and studio are later this phase) — this
- * seam is where the client-document write goes. Deferral logged in
- * docs/design-decisions.md (D-027) and plan §10. Isolation contract: callers
- * catch; a storage failure must never fail the request.
+ * The §3b dual-write's storage half (closes D-027): every submission also
+ * becomes a Sanity document, so a mail hiccup can never lose a lead.
+ *
+ * The _id is `drafts.`-prefixed ON PURPOSE and must stay that way: the dataset
+ * is public (free tier), and documents whose _id contains a period are the ones
+ * the API refuses to serve without a token — that dot is what keeps names,
+ * emails, and phone numbers private. The studio strips the Publish action for
+ * this type so nobody can accidentally make one world-readable.
+ *
+ * Raw Mutations API via fetch — no SDK dependency inside the Worker. Photos are
+ * not uploaded (the email carries them); only filename/size metadata is kept.
+ * Isolation contract: the caller catches; a storage failure (including a
+ * missing token) must never block or fail the email path.
  */
-async function storeSubmission(submission: Submission): Promise<void> {
-  console.warn(
-    `[quote] TODO(phase-1b): storage seam — submission from ${submission.email} not persisted (email is the only record until Sanity lands)`,
+async function storeSubmission(env: Env, s: Submission): Promise<void> {
+  if (!env.SANITY_API_TOKEN) {
+    console.warn(
+      `[quote] SANITY_API_TOKEN not set — submission from ${s.email} not persisted (email is the only record)`,
+    );
+    return;
+  }
+
+  const doc = {
+    _id: `drafts.${crypto.randomUUID()}`,
+    _type: 'quoteSubmission',
+    submittedAt: new Date().toISOString(),
+    name: s.name,
+    email: s.email,
+    phone: s.phone,
+    service: s.service,
+    details: s.details,
+    page: s.page,
+    photos: s.photos.map((p, i) => ({ _key: `photo-${i}`, filename: p.name, size: p.size })),
+  };
+
+  const res = await fetch(
+    `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}/data/mutate/${SANITY_DATASET}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.SANITY_API_TOKEN}`,
+      },
+      body: JSON.stringify({ mutations: [{ create: doc }] }),
+    },
   );
+  if (!res.ok) {
+    throw new Error(`Sanity mutate rejected: ${res.status} ${await res.text()}`);
+  }
 }
 
 async function sendEmail(env: Env, s: Submission) {
