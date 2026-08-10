@@ -1,0 +1,20 @@
+{
+  "name": "limitless3d-studio",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Sanity Studio for Limitless 3D — content editing only; the site builds from this data at build time",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build"
+  },
+  "dependencies": {
+    "@sanity/vision": "^6.9.1",
+    "react": "^19.2.2",
+    "react-dom": "^19.2.2",
+    "sanity": "^6.9.1",
+    "styled-components": "^6.1.15"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}

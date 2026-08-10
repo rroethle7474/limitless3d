@@ -22,6 +22,9 @@ pnpm-debug.log*
 # wrangler local state
 .wrangler/
 
+# sanity studio runtime cache
+.sanity/
+
 # editor / os
 .vscode/*
 !.vscode/extensions.json
