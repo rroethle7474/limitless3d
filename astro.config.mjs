@@ -18,6 +18,10 @@ export default defineConfig({
     // and emitted as AVIF/WebP at display size. Nothing is ever hotlinked (plan §6).
     responsiveStyles: true,
     layout: 'constrained',
+    // Owner-managed photos (gallery, service pages) live in Sanity. Authorizing the
+    // domain makes Astro FETCH them at build and run them through the same Sharp
+    // pipeline — dist/ still serves local optimized files, nothing hotlinks the CDN.
+    domains: ['cdn.sanity.io'],
   },
 
   vite: {

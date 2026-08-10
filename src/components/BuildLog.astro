@@ -1,9 +1,9 @@
 ---
 import { Image } from 'astro:assets';
-import { SHOWCASE, type ShowcaseEntry } from '~/data/showcase';
+import { SHOWCASE, type ShowcaseEntry } from '~/data/cms';
 
 interface Props {
-  /** Defaults to the homepage's six entries; the gallery passes its ten. */
+  /** Defaults to the homepage's featured entries; the gallery passes all of them. */
   entries?: ShowcaseEntry[];
   kicker?: string;
   heading?: string;
@@ -30,7 +30,9 @@ const {
       {
         entries.map((w, i) => (
           <Image
-            src={w.img}
+            src={w.img.src}
+            width={w.img.width}
+            height={w.img.height}
             alt={w.alt}
             widths={[640, 960, 1280]}
             sizes="(max-width: 1180px) 92vw, 1080px"
@@ -62,7 +64,7 @@ const {
       {
         entries.map((w) => (
           <button aria-label={w.title}>
-            <Image src={w.img} alt="" width={164} height={120} loading="lazy" />
+            <Image src={w.img.src} alt="" width={164} height={120} loading="lazy" />
           </button>
         ))
       }

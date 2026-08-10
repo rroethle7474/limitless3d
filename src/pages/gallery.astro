@@ -8,51 +8,16 @@ import FeatureCards from '~/components/FeatureCards.astro';
 import Testimonial from '~/components/Testimonial.astro';
 import QuoteSection from '~/components/QuoteSection.astro';
 
-import { SHOWCASE, type ShowcaseEntry } from '~/data/showcase';
+import { GALLERY } from '~/data/cms';
 
 import pondNozzle from '~/assets/work/pond-nozzle.jpg';
-import pondNozzle2 from '~/assets/work/pond-nozzle-2.jpg';
-import displayStand from '~/assets/work/display-stand.jpg';
-import workshop01 from '~/assets/work/workshop-01.jpg';
-import workshop02 from '~/assets/work/workshop-02.jpg';
 
 const title = 'Project Gallery | Real 3D Printed Parts and Repairs | Limitless 3D';
 const description =
   'A look at real work from the Limitless 3D workshop in Neenah, WI. Commissioned parts, repairs, restorations, prototypes, and hobby builds.';
 
-// The gallery spotlight is the homepage's six entries plus four more, in the prototype's order.
-// Alt text is ours, not the prototype's (D-014).
-const GALLERY: ShowcaseEntry[] = [
-  ...SHOWCASE,
-  {
-    img: displayStand,
-    kicker: 'PROTOTYPE',
-    title: 'Display stand',
-    sub: 'FROM DRAWING TO PART',
-    alt: 'A black printed display stand resting on the dimensioned drawing it was made from',
-  },
-  {
-    img: workshop01,
-    kicker: 'RESIN DETAIL',
-    title: 'Sculpted figure',
-    sub: 'PRINTED IN RESIN',
-    alt: 'A classical figure sculpture printed in white resin, down to the folds of the dress',
-  },
-  {
-    img: workshop02,
-    kicker: 'RESIN DETAIL',
-    title: 'Textured vase',
-    sub: 'FINE LAYER FINISH',
-    alt: 'A translucent printed vase covered in a finely ridged, woven surface texture',
-  },
-  {
-    img: pondNozzle2,
-    kicker: 'ENGINEERED PART',
-    title: 'Nozzle underside',
-    sub: 'FUNCTION FIRST',
-    alt: 'The threaded underside of the fountain nozzle, with its orange O-ring seated in the groove',
-  },
-];
+// The spotlight entries (homepage six + four more) come from Sanity, in editor-set
+// order. Alt text is ours, not the prototype's (D-014) — required in the schema.
 
 const pattern = [
   {
