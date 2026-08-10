@@ -9,8 +9,7 @@ import {schemaTypes} from './schemaTypes'
  * world-readable by design). The site's build reads the same values from
  * src/data/sanity-project.ts — keep them in sync if they ever change.
  */
-// TODO(session-5): filled in right after `sanity init --bare` creates the project.
-export const projectId = 'REPLACE_WITH_PROJECT_ID'
+export const projectId = 'nkqo9g6v'
 export const dataset = 'production'
 
 export default defineConfig({

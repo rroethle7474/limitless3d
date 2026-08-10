@@ -11,7 +11,6 @@
  * The write token (function only) is env: SANITY_API_TOKEN in .dev.vars / Pages.
  */
 
-// TODO(session-5): filled in right after the project is created.
-export const SANITY_PROJECT_ID = 'REPLACE_WITH_PROJECT_ID';
+export const SANITY_PROJECT_ID = 'nkqo9g6v';
 export const SANITY_DATASET = 'production';
 export const SANITY_API_VERSION = '2026-08-01';
