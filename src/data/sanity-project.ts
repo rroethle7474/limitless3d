@@ -11,6 +11,6 @@
  * The write token (function only) is env: SANITY_API_TOKEN in .dev.vars / Pages.
  */
 
-export const SANITY_PROJECT_ID = 'nkqo9g6v';
+export const SANITY_PROJECT_ID = '1hhfxbth';
 export const SANITY_DATASET = 'production';
 export const SANITY_API_VERSION = '2026-08-01';

@@ -9,7 +9,7 @@ import {schemaTypes} from './schemaTypes'
  * world-readable by design). The site's build reads the same values from
  * src/data/sanity-project.ts — keep them in sync if they ever change.
  */
-export const projectId = 'nkqo9g6v'
+export const projectId = '1hhfxbth'
 export const dataset = 'production'
 
 export default defineConfig({
