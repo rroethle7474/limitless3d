@@ -98,6 +98,8 @@ and variant exploration after the owner's first review in Phase 2.
 - Windows. PowerShell and Git Bash both available; they need different syntax.
 - Astro's dev server is Vite, which binds IPv6 first — probe `localhost`, not `127.0.0.1`.
 - npm on Windows can swallow `-- --flag`; invoke binaries from `node_modules/.bin` when flags
-  matter.
+  matter. Quoted multi-word values can vanish through `.CMD` shims too (a `--project-name
+  "Limitless 3D"` fell back to the cwd name). And `npx <pkg>`'s "Ok to proceed?" prompt
+  blocks forever in detached/background shells — always `npx -y` there.
 - Background dev servers die with their parent tool-call shell. For anything that must outlive
   a command, launch detached and kill by PID.
