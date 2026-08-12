@@ -1,57 +1,66 @@
-# Session 6 kickoff prompt — Phase 1b: staging deployment
+# Session 7 kickoff prompt — Phase 1b: CI, real Turnstile, studio hosting
 
-Copy the block below into a fresh Claude Code session. (Sessions 4–5 are done: Sanity is
-live end to end — schema, studio, migrated content, D-027 closed. See the RESUME section of
-`docs/design-decisions.md` and decisions D-030–D-032.)
+Copy the block below into a fresh Claude Code session. (Session 6 is done: staging is live
+at `main.limitless3d.pages.dev` — noindex verified, quote pipeline validated from the
+public URL, Ryan confirmed email + studio draft. See D-033 and the RESUME section of
+`docs/design-decisions.md`.)
 
 **Before pasting — setup status:**
 
-1. Ryan may have already created the Cloudflare Pages project himself (checklist given
-   2026-08-09: GitHub push, preview-branch trick for auto-noindex, env vars incl.
-   `NODE_VERSION=24`). **First order of business: ask what exists and record it** —
-   don't re-derive.
-2. Secrets for the Pages env when the time comes (Ryan sets them in the dashboard):
-   `RESEND_API_KEY`, `QUOTE_TO_EMAIL`, `TURNSTILE_SECRET_KEY` (real key at staging per
-   D-029), `SANITY_API_TOKEN` (Editor token for project `1hhfxbth` — the one in
-   `.dev.vars` works, or mint a staging-specific one; NOT Access Manager, that
-   permission can't write documents).
-3. Real Turnstile keys mean a Cloudflare Turnstile widget for the domain —
-   `PUBLIC_TURNSTILE_SITE_KEY` is a BUILD-time env var (inlined), the secret is runtime.
+1. GitHub repo `rroethle7474/limitless3d` (private) is the source of truth; local main is
+   pushed. Cloudflare Pages project `limitless3d` (Direct Upload, production branch
+   `production` = nonexistent on purpose). Deploy today = `npm run build` +
+   `npx -y wrangler pages deploy dist --branch main`.
+2. The GitHub Action will need two repo secrets Ryan creates (Settings → Secrets →
+   Actions): `CLOUDFLARE_API_TOKEN` (create at dash.cloudflare.com/profile/api-tokens,
+   "Edit Cloudflare Workers"-style template scoped to the account's Pages) and
+   `CLOUDFLARE_ACCOUNT_ID` (`ea498151611f1ad05a01bb395bb06be3`, visible on the Workers &
+   Pages overview — not a secret, but tidy as one).
+3. Real Turnstile keys: Ryan creates a Turnstile widget in the Cloudflare dash for the
+   pages.dev hostname (+ the real domain, ready for cutover). Site key is build-time
+   (`PUBLIC_TURNSTILE_SITE_KEY`), secret replaces the test value in the Pages Preview env
+   and `.dev.vars` keeps the test pair for local dev.
+4. Sanity webhook (rebuild-on-publish) is created at sanity.io/manage/project/1hhfxbth →
+   API → Webhooks once the Action exists (GitHub `repository_dispatch` endpoint with a
+   PAT, or a `workflow_dispatch` URL — session decides, logs the choice).
 
 ---
 
 ```
 Read CLAUDE.md, then docs/design-decisions.md (start at "RESUME HERE"; D-030
-through D-032 are the Sanity state), then limitless3d-rebuild-plan.md §5.6,
-§3b, and the Phase 1b bullets in §7.
+through D-033 are the Sanity + staging state), then the Phase 1b bullets in
+limitless3d-rebuild-plan.md §7.
 
-This is Phase 1b, session 6: the staging deployment. Sanity is live (project
-1hhfxbth, public production dataset, studio local in studio/); the site
-builds from it with proven equivalence; quote submissions dual-write (email
-+ private draft). Ryan may already have a Cloudflare Pages project — ask
-first, record what exists.
+This is Phase 1b, session 7. Staging is live (D-033: Direct-Upload Pages,
+noindexed previews, wrangler deploys from the repo). Sanity is live
+(D-030–D-032, project 1hhfxbth). The quote pipeline works end to end from
+the public URL.
 
-THE TASK: get the site deployed to a shareable, noindexed staging URL with
-the quote pipeline fully working there, and wire rebuild-on-publish.
+THE TASK, in order:
+1. GitHub Action CI: on push to main AND on repository_dispatch (the
+   Sanity-publish signal) → npm ci, npm run build (pulls Sanity), npx
+   wrangler pages deploy dist --branch main. This restores deploy-on-push
+   and delivers rebuild-on-publish in one workflow. Then the Sanity webhook
+   pointing at it (fires on publish of any content type; ignore
+   quoteSubmission drafts — they must NOT trigger builds).
+2. Real Turnstile keys (D-029's env swap): widget for pages.dev + the
+   production domain; verify the real challenge renders on staging and a
+   submission still passes; test keys stay for local dev.
+3. Studio hosting decision: Randy needs a URL in Phase 2. Propose (sanity
+   deploy → *.sanity.studio is the zero-infra default) and execute if Ryan
+   agrees.
+4. Housekeeping: delete the test-submission drafts from the studio; human
+   scroll-through of staging on desktop + phone if not yet done.
 
-Constraints:
-- Staging must never be indexable (plan §5.6). Preview deployments get
-  X-Robots-Tag: noindex automatically; production pages.dev does not —
-  the production-branch-that-doesn't-exist trick keeps everything preview.
-- Deploy hook: a Sanity webhook on publish → Pages deploy hook → rebuild.
-  Debounce/politeness matters less at this scale than simplicity.
-- Real Turnstile keys at staging (D-029's env swap); keep the test keys
-  working locally.
-- The studio stays local this session unless Ryan asks — hosting it
-  (sanity deploy / Pages) is a decision to propose, not assume.
-- Verify the deployed staging URL end to end: pages render from Sanity,
-  quote submission → email + studio draft, noindex header present.
+Validation: push a trivial commit → Action deploys; publish a gallery-entry
+tweak in the studio → site rebuilds and shows it; quote submission passes
+the REAL Turnstile on staging; submission drafts still don't trigger
+builds.
 
-Small items owed from session 5 (do early): Ryan eyeballs the studio's
-Quote submissions list + the three test emails; a human scroll-through of
-the site (dist-diff said equivalent; run-and-look is still the convention).
-Delete the test-submission drafts after confirming.
+Conventions unchanged: small commits, decision rows (the CI shape, the
+webhook filter, studio hosting), plan §10 for refinements.
 
-Out of scope: cutover/DNS, domain verification/SPF/DKIM, Square catalog,
-Etsy pull, homepage FAQ, the 1a polish pass (still owed).
+Out of scope: cutover/DNS, SPF/DKIM/domain verification, Square catalog
+(§9.7 credentials), Etsy pull, homepage FAQ, the 1a polish pass (still
+owed, separate session).
 ```

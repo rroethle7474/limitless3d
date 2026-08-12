@@ -33,6 +33,7 @@ refine or contradict the plan also get a row in `limitless3d-rebuild-plan.md` §
 | D-030 | 2026-08-10 | **Sanity live** (spec approved session 4, executed session 5): free tier, one **public** `production` dataset, project `1hhfxbth` ("limitless", org Mandry Software, rroethle@gmail.com), studio v6 in `studio/` (local only until staging). Schema = §4's five collections + `quoteSubmission`, scoped per the approved spec: `<h1>` headlines, FAQs, FeatureCards, SectionHeads, QuoteSection overrides, materials table, SEO metadata, homepage section copy, and the `SERVICES` enum all stay in code; §4.1's "story" field and §4.4's hours omitted (nothing renders them). Testimonial quotes stored **without** surrounding “ ” (templates add them) — the one stored-copy normalization. `src/data/cms.ts` is the only Sanity-touching module: build-time top-level await, no token (published content only), fail-loud so a broken fetch fails the build (§3b stale-not-down). `quote-form.ts` reads the fallback phone/email from the rendered DOM — no Sanity code in any client bundle. | Randy-proof editing per the Phase 2 acceptance test; drift-proof layout per §4's principle. **Migration equivalence proven, not assumed**: dist/ diffed against the pre-migration build — copy byte-identical on all nine pages (normalized: whitespace, quote-entity form, hashed asset URLs, reordered-but-rule-identical style bundles). Mid-session incident that validates the design: the original project (`nkqo9g6v`) was accidentally deleted when Ryan recreated it at manage — schema-in-repo + idempotent seed + repo-sourced photos made total recovery ~10 minutes. |
 | D-031 | 2026-08-10 | **Owner-managed photos live in Sanity; the Sharp pipeline stays** (the deliberate images decision the session-4 prompt required). Gallery/build-log photos and service-page photos are Sanity image assets; `cdn.sanity.io` is authorized in `astro.config` `image.domains`, so Astro **fetches originals at build and emits the same local hashed variants** — zero CDN references in `dist/` (verified). Decorative/non-owner imagery (parts wall D-016, about-page photos, non-service PageHero images) stays in `src/assets/`. `capWidths()` clamps remote srcset requests to the asset's intrinsic width. | §6 wants owner-managed photos and Phase 2's acceptance test needs Randy adding a photo; the 1a baseline shows the image pipeline is the site's biggest performance win — this keeps both. The clamp exists because the dist diff caught Astro upscaling a 630px original to 960w/1280w variants for remote sources, which the local pipeline never does; byte-diffing the migration is what surfaced it. Known drift point: gallery's "Ten projects, start to finish" heading hardcodes the count — becomes wrong at Randy's 11th entry (copy is verbatim, so left; revisit at Phase 2). |
 | D-032 | 2026-08-10 | **D-027 closed — submissions dual-write as `drafts.`-prefixed Sanity documents.** `storeSubmission()` posts to the raw Mutations API (no SDK in the Worker); `_id: drafts.<uuid>` is the privacy mechanism: in a public dataset, documents with a dot in the `_id` are unreadable without a token. Studio strips Publish/Duplicate actions for the type (Delete stays for spam) and all fields are readOnly; photo **metadata only** (filename/size — the email carries the files); missing `SANITY_API_TOKEN` degrades to email-only with a loud log. Verified end-to-end through wrangler: `{"ok":true}` → draft visible via authenticated raw-perspective query with correct shape → unauthenticated `quoteSubmission` query returns `[]` while published content resolves. | Free tier has no private datasets (Growth is $15/occupied seat — $30/mo once Randy joins, over the ~$20 ceiling; Ryan declined, upgrade path open: flip to a private dataset by env change). The isolation contract was battle-tested twice for real en route: an Access-Manager-permission token and a deleted-project token each 401'd storage while every visitor still got `{"ok":true}` and the email — §3b under genuine fire. Caveat inherited from the drafts mechanism: privacy rests on the dot-in-`_id` rule plus the studio not offering Publish, not on a dataset wall. API-version note: 2025+ API versions default to the `published` perspective even authenticated — draft queries need `--api-version 2021-10-21` or an explicit raw perspective. |
+| D-033 | 2026-08-11 | **Staging ships as a wrangler-deployed Pages project (Direct Upload), not Git-connected.** Cloudflare's dashboard no longer offers Git-connected Pages creation for this account — every create path funnels into the Workers flow ("Configure your Worker project", `npx wrangler deploy`), which our repo deliberately doesn't fit (the quote API is a Pages `functions/` function; the noindex guard is a Pages preview-deployment behavior). Project created via `wrangler pages project create limitless3d --production-branch production` — the production branch doesn't exist, so **every deploy of `main` is a preview** → automatic `x-robots-tag: noindex`, **verified live** on `main.limitless3d.pages.dev` (plan §5.6 satisfied). Deploys are `npx -y wrangler pages deploy dist --branch main` from the repo. Env vars: dashboard manages **secrets only** (a repo `wrangler.toml` pins plaintext vars), Preview environment, imported from a generated .env staged OUTSIDE the repo and deleted after import; `NODE_VERSION` is moot (no Cloudflare-side builds). GitHub repo `rroethle7474/limitless3d` (private) is up as source of truth. | Fighting the dashboard for a removed flow is a dead end; direct upload gets the identical staging artifact with zero code changes. Consequence, deliberately accepted: **no auto-build on push and no Pages deploy hooks** — rebuild-on-publish (Sanity webhook) lands as a GitHub Action running build + `wrangler pages deploy` (Cloudflare's documented direct-upload CI pattern), which then also restores deploy-on-push. Staging e2e verified from the public URL: `{"ok":true}`, email sent, draft stored in Sanity. Ops notes: fail-closed confirmed in production-shape (500 `config` before secrets landed); fresh `pages.dev` TLS takes ~1 min; Git-Bash curl mangles leading-slash form values (`/staging-e2e` → `C:/Program Files/Git/...`) — test-harness artifact only, browsers set `page` from `location.pathname`. |
 
 ## RESUME HERE — next session
 
@@ -102,20 +103,29 @@ deleted-and-recreated at manage, which kills tokens and content; recovery is rep
 re-seed → new Editor token, ~10 min). The new project carries an auto **Growth Trial** —
 it lapses to free by itself; nothing depends on trial features.
 
-**Small human checks left from session 5** (do next session if not done): Ryan eyeballing
-the test-submission drafts in the studio's Quote submissions list and the three test
-emails in his inbox; a scroll-through of the wrangler-served site (the dist diff makes
-regressions unlikely, but run-and-look is the convention).
+**Phase 1b session 6 (2026-08-11): staging is live and human-verified — D-033.**
+`https://main.limitless3d.pages.dev` serves the Sanity-built site with `x-robots-tag:
+noindex` verified on the wire; the quote pipeline was validated end to end **from the
+public URL** (200 → email confirmed in Ryan's inbox → draft confirmed in the studio).
+Pages project `limitless3d` created via wrangler (Direct Upload — the dashboard's
+Git-Pages flow is gone, see D-033), production branch `production` (nonexistent, so
+everything deploys as noindexed previews). Deploy = `npm run build` then
+`npx -y wrangler pages deploy dist --branch main`. Secrets live in the project's
+**Preview** env (dashboard, secrets-only because a repo `wrangler.toml` exists; also
+duplicated in Production env — correct for cutover). GitHub: `rroethle7474/limitless3d`
+(private), pushed through commit `e01f345`-era history; keep pushing, it's the source of
+truth and the future CI home. Fail-closed (`500 config`) was observed live before secrets
+landed — D-026's contract holds in production shape.
 
-**Also open:** Ryan was going to stand up the Cloudflare Pages project himself (preview-
-branch trick for auto-noindex, env vars incl. `NODE_VERSION=24`; checklist given
-2026-08-09) — next session should ask what exists and record it. Production Pages env will
-need `SANITY_API_TOKEN` (Editor) for the function's storage half. Gallery heading "Ten
-projects, start to finish" hardcodes the count (D-031). The homepage `SHOWCASE` heading
-count and webhook-triggered rebuilds on publish arrive with the staging deploy.
+**Still open / owed:** rebuild-on-publish (Sanity webhook → GitHub Action → build +
+wrangler deploy; also restores deploy-on-push), real Turnstile keys (D-029's env swap —
+staging still passes everyone), the studio hosting decision (local-only today; Randy
+needs a URL for Phase 2), deleting the three test-submission drafts from the studio, a
+human scroll-through of the staging URL on desktop + phone, the 1a polish pass (mobile /
+reduced-motion / nogl, unchanged), and the gallery "Ten projects" count drift (D-031).
 
-**Next up in Phase 1b** (plan §7): staging deployment (noindex, real Turnstile keys,
-deploy hook → rebuild-on-publish, studio hosting decision), then Square catalog (gated on §9.7
+**Next up in Phase 1b** (plan §7): rebuild-on-publish + real Turnstile keys + studio
+hosting (session 7), then Square catalog (gated on §9.7
 credentials). The 1a polish pass (items 1–5 above) is still owed and runs as its own later
 session. (The homepage FAQ was deferred to Phase 2 — its content needs Randy's input; see
 the plan's §9.6 and §10.)
