@@ -33,8 +33,10 @@ on:
     - cron: '47 9 * * *' # daily 09:47 UTC ≈ 03:47 America/Chicago
   workflow_dispatch:
 
-# Serialize deploys; never cancel one mid-flight (every queued run completes, so
-# the newest content always deploys last).
+# Serialize deploys; never cancel one MID-FLIGHT. Note GitHub keeps at most one
+# PENDING run per group — pile-ups supersede the older pending runs ("cancelled"
+# in the run list, harmless): the newest trigger always ends in a completed
+# deploy, which is the property that matters.
 concurrency:
   group: deploy
   cancel-in-progress: false
