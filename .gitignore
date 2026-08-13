@@ -25,6 +25,9 @@ pnpm-debug.log*
 # sanity studio runtime cache
 .sanity/
 
+# shop image cache — re-downloadable via `node scripts/shop/extract.mjs --images`
+scripts/shop/images/
+
 # editor / os
 .vscode/*
 !.vscode/extensions.json
