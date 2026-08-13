@@ -120,18 +120,42 @@ duplicated in Production env — correct for cutover). GitHub: `rroethle7474/lim
 truth and the future CI home. Fail-closed (`500 config`) was observed live before secrets
 landed — D-026's contract holds in production shape.
 
-**Still open / owed:** rebuild-on-publish (Sanity webhook → GitHub Action → build +
-wrangler deploy; also restores deploy-on-push), real Turnstile keys (D-029's env swap —
-staging still passes everyone), the studio hosting decision (local-only today; Randy
-needs a URL for Phase 2), deleting the three test-submission drafts from the studio, a
-human scroll-through of the staging URL on desktop + phone, the 1a polish pass (mobile /
+**Phase 1b session 7 (2026-08-12): the Square catalog demo is live end to end —
+D-034/D-035/D-036.** Extraction: all 61 products verbatim from the live shop's own
+public storefront API joined with the D-024 snapshot's editorial layer, zero
+discrepancies, slug proven to be a pure function of the name (D-034). Ryan created
+sandbox credentials (app "Limitless 3D Site", location `LW9TD5V61XPXA`, `.dev.vars`);
+`scripts/shop/seed.mjs` seeded 61 items / 120 variations / 294 unique images,
+idempotent to a true no-op, verified 61/61 (D-035 — read its column for three
+hard-won Square behaviors: content-dedup on image upload, `image_ids` cleared when
+omitted from an item upsert, children replaced on upsert). `/parts` + 61 PDPs build
+from the catalog at 71 pages total (D-036): per-variation Square-hosted payment
+links with build-time ensure-semantics, variation select on the 25 multi-choice
+products, zero hotlinks in dist (verified), **Square-Version pinned in seed + build
+after the unpinned default silently dropped every description**. Verified: local
+run-and-look (grid, filter 61→7→61, PDP gallery swap, variation select swapping the
+buy href), fake checkout COMPLETED in sandbox ($31.99 "Nespresso Vertuo Capsule
+Dispenser — Black" confirmed via Payments API; sandbox payment links open Square's
+guided testing panel, not the raw checkout page — explain that in Randy's
+walkthrough), staging re-verified on the public URL (200 + noindex on `/parts/`,
+61 cards, buy links, images serving). **Nothing links to /parts yet** — every nav
+"Parts Shop" entry is still the D-011 `SHOP_URL` link-out; the flip is proposed,
+not assumed (Ryan decides).
+
+**Still open / owed:** the SHOP_URL → /parts flip decision (three touchpoints:
+`site.ts` nav entries, PartsDoor CTA, shipping-page CTA), real Turnstile keys
+(D-029's env swap — staging still passes everyone), rebuild-on-publish + deploy-on-push
+(GitHub Action; the Action will also need the three `SQUARE_*` env values as secrets),
+the studio hosting decision (local-only today; Randy needs a URL for Phase 2),
+deleting the test-submission drafts from the studio (and the $31.99 sandbox test
+order can stay — it makes the Order Manager demo real), a human scroll-through of
+staging on desktop + phone (now including /parts), the 1a polish pass (mobile /
 reduced-motion / nogl, unchanged), and the gallery "Ten projects" count drift (D-031).
 
-**Next up in Phase 1b** (plan §7): rebuild-on-publish + real Turnstile keys + studio
-hosting (session 7), then Square catalog (gated on §9.7
-credentials). The 1a polish pass (items 1–5 above) is still owed and runs as its own later
-session. (The homepage FAQ was deferred to Phase 2 — its content needs Randy's input; see
-the plan's §9.6 and §10.)
+**Next up** (roadmap agreed 2026-08-11): session 8 = real Turnstile keys + GitHub
+Action CI + studio hosting; session 9 = the 1a polish pass + site improvements —
+walkthrough-ready before Randy is back. (Homepage FAQ stays deferred to Phase 2,
+plan §9.6.)
 
 **Tooling note (still true in session 2):** the Chrome automation keeps backgrounding the tab
 (`document.hidden === true`), which stales screenshots and throttles rAF/IntersectionObserver —

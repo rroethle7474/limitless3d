@@ -1,64 +1,59 @@
-# Session 7 kickoff prompt — Phase 1b: Square catalog on Ryan's sandbox
+# Session 8 kickoff prompt — Phase 1b: Turnstile keys + CI + studio hosting
 
 Copy the block below into a fresh Claude Code session.
 
-**The roadmap while Randy is away** (agreed 2026-08-11): session 7 = Square catalog demo
-(this file). Session 8 = real Turnstile keys + GitHub Action CI (deploy-on-push +
-Sanity rebuild-on-publish) + studio hosting. Session 9 = the 1a polish pass + site
-improvements. Goal: a complete walkthrough-ready site before Randy is back.
+**The roadmap while Randy is away** (agreed 2026-08-11): ~~session 7 = Square catalog~~
+(done 2026-08-12, D-034–D-036). Session 8 = this file. Session 9 = the 1a polish pass +
+site improvements. Goal: a complete walkthrough-ready site before Randy is back.
 
 **Before pasting — setup status:**
 
-1. Staging is live: `main.limitless3d.pages.dev` (D-033 — wrangler Direct-Upload deploys;
+1. Staging: `main.limitless3d.pages.dev` (D-033, wrangler Direct Upload; deploy =
    `npm run build` + `npx -y wrangler pages deploy dist --branch main`). Sanity live
-   (D-030–D-032, project `1hhfxbth`).
-2. **Square**: Ryan has a Square account. The session needs sandbox credentials from
-   **developer.squareup.com** → create an application → Sandbox access token + sandbox
-   location id. Ryan creates these interactively when asked; the token is a secret →
-   `.dev.vars` (`SQUARE_ACCESS_TOKEN`, `SQUARE_LOCATION_ID`, plus
-   `SQUARE_ENVIRONMENT=sandbox`), never the repo or chat. At cutover these swap to
-   Randy's production values — that swap being trivial is the whole design (D-024, §10
-   2026-08-11).
-3. Product source data: Randy's live shop (public) + the captured snapshot
-   (`docs/prototype-snapshot/shop.html` — grid of products; `parts-pdp-example.html` —
-   the PDP design). Both hotlink Square CDN — reference only; the build must keep the
-   zero-hotlink rule (fetch through Astro's pipeline like the Sanity images, D-031
-   pattern).
+   (D-030–D-032). Square catalog demo live on Ryan's sandbox (D-034–D-036): /parts +
+   61 PDPs build from the catalog; `.dev.vars` carries `SQUARE_ACCESS_TOKEN`,
+   `SQUARE_ENVIRONMENT=sandbox`, `SQUARE_LOCATION_ID=LW9TD5V61XPXA`.
+2. **The build now needs Square env** — any CI build must provide the three `SQUARE_*`
+   values as secrets alongside the Sanity/Resend/Turnstile ones.
+3. GitHub repo `rroethle7474/limitless3d` (private) is the source of truth and the CI
+   home. Cloudflare API token for the Action: Ryan creates it interactively when asked
+   (Pages:Edit scope) — secrets go to GitHub Actions secrets, never the repo or chat.
+4. Turnstile: real keys come from the Cloudflare dashboard (Ryan, interactively);
+   `PUBLIC_TURNSTILE_SITE_KEY` is a build-time var, `TURNSTILE_SECRET_KEY` a Pages
+   secret (D-029). Staging currently passes everyone on the test keys.
+5. Open decision Ryan owns: the SHOP_URL → /parts flip (three touchpoints: `site.ts`
+   nav entries, PartsDoor CTA, shipping-page CTA) — D-011 link-outs still point at the
+   dead subdomain; flipping makes the demo self-contained for Randy's walkthrough.
 
 ---
 
 ```
 Read CLAUDE.md, then docs/design-decisions.md (start at "RESUME HERE";
-D-024 is the captured shop design, D-030–D-033 the Sanity/staging state),
-then limitless3d-rebuild-plan.md §2, the 2026-08-11 §10 rows, and §9.7.
+D-033 is the staging architecture, D-034–D-036 the Square catalog state),
+then limitless3d-rebuild-plan.md §7 Phase 1b and the 2026-08-11/12 §10 rows.
 
-This is Phase 1b, session 7: the Square catalog, built and demoed against
-Ryan's own Square SANDBOX so Randy's walkthrough (he's back in a few days)
-shows his actual products with a complete fake-checkout flow — without his
-credentials. Those become a cutover-time env swap.
+This is Phase 1b, session 8: make the pipeline production-shaped —
+real Turnstile keys, CI, studio hosting. Randy is back soon; after this
+session only the polish pass (session 9) should remain.
 
 THE TASK:
-1. Extract the product inventory from the snapshot + live shop (names,
-   prices, descriptions, image URLs, categories if any). Verbatim data;
-   log judgment calls.
-2. One-off seed script → Ryan's sandbox catalog via Square Catalog API
-   (idempotent, same discipline as the Sanity seed). Images uploaded to
-   the catalog where the API allows, else carried by the site build.
-3. Build the shop section per the captured design (D-024): /parts grid
-   page + /parts/<slug> PDPs, fetched at BUILD time (static stays static),
-   Square-hosted checkout links (CreatePaymentLink) into the sandbox.
-   Existing SHOP_URL link-outs (D-011) keep working until cutover flips
-   them to /parts — propose the flip, don't assume it.
-4. Verify: build renders the grid + PDPs with zero hotlinks; a fake
-   checkout completes in sandbox with Square's test card; deploy to
-   staging and re-verify there.
+1. Real Turnstile keys (D-029's env swap): walk Ryan through creating
+   the widget for the pages.dev + production domains; site key into the
+   build env, secret into Pages env (both environments); verify on
+   staging that the widget renders real and a submission still lands
+   (email + Sanity draft).
+2. GitHub Action CI: build + `wrangler pages deploy` on push to main
+   (restores deploy-on-push, D-033's accepted gap) + a
+   `repository_dispatch`/webhook path for Sanity rebuild-on-publish.
+   All build secrets (Sanity none needed, Resend/Turnstile/Square) as
+   Actions secrets — walk Ryan through the imports, verify with a real
+   push-triggered deploy and a studio publish-triggered rebuild.
+3. Studio hosting so Randy has a URL for Phase 2 (recommend: Sanity's
+   hosted studio via `sanity deploy` — zero infra; log the decision).
+4. The SHOP_URL → /parts flip if Ryan approves it this session.
+5. Verify everything from the public staging URL; decision rows + RESUME
+   as work lands; push.
 
-Constraints unchanged: static site, build-time fetch only, no client
-Square JS, zero hotlinked images, secrets in .dev.vars, small commits,
-decision rows as the work lands (the catalog data model, the slug scheme,
-checkout-link approach, what happens to the PartsDoor/SHOP_URL).
-
-Out of scope this session: Randy's real credentials, cutover/DNS, real
-Turnstile keys + CI (session 8), the polish pass (session 9), Etsy pull,
-homepage FAQ.
+Out of scope: cutover/DNS, Randy's real Square credentials, the polish
+pass (session 9), Etsy pull, homepage FAQ.
 ```
