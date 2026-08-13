@@ -4,7 +4,9 @@ import { BUSINESS } from '~/data/cms';
 import { NAV_LINKS } from '~/data/site';
 
 const { pathname } = Astro.url;
-const isOn = (href: string) => pathname === href || pathname === `${href}/`;
+/* Prefix match so /parts/<slug> lights up "Parts Shop", as the prototype's PDP does. */
+const isOn = (href: string) =>
+  pathname === href || pathname === `${href}/` || pathname.startsWith(`${href}/`);
 ---
 
 <nav>

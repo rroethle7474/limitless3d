@@ -21,9 +21,8 @@ site improvements. Goal: a complete walkthrough-ready site before Randy is back.
 4. Turnstile: real keys come from the Cloudflare dashboard (Ryan, interactively);
    `PUBLIC_TURNSTILE_SITE_KEY` is a build-time var, `TURNSTILE_SECRET_KEY` a Pages
    secret (D-029). Staging currently passes everyone on the test keys.
-5. Open decision Ryan owns: the SHOP_URL → /parts flip (three touchpoints: `site.ts`
-   nav entries, PartsDoor CTA, shipping-page CTA) — D-011 link-outs still point at the
-   dead subdomain; flipping makes the demo self-contained for Randy's walkthrough.
+5. ~~The SHOP_URL → /parts flip~~ — done 2026-08-12 (D-037, closes D-011); the demo
+   is self-contained.
 
 ---
 
@@ -50,8 +49,7 @@ THE TASK:
    push-triggered deploy and a studio publish-triggered rebuild.
 3. Studio hosting so Randy has a URL for Phase 2 (recommend: Sanity's
    hosted studio via `sanity deploy` — zero infra; log the decision).
-4. The SHOP_URL → /parts flip if Ryan approves it this session.
-5. Verify everything from the public staging URL; decision rows + RESUME
+4. Verify everything from the public staging URL; decision rows + RESUME
    as work lands; push.
 
 Out of scope: cutover/DNS, Randy's real Square credentials, the polish

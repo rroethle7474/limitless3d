@@ -15,22 +15,19 @@ export const SOCIAL = {
   etsyShop: 'https://www.etsy.com/shop/Limitless3DDesign',
 } as const;
 
-/**
- * The Square Online parts shop.
- *
- * TODO(phase-3): this subdomain is connected in Square's domain settings at cutover
- * (plan §7 Phase 3). Until then the link resolves to nothing — that is expected, and it is
- * deliberately not pointed at the current /s/shop URL, which gets 301'd here anyway.
- * Decision D-011.
+/*
+ * The parts shop lives on-site at /parts since D-037 (Square catalog demo,
+ * session 7) — the D-011 `SHOP_URL` subdomain link-out is retired. Whether the
+ * old Square Online store also survives at shop.limitless3ddesign.com is the
+ * §9.7 fallback question, decided at cutover.
  */
-export const SHOP_URL = 'https://shop.limitless3ddesign.com';
 
 export const NAV_LINKS = [
   { href: '/3d-scanning', label: 'Scanning' },
   { href: '/3d-printing', label: 'Printing' },
   { href: '/3d-design', label: 'Design' },
   { href: '/gallery', label: 'Gallery' },
-  { href: SHOP_URL, label: 'Parts Shop', external: true },
+  { href: '/parts', label: 'Parts Shop' },
   { href: '/about', label: 'About' },
 ] as const;
 
@@ -42,7 +39,7 @@ export const FOOTER_LINKS = {
     { href: '/gallery', label: 'Gallery' },
   ],
   shopAndContact: [
-    { href: SHOP_URL, label: 'Parts Shop', external: true },
+    { href: '/parts', label: 'Parts Shop' },
     { href: '/reviews', label: 'Reviews' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },

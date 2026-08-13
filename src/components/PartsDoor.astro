@@ -1,7 +1,6 @@
 ---
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
-import { SHOP_URL } from '~/data/site';
 
 /**
  * The parts-shop "door": two 3D-rotated walls of printed parts receding toward a centred CTA.
@@ -56,9 +55,7 @@ const right = parts.slice(6, 12);
         Over 60 replacement parts and originals, designed and printed in the workshop. Shipped
         nationwide.
       </p>
-      <a class="btn primary" href={SHOP_URL} target="_blank" rel="noopener">
-        Enter the Parts Shop
-      </a>
+      <a class="btn primary" href="/parts">Enter the Parts Shop</a>
       <div class="mono sub">60+ PARTS &middot; SECURE CHECKOUT &middot; SHIPS NATIONWIDE</div>
     </div>
   </div>
