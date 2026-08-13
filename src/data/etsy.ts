@@ -28,10 +28,13 @@
  */
 
 import { existsSync, readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 import { QUOTE_BAND, REVIEWS } from './cms';
+// Static import so the fixture travels with the bundled module — an
+// import.meta.url-relative fs read breaks after Astro bundles this file
+// into dist/chunks/. Server-side only; never reaches a client bundle.
+import fixtureJson from './etsy-fixture.json';
 
 /* ---------------------------------------------------------------------------
  * Env (square.ts pattern: process.env first for CI, then .dev.vars locally)
@@ -86,11 +89,7 @@ if (SOURCE === 'fixture') {
     '[etsy] FIXTURE MODE — serving reviews recorded from the public shop page on ' +
       '2026-08-12. Flip ETSY_SOURCE=live once the API key clears approval.',
   );
-  const fixturePath = fileURLToPath(new URL('./etsy-fixture.json', import.meta.url));
-  const fixture = JSON.parse(readFileSync(fixturePath, 'utf8')) as {
-    shop: EtsyShop;
-    reviews: EtsyReviewsPage;
-  };
+  const fixture = fixtureJson as unknown as { shop: EtsyShop; reviews: EtsyReviewsPage };
   shop = fixture.shop;
   reviewsTotal = fixture.reviews.count;
   allReviews = fixture.reviews.results;
