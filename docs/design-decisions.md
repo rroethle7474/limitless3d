@@ -157,7 +157,9 @@ reduced-motion / nogl, unchanged), and the gallery "Ten projects" count drift (D
 (§9.8 gate falls via Ryan's own Etsy developer app, same move as the Square sandbox;
 scope + prompt in `docs/next-session-prompt.md`, groundwork in the plan's §10
 2026-08-09 Etsy row); session 9 = real Turnstile keys + GitHub Action CI (now also
-owing a weekly scheduled rebuild for review freshness + `ETSY_API_KEY` in secrets) +
+owing a **daily** scheduled rebuild for review freshness — Etsy's API Terms cap
+displayed non-listing content at 24h stale, see the plan's §10 2026-08-12
+verification row — + `ETSY_API_KEY`/`ETSY_SHOP_ID` in secrets) +
 studio hosting; session 10 = the 1a polish pass + site improvements —
 walkthrough-ready before Randy is back. (Homepage FAQ stays deferred to Phase 2,
 plan §9.6.)

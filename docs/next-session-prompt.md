@@ -68,9 +68,10 @@ THE TASK:
 5. Docs as work lands: decision rows (data model, which stats went
    live, curation/override semantics, attribution), §9.8 re-scope in
    the plan, RESUME update, and hand the CI session its new
-   requirement: a weekly scheduled rebuild (GitHub Action `schedule:`)
-   so reviews refresh without a publish — plus ETSY_API_KEY in the CI
-   secrets list.
+   requirement: a DAILY scheduled rebuild (GitHub Action `schedule:`;
+   Etsy's API Terms cap displayed non-listing content at 24h stale —
+   §10 2026-08-12 verification row) so reviews refresh without a
+   publish — plus ETSY_API_KEY in the CI secrets list.
 
 Constraints unchanged: static site, build-time fetch only, verbatim
 review text (no paraphrasing; truncation rules get a decision row),
@@ -120,9 +121,10 @@ THE TASK:
 2. GitHub Action CI: build + verify-dist (D-038 gate) + `wrangler pages
    deploy` on push to main (restores deploy-on-push, D-033's accepted
    gap) + a `repository_dispatch`/webhook path for Sanity
-   rebuild-on-publish + a WEEKLY `schedule:` cron so Etsy reviews and
+   rebuild-on-publish + a DAILY `schedule:` cron so Etsy reviews and
    Square catalog data refresh without a publish (session 8's
-   requirement). All build secrets (Resend/Turnstile/Square/Etsy) as
+   requirement; Etsy's API Terms cap displayed non-listing content at
+   24h stale — the plan's §10 2026-08-12 verification row). All build secrets (Resend/Turnstile/Square/Etsy) as
    Actions secrets — walk Ryan through the imports, verify with a real
    push-triggered deploy and a studio publish-triggered rebuild.
 3. Studio hosting so Randy has a URL for Phase 2 (recommend: Sanity's
