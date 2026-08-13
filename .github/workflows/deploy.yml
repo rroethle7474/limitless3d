@@ -1,0 +1,80 @@
+# Build + verify + deploy to Cloudflare Pages (staging: main.limitless3d.pages.dev).
+#
+# Restores deploy-on-push (D-033's accepted gap: the Pages project is Direct Upload,
+# so nothing builds on Cloudflare's side) and adds the two rebuild paths that exist
+# because content lives outside the repo:
+#
+#   - repository_dispatch "sanity-publish": fired by a Sanity webhook when Randy
+#     publishes content, so the site rebuilds without a commit.
+#   - daily cron: Etsy's API Terms cap displayed non-listing content at 24h staler
+#     than Etsy shows it (plan §10 2026-08-12 verification row) — a weekly refresh
+#     would violate them. Also keeps Square catalog data ≤24h stale for free.
+#     Off the top of the hour: GitHub delays/drops on-the-hour scheduled runs.
+#
+# Build-time env: Sanity content needs NO token (public dataset, published content
+# only — D-030); Square needs the three SQUARE_* values (reads + payment-link
+# ensure-writes, D-036); Etsy needs key+secret+shop id (D-039, header format
+# "keystring:shared_secret"); the Turnstile SITE key inlines into the HTML (D-029).
+# Runtime secrets (Resend, Turnstile secret, Sanity write token) live in the Pages
+# project env — they are NOT needed here and are deliberately not duplicated.
+#
+# ETSY_SOURCE is an Actions *variable*, not a secret: it must be visibly flippable
+# between "live" and "fixture" (the committed fixture keeps CI deterministic if
+# Etsy's API or key ever breaks — flip it back without touching code).
+
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [sanity-publish]
+  schedule:
+    - cron: '47 9 * * *' # daily 09:47 UTC ≈ 03:47 America/Chicago
+  workflow_dispatch:
+
+# Serialize deploys; never cancel one mid-flight (every queued run completes, so
+# the newest content always deploys last).
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # The Astro remote-image cache (node_modules/.astro) is deliberately NOT
+      # cached between runs: D-038 traced silently-missing srcset variants to its
+      # stale-cache revalidation path. A cold fetch every build is the safe path.
+      - name: Build
+        run: npm run build
+        env:
+          PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+          SQUARE_ENVIRONMENT: ${{ secrets.SQUARE_ENVIRONMENT }}
+          SQUARE_ACCESS_TOKEN: ${{ secrets.SQUARE_ACCESS_TOKEN }}
+          SQUARE_LOCATION_ID: ${{ secrets.SQUARE_LOCATION_ID }}
+          ETSY_API_KEY: ${{ secrets.ETSY_API_KEY }}
+          ETSY_SHARED_SECRET: ${{ secrets.ETSY_SHARED_SECRET }}
+          ETSY_SHOP_ID: ${{ secrets.ETSY_SHOP_ID }}
+          ETSY_SOURCE: ${{ vars.ETSY_SOURCE }}
+
+      # D-038 gate — non-optional since the /parts hero shipped broken markup that
+      # every HTTP-level check passed. Fails the run before anything deploys.
+      - name: Verify dist integrity
+        run: node scripts/verify-dist.mjs
+
+      - name: Deploy to Cloudflare Pages
+        run: npx -y wrangler pages deploy dist --branch main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
