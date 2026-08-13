@@ -39,6 +39,8 @@ refine or contradict the plan also get a row in `limitless3d-rebuild-plan.md` §
 | D-036 | 2026-08-12 | **/parts + /parts/<slug> live from the sandbox catalog** (D-024 design, 71-page build). `src/data/square.ts` is the only Square-touching module — cms.ts contract: build-time top-level await, fail-loud (§3b), no Square code client-side; catalog images ride the D-031 remote-pipeline pattern (`items-images-{sandbox,production}.s3…` in `image.domains`), zero hotlinks verified in dist. **Checkout links are per-variation Square-hosted payment links with ensure-semantics at build**: list links → batch-retrieve their orders → map variation→URL purely from Square state; only unlinked variations trigger CreatePaymentLink (the build's one deliberate write — first build created all 120, steady-state creates none, and a product Randy adds later gets its link on the next build with no other steps). PDP deltas from the exemplar, both logged here: a variation `<select>` (quote-form field styling) when an item has >1 — 25 products need one and the exemplar product had none — swapping the Buy href per choice; and "Other parts that fit" genuinely filters same-machine-then-same-bucket (the exemplar hardcoded the grid's first four). Gallery is the D-012 stacked-crossfade pattern (no JS-built URLs). Grid/PDP share `PartCard`/`PartsGrid`; filter JS ported verbatim as per-section module. The two in-stock counts follow the catalog (snapshot hardcoded "61"). PageHero/ProofBar/Section/SectionHead/FeatureCards/QuoteSection reused untouched. | **Square-Version must be pinned** (now in both seed and build, keep in sync): unpinned requests fall back to the account default, which silently DROPPED `description_html` on write and omitted it on read — first build shipped 61 PDPs with empty descriptions; no error surfaced anywhere. Payment-link mapping avoids any metadata side-channel so cutover inherits nothing sandbox-specific. Editorial fallbacks for catalog items the extract never saw: machine chip "Limitless 3D", bucket `other`, slug = slugify(name). S3 revalidation warnings on rebuild are benign: Square image URLs are content-addressed, stale-cache-equals-same-bytes. |
 | D-037 | 2026-08-12 | **SHOP_URL retired — every "Parts Shop" link now points at `/parts`** (Ryan approved same session). Four touchpoints: `site.ts` nav + footer entries (external flag dropped, so no more new-tab), the PartsDoor CTA, and the shipping page's "Back to the shop" hero CTA. `Nav.astro`'s active-state check gained a prefix match so `/parts/<slug>` lights up "Parts Shop" — which the prototype's PDP also does. The `SHOP_URL` constant is deleted (git history keeps it); whether the old Square Online store additionally survives at the subdomain is still the §9.7 cutover question. Verified in dist and on staging: all four links internal, zero `shop.limitless3ddesign.com` references anywhere. | D-011's interim state existed because there was nothing on-site to link to; with D-036 there is, and a dead-subdomain link-out in Randy's walkthrough would read as broken. Closes D-011. |
 | D-038 | 2026-08-12 | **Dist integrity verifier added** (`scripts/verify-dist.mjs` — every `/_astro/*` URL referenced by any built page must exist on disk; run after build, before deploy). Trigger: the /parts hero shipped broken (alt text in the frame, Ryan's catch) while every card/PDP image worked. Root cause chain: a rebuild hit Astro's remote-image cache revalidation against the Square S3 host, S3 answered the conditional GET with a redirect, Astro warned "proceeding with stale cache" but then **emitted the hero's srcset markup without ever writing the three variant files**; Cloudflare Pages soft-404s missing assets as `200 text/html`, so the browser received HTML bytes for a webp and both curl status checks and the earlier "images 200" verification passed. Fix: wipe `node_modules/.astro/assets`, clean rebuild (zero warnings), verifier reports 71 pages / 1779 refs / 0 missing, redeployed, hero confirmed rendering from the public URL. | Two verification lessons now encoded: an HTTP 200 from Pages proves nothing without checking `content_type` (soft-404s lie), and "the page's other images load" doesn't clear the page (srcset candidates fail per-variant). The verifier closes the whole class; the S3-revalidation warning is now known to be a *possible* silent variant-killer, not benign noise — if it appears, run the verifier before trusting the build. Candidate for the session-8 CI pipeline as a post-build gate. |
+| D-039 | 2026-08-12 | **Etsy reviews layer ships fixture-first** (`src/data/etsy.ts` + `src/data/etsy-fixture.json`, session 8). The module is a contract mirror of cms.ts/square.ts (top-level await, fail-loud §3b, no Etsy code client-side — verified: zero `etsy` strings in shipped JS). `ETSY_SOURCE` selects `live` (Open API v3, key-only auth, pages the FULL review set ~6 requests) or `fixture` — an **explicit opt-in that warns on every build; no silent fallback in either direction**. The fixture exists because step 0 found Etsy's key approval is now manual and stalls (the key sits "Pending Personal Approval"; a pending key 403s even on public endpoints — verified empirically): it carries 10 reviews recorded **verbatim** from the public shop page on 2026-08-12 plus the page's own aggregate (576 reviews · 4.8 · 3,533 sales) and shop_id 26921666 read from the page's embedded data. Nothing is invented; staging in fixture mode shows only real, publicly-displayed review content. The live flip owed when the key clears: re-resolve the shop id via `findShops` (the module also guards with a shop_name assertion), settle the `x-api-key` header-format ambiguity (spec says `keystring:shared_secret`, practice says keystring), set `ETSY_SOURCE=live`, rebuild, cross-check against the shop page, redeploy. | Registering first and building against recorded-real data converts a multi-day external approval queue into zero schedule risk — same move as the Square sandbox (§10 2026-08-11). Bundling lesson encoded in the module: the fixture loads via **static JSON import**, because an `import.meta.url`-relative `readFileSync` resolves to `dist/chunks/` after Astro bundles the module — the first production build died on exactly that. |
+| D-040 | 2026-08-12 | **Hybrid reviews wiring semantics** (session 8). Proof bar: STATS rows now carry their Sanity `_key`; ProofBar overlays live Etsy values onto the rows it has sources for — `rating` (Etsy's maintained `Shop.review_average`, displayed `★ 4.8`), `reviews` (lifetime count floored to the nearest 100 → `500+`), `orders` (`transaction_sold_count` floored to the nearest 500 → `3,500+`) — while `star` (Star Seller, **no API source exists**) and any row Randy adds later render exactly as edited in Sanity. Rounding is always DOWN into the prototype's "N+" vocabulary so the bar can never overstate. The rating is deliberately **Etsy's own number, not a self-computed mean**: the public page labels it "Average item review" and computes it recency-weighted (half-life one year), so any mean we computed could disagree with — or overstate — what a visitor sees on click-through (floored-mean fallback only if the API serves null; which branch fires gets confirmed at the live flip). /reviews: new tint section "Straight from Etsy" directly after the proof bar (tint/default rhythm preserved with zero changes to existing sections): the 4 newest qualifying reviews in the existing `.rcards` vocabulary. Pool rules: 5★ · has text · **40–340 chars shown whole — a review is never truncated; it either fits the card or isn't featured** · English · deduped against curated Sanity quotes by normalized containment · newest first. Attribution line "Verified Etsy review · July 2026" (month + year; the API exposes no reviewer names — matches the design's existing anonymous style). The truthful aggregate renders in the section sub beside the filtered picks ("The full picture: 576 reviews, 4.8 stars average" — FTC aggregate-plus-highlights pattern) and Etsy's required trademark notice renders verbatim as fine print (exported as a constant so it can't drift). Curated Sanity testimonials are untouched (quote band + "In their words" cards) — **revert path if Randy declines the feature: delete the strip section and the ProofBar overlay; the curated path never gets dismantled** (Ryan asked for this explicitly). | Section copy is net-new (no prototype reference exists for an auto-strip) and logged here per the verbatim-copy rule. Known static-copy drift point, same class as D-031's gallery count: the /reviews PageHero's verbatim "4.8 stars from over 500 customers" and "more than three thousand orders" — true today and conservative, but hardcoded; revisit if the live numbers ever make them wrong. |
 
 ## RESUME HERE — next session
 
@@ -144,25 +146,49 @@ walkthrough), staging re-verified on the public URL (200 + noindex on `/parts/`,
 approved in-session): nav, footer, PartsDoor, and shipping CTA all point at
 `/parts`, verified on staging — the demo is self-contained.
 
+**Phase 1b session 8 (2026-08-12): Etsy reviews are live on staging in fixture mode —
+D-039/D-040.** Step 0 re-verified Etsy API reality against current docs and found four
+deltas (plan §10 2026-08-12 verification row) — the big one: **key approval is manual
+now**, so Ryan's app "limitless-3d" sits "Pending Personal Approval" (registered
+2026-08-12; a pending key 403s even on public endpoints, verified). The module was
+built fixture-first: `src/data/etsy.ts` (cms/square contract) + a fixture of 10
+reviews recorded **verbatim** from the public shop page — nothing on staging is
+invented. Hybrid wired per D-040: proof bar overlays live values by singleton row key
+(`★ 4.8` / `500+` / `3,500+`; Star Seller stays Sanity), /reviews gains the
+"Straight from Etsy" tint strip (4 newest 5★ verbatim, truthful aggregate in the sub,
+required Etsy attribution as fine print), curated Sanity testimonials untouched.
+Verified: `astro check` 0/0/0, 71 pages, verify-dist 0 missing, zero `etsy` strings
+in shipped JS, staging re-verified from the public URL (200 + noindex + strip + live
+proof values). `.dev.vars` gained `ETSY_API_KEY`, `ETSY_SHOP_ID=26921666`,
+`ETSY_SOURCE=fixture`.
+
+**Owed when the Etsy key clears (any session): the live flip** — test the
+`x-api-key` header format (keystring alone vs the spec's `keystring:shared_secret`;
+if the secret turns out to be required Ryan adds it to `.dev.vars` himself),
+re-resolve the shop id via `findShops?shop_name=Limitless3DDesign` (expect 26921666,
+which the module also asserts by shop_name), set `ETSY_SOURCE=live`, rebuild,
+cross-check rendered numbers against the public shop page, verify-dist, redeploy.
+If still pending after ~2 weekdays (registered 2026-08-12), Ryan emails
+developer@etsy.com naming the app — Etsy staff reportedly don't work the queue
+unsolicited.
+
 **Still open / owed:** real Turnstile keys
 (D-029's env swap — staging still passes everyone), rebuild-on-publish + deploy-on-push
-(GitHub Action; the Action will also need the three `SQUARE_*` env values as secrets),
+(GitHub Action; the Action will also need the three `SQUARE_*` env values as secrets,
+plus `ETSY_API_KEY`/`ETSY_SHOP_ID`/`ETSY_SOURCE` and a **daily** `schedule:` cron —
+Etsy's API Terms cap displayed non-listing content at 24h stale),
 the studio hosting decision (local-only today; Randy needs a URL for Phase 2),
 deleting the test-submission drafts from the studio (and the $31.99 sandbox test
 order can stay — it makes the Order Manager demo real), a human scroll-through of
-staging on desktop + phone (now including /parts), the 1a polish pass (mobile /
-reduced-motion / nogl, unchanged), and the gallery "Ten projects" count drift (D-031).
+staging on desktop + phone (now including /parts and the /reviews strip), the 1a
+polish pass (mobile / reduced-motion / nogl, unchanged), the gallery "Ten projects"
+count drift (D-031), and the /reviews PageHero's static "4.8 stars / 500 customers /
+three thousand orders" copy (D-040's drift note).
 
-**Next up** (re-sequenced 2026-08-12, Ryan): session 8 = **Etsy reviews auto-pull**
-(§9.8 gate falls via Ryan's own Etsy developer app, same move as the Square sandbox;
-scope + prompt in `docs/next-session-prompt.md`, groundwork in the plan's §10
-2026-08-09 Etsy row); session 9 = real Turnstile keys + GitHub Action CI (now also
-owing a **daily** scheduled rebuild for review freshness — Etsy's API Terms cap
-displayed non-listing content at 24h stale, see the plan's §10 2026-08-12
-verification row — + `ETSY_API_KEY`/`ETSY_SHOP_ID` in secrets) +
-studio hosting; session 10 = the 1a polish pass + site improvements —
-walkthrough-ready before Randy is back. (Homepage FAQ stays deferred to Phase 2,
-plan §9.6.)
+**Next up**: session 9 = real Turnstile keys + GitHub Action CI + studio hosting
+(prompt in `docs/next-session-prompt.md`); session 10 = the 1a polish pass + site
+improvements — walkthrough-ready before Randy is back. (Homepage FAQ stays deferred
+to Phase 2, plan §9.6.)
 
 **Tooling note (still true in session 2):** the Chrome automation keeps backgrounding the tab
 (`document.hidden === true`), which stales screenshots and throttles rAF/IntersectionObserver —
