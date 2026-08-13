@@ -18,9 +18,14 @@
  * their ids + versions carried into the upsert; variations match by variation
  * name within the item. Re-running with no source changes is a no-op upsert.
  * Items that exist in Square but not in products.json are REPORTED, never
- * deleted. Images: skipped when the item already has >= the expected count
- * (uploads run in gallery order, so a partial failure resumes where it left
- * off); gallery order and the primary flag ride on upload order + is_primary.
+ * deleted. Images reconcile CONTENT-ADDRESSED: Randy's galleries repeat photos
+ * (9 of 303 are byte-identical to another — within galleries and across
+ * products) and Square dedupes uploads by content, returning the existing
+ * IMAGE instead of creating one. So the seed maps local-file sha1 → IMAGE id
+ * (seeding the map from the "<slug> <seq>" names of already-uploaded objects),
+ * uploads only genuinely-new content, and then upserts every item's image_ids
+ * in gallery order with same-item duplicates dropped — the one deliberate
+ * gallery normalization (same photo twice in a row helps nobody).
  *
  * Modeling judgment calls (log rows in docs/design-decisions.md):
  *  - The 25 single-axis dropdowns (color / grate / item number; no price
@@ -109,7 +114,10 @@ do {
 console.log(`existing catalog items: ${existing.size}`)
 
 // ---- build upsert batch ----------------------------------------------------
-const variationNames = (p) => (p.option ? p.option.choices : ['Regular'])
+// Trimmed: the live data contains one choice with a leading space (" Include
+// Grate!") and Square stores variation names trimmed — matching must agree.
+const variationNames = (p) =>
+  p.option ? p.option.choices.map((c) => c.trim()) : ['Regular']
 
 const objects = []
 let creates = 0,
@@ -149,6 +157,9 @@ for (const p of products) {
       name: p.name,
       description_html: p.descriptionHtml,
       variations,
+      // omitting image_ids on an update CLEARS the gallery — carry it through
+      // (the enforcement step below owns the correct final order)
+      ...(prior?.item_data.image_ids ? { image_ids: prior.item_data.image_ids } : {}),
     },
   })
   prior ? updates++ : creates++
@@ -183,42 +194,117 @@ do {
   cursor = page.cursor
 } while (cursor)
 
-let uploaded = 0,
-  skipped = 0
+async function listImagesByName() {
+  const byName = new Map()
+  let cur
+  do {
+    const page = await sq('/v2/catalog/list?types=IMAGE' + (cur ? `&cursor=${cur}` : ''))
+    for (const o of page.objects ?? []) byName.set(o.image_data.name, o)
+    cur = page.cursor
+  } while (cur)
+  return byName
+}
+
+const imagesByName = await listImagesByName()
+console.log(`existing IMAGE objects: ${imagesByName.size}`)
+
+// content hash of every cached gallery file, and hash → IMAGE id seeded from
+// the names of objects this script uploaded on previous runs
+const { createHash } = await import('node:crypto')
+const fileHash = new Map() // "pid seq" → sha1
+for (const p of products)
+  for (const img of p.images)
+    fileHash.set(
+      `${p.id} ${img.seq}`,
+      createHash('sha1')
+        .update(readFileSync(path.join(IMG_DIR, `p${p.id}_i${img.seq}.jpeg`)))
+        .digest('hex'),
+    )
+const hashToId = new Map()
+for (const p of products)
+  for (const img of p.images) {
+    const obj = imagesByName.get(`${p.slug} ${img.seq}`)
+    const h = fileHash.get(`${p.id} ${img.seq}`)
+    if (obj && !hashToId.has(h)) hashToId.set(h, obj.id)
+  }
+
+let uploaded = 0
+const desiredIds = new Map() // product id → ordered deduped IMAGE ids
 for (const p of products) {
   const item = itemsNow.get(p.name)
   if (!item) throw new Error(`post-upsert: "${p.name}" not found`)
-  const have = item.item_data.image_ids?.length ?? 0
-  if (have >= p.images.length) {
-    skipped += p.images.length
-    continue
+  const desired = []
+  for (const img of p.images) {
+    const h = fileHash.get(`${p.id} ${img.seq}`)
+    let id = hashToId.get(h)
+    if (!id) {
+      const form = new FormData()
+      form.append(
+        'request',
+        JSON.stringify({
+          idempotency_key: crypto.randomUUID(),
+          object_id: item.id,
+          image: {
+            type: 'IMAGE',
+            id: `#l3d-img-${p.id}-${img.seq}`,
+            image_data: { name: `${p.slug} ${img.seq}`, is_primary: img.seq === 1 },
+          },
+        }),
+      )
+      form.append(
+        'image_file',
+        new Blob([readFileSync(path.join(IMG_DIR, `p${p.id}_i${img.seq}.jpeg`))], {
+          type: 'image/jpeg',
+        }),
+        `p${p.id}_i${img.seq}.jpeg`,
+      )
+      const created = await sq('/v2/catalog/images', { method: 'POST', body: form })
+      id = created.image?.id
+      if (!id) throw new Error(`upload p${p.id}_i${img.seq}: no image id in response`)
+      hashToId.set(h, id)
+      uploaded++
+      if (uploaded % 25 === 0) console.log(`  images: ${uploaded} uploaded…`)
+    }
+    if (!desired.includes(id)) desired.push(id) // same-item content dup → drop
   }
-  for (const img of p.images.slice(have)) {
-    const file = path.join(IMG_DIR, `p${p.id}_i${img.seq}.jpeg`)
-    const form = new FormData()
-    form.append(
-      'request',
-      JSON.stringify({
-        idempotency_key: `l3d-img-${p.id}-${img.seq}`,
-        object_id: item.id,
-        image: {
-          type: 'IMAGE',
-          id: `#l3d-img-${p.id}-${img.seq}`,
-          image_data: { name: `${p.slug} ${img.seq}`, is_primary: img.seq === 1 },
-        },
-      }),
-    )
-    form.append(
-      'image_file',
-      new Blob([readFileSync(file)], { type: 'image/jpeg' }),
-      `p${p.id}_i${img.seq}.jpeg`,
-    )
-    await sq('/v2/catalog/images', { method: 'POST', body: form })
-    uploaded++
-    if (uploaded % 25 === 0) console.log(`  images: ${uploaded} uploaded…`)
+  desiredIds.set(p.id, desired)
+}
+console.log(`images: ${uploaded} uploaded, ${hashToId.size} unique in catalog`)
+
+// ---- enforce gallery order (and heal missed attachments) -------------------
+// item_data.image_ids is writable via upsert; setting it explicitly makes the
+// gallery order a function of products.json, not of upload history. NOTE: an
+// item upsert replaces its children, so the objects sent here are FRESHLY
+// fetched (current item + variation versions, full variation list intact) —
+// the in-memory imagesByName (initial list + upload responses) is authoritative
+// for ids, since the list index lags fresh creations.
+const freshItems = new Map()
+cursor = undefined
+do {
+  const page = await sq('/v2/catalog/list?types=ITEM' + (cursor ? `&cursor=${cursor}` : ''))
+  for (const obj of page.objects ?? []) freshItems.set(obj.item_data.name, obj)
+  cursor = page.cursor
+} while (cursor)
+
+const orderFixes = []
+for (const p of products) {
+  const item = freshItems.get(p.name)
+  const desired = desiredIds.get(p.id)
+  if (JSON.stringify(item.item_data.image_ids ?? []) !== JSON.stringify(desired)) {
+    item.item_data.image_ids = desired
+    orderFixes.push(item)
   }
 }
-console.log(`images: ${uploaded} uploaded, ${skipped} already present`)
+if (orderFixes.length) {
+  await sq('/v2/catalog/batch-upsert', {
+    method: 'POST',
+    body: JSON.stringify({
+      idempotency_key: crypto.randomUUID(),
+      batches: [{ objects: orderFixes }],
+    }),
+  })
+  console.log(`image order enforced on ${orderFixes.length} item(s)`)
+} else console.log('image order already correct everywhere')
 
 // ---- verify ----------------------------------------------------------------
 const verify = []
@@ -236,12 +322,14 @@ for (const p of products) {
   const priceOk = vars.every(
     (v) => v.item_variation_data.price_money?.amount === p.priceCents,
   )
-  const imgOk = (item?.item_data.image_ids?.length ?? 0) === p.images.length
+  const expectImgs = desiredIds.get(p.id)
+  const imgOk =
+    JSON.stringify(item?.item_data.image_ids ?? []) === JSON.stringify(expectImgs)
   const varOk = vars.length === variationNames(p).length
   if (item && priceOk && imgOk && varOk) ok++
   else
     console.log(
-      `  VERIFY FAIL #${p.id} "${p.name}": item=${!!item} price=${priceOk} imgs=${item?.item_data.image_ids?.length ?? 0}/${p.images.length} vars=${vars.length}/${variationNames(p).length}`,
+      `  VERIFY FAIL #${p.id} "${p.name}": item=${!!item} price=${priceOk} imgs=${item?.item_data.image_ids?.length ?? 0}/${expectImgs.length}(ordered=${imgOk}) vars=${vars.length}/${variationNames(p).length}`,
     )
 }
 console.log(`verify: ${ok}/${products.length} items fully correct`)
