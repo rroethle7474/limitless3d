@@ -153,8 +153,12 @@ order can stay — it makes the Order Manager demo real), a human scroll-through
 staging on desktop + phone (now including /parts), the 1a polish pass (mobile /
 reduced-motion / nogl, unchanged), and the gallery "Ten projects" count drift (D-031).
 
-**Next up** (roadmap agreed 2026-08-11): session 8 = real Turnstile keys + GitHub
-Action CI + studio hosting; session 9 = the 1a polish pass + site improvements —
+**Next up** (re-sequenced 2026-08-12, Ryan): session 8 = **Etsy reviews auto-pull**
+(§9.8 gate falls via Ryan's own Etsy developer app, same move as the Square sandbox;
+scope + prompt in `docs/next-session-prompt.md`, groundwork in the plan's §10
+2026-08-09 Etsy row); session 9 = real Turnstile keys + GitHub Action CI (now also
+owing a weekly scheduled rebuild for review freshness + `ETSY_API_KEY` in secrets) +
+studio hosting; session 10 = the 1a polish pass + site improvements —
 walkthrough-ready before Randy is back. (Homepage FAQ stays deferred to Phase 2,
 plan §9.6.)
 
