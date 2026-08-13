@@ -14,13 +14,17 @@ keeping the domain and its SEO equity. Rebuild of an approved prototype's design
 
 ## Current status
 
-**Phase 1a — static best-guess build.** Homepage and all eight interior pages built and
-browser-verified; remaining 1a work is the polish pass — see the RESUME section of
-`docs/design-decisions.md`. (Homepage FAQ deferred to Phase 2 pending owner input, plan §9.6.)
-Content is hardcoded (content collections arrive in Phase 1b with the CMS).
+**Phase 1b — wire-up, nearly complete.** Live on staging (`main.limitless3d.pages.dev`,
+noindexed previews): Sanity content + hosted studio (`limitless3d.sanity.studio`), the
+quote backend (Resend + real Turnstile keys + draft dual-write), the Square catalog demo
+from Ryan's sandbox (`/parts` + 61 PDPs, hosted checkout links), live Etsy reviews
+(proof bar + /reviews strip), and CI: a push to `main`, a Sanity publish (webhook →
+`repository_dispatch`), or the daily cron each build → verify-dist → deploy. The RESUME
+section of `docs/design-decisions.md` has exact state and open items. Remaining before
+Phase 2: the 1a polish pass (session 10). (Homepage FAQ deferred to Phase 2, plan §9.6.)
 
-Out of scope until told otherwise: Sanity/CMS, Resend, Turnstile, deployment config,
-redirects, Square APIs, the shop subdomain.
+Out of scope until told otherwise: cutover work (DNS, redirects, removing noindex),
+Randy's production Square credentials, the homepage FAQ.
 
 ## Stack
 
@@ -37,6 +41,10 @@ npm run build     # production build
 npm run preview   # serve the built output
 npm run check     # astro check (types + template diagnostics)
 ```
+
+Deploys are CI's job (push to `main`). Manual fallback, in this exact order:
+`npm run build` → `node scripts/verify-dist.mjs` (non-optional, D-038) →
+`npx -y wrangler pages deploy dist --branch main`.
 
 ## Conventions
 

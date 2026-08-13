@@ -1,84 +1,67 @@
-# Session 9 kickoff prompt — Phase 1b: Turnstile keys + CI + studio hosting
+# Session 10 kickoff prompt — the 1a polish pass + site improvements
 
 Copy the block below into a fresh Claude Code session.
 
 **The roadmap while Randy is away** (re-sequenced 2026-08-12, Ryan): session 8 = Etsy
-reviews — **done 2026-08-12** (D-039/D-040; fixture mode, key pending). Session 9 =
-this file. Session 10 = the 1a polish pass + site improvements. Goal: a complete
-walkthrough-ready site before Randy is back.
+reviews — done. Session 9 = Turnstile/CI/studio — **done 2026-08-13** (D-041–D-044;
+Etsy went live the same session, key approved mid-session). Session 10 = this file.
+Goal: a complete walkthrough-ready site before Randy is back.
 
-**Before pasting — setup status (as of end of session 8; re-verify against RESUME):**
+**Setup status (end of session 9 — re-verify against RESUME):**
 
-1. Staging: `main.limitless3d.pages.dev` (D-033, wrangler Direct Upload; deploy =
-   `npm run build` + `node scripts/verify-dist.mjs` + `npx -y wrangler pages deploy
-   dist --branch main` — the verifier is non-optional since D-038). Sanity live
-   (D-030–D-032), Square catalog demo live (D-034–D-038), Etsy reviews live in
-   fixture mode (D-039/D-040).
-2. **The build needs env** — CI must provide as Actions secrets: the three
-   `SQUARE_*` values, `ETSY_API_KEY` + `ETSY_SHOP_ID` (in `.dev.vars` locally),
-   and the Sanity/Resend/Turnstile set. **Plus `ETSY_SOURCE`**: keep it `fixture`
-   in CI while Ryan's Etsy key sits in the approval queue, flip to `live` once it
-   clears (an Actions *variable*, not a secret — it's not sensitive and needs to
-   be visibly flippable). The fixture is committed, so fixture-mode CI builds are
-   deterministic and network-free on the Etsy side.
-3. **Etsy live flip (D-039)** — if the key has cleared by session time (check
-   etsy.com/developers/your-apps: app "limitless-3d", registered 2026-08-12 under
-   Ryan's account), do the flip FIRST, it's ten minutes: test the `x-api-key`
-   header format (keystring alone vs the spec's claimed `keystring:shared_secret`;
-   if the secret is really needed, Ryan adds it to `.dev.vars` himself — it was
-   deliberately not stored), resolve `findShops?shop_name=Limitless3DDesign`
-   (expect shop_id 26921666), set `ETSY_SOURCE=live` in `.dev.vars`, rebuild,
-   cross-check rendered numbers against the public shop page, verify-dist, deploy.
-   If still pending after ~2 weekdays, Ryan emails developer@etsy.com naming the
-   app. The flip blocks nothing in this session — CI ships fixture-mode if needed.
-4. GitHub repo `rroethle7474/limitless3d` (private) is the source of truth and the
-   CI home. Cloudflare API token for the Action: Ryan creates it interactively when
-   asked (Pages:Edit scope) — secrets go to GitHub Actions secrets, never the repo
-   or chat. Established rhythm: dashboard steps one at a time, programmatic
-   verification after each.
-5. Turnstile: real keys come from the Cloudflare dashboard (Ryan, interactively);
-   `PUBLIC_TURNSTILE_SITE_KEY` is a build-time var, `TURNSTILE_SECRET_KEY` a Pages
-   secret (D-029). Staging currently passes everyone on the test keys.
+1. Staging `main.limitless3d.pages.dev` serves the full stack: Sanity content, live
+   Etsy reviews, Square sandbox catalog (/parts + 61 PDPs), quote form with REAL
+   Turnstile keys (widget renders and gates for real now — test on a phone too).
+2. **CI owns deploys**: push to `main`, publish in the studio
+   (`limitless3d.sanity.studio`), or the daily 09:47 UTC cron → build →
+   verify-dist → deploy. No more manual wrangler unless CI is down. A local
+   `npm run build` needs `.env` (Turnstile site key) + `.dev.vars` (the rest).
+3. `gh` CLI is installed and authed (fine-grained PAT `limitless3d-ci` — also the
+   Sanity webhook's auth header; rotation touches both). `gh run list -R
+   rroethle7474/limitless3d` to check CI. Note: use the full path
+   `"C:\Program Files\GitHub CLI\gh.exe"` if `gh` isn't on PATH in tool shells.
+4. ETSY_SOURCE (Actions variable) = `live`. Outage runbook: flip to `fixture` in
+   repo → Settings → Variables, rerun the workflow.
 
 ---
 
 ```
 Read CLAUDE.md, then docs/design-decisions.md (start at "RESUME HERE";
-D-033 is the staging architecture, D-034–D-038 the Square catalog state,
-D-039/D-040 the Etsy reviews state), then limitless3d-rebuild-plan.md §7
-Phase 1b and the 2026-08-11/12 §10 rows.
+D-041–D-044 are session 9's state), then the plan's §10 2026-08-13 row.
 
-This is Phase 1b, session 9: make the pipeline production-shaped —
-real Turnstile keys, CI, studio hosting. Randy is back soon; after this
-session only the polish pass should remain.
+This is session 10: the long-owed 1a polish pass, plus site improvements
+Ryan brings to the session. After this, the site should be walkthrough-
+ready for Randy.
 
-THE TASK:
-0. If the Etsy key has cleared approval (etsy.com/developers/your-apps,
-   app "limitless-3d"), run D-039's live flip first — the steps are in
-   the RESUME section and the kickoff notes above. If not, proceed in
-   fixture mode; the flip blocks nothing.
-1. Real Turnstile keys (D-029's env swap): walk Ryan through creating
-   the widget for the pages.dev + production domains; site key into the
-   build env, secret into Pages env (both environments); verify on
-   staging that the widget renders real and a submission still lands
-   (email + Sanity draft).
-2. GitHub Action CI: build + verify-dist (D-038 gate) + `wrangler pages
-   deploy` on push to main (restores deploy-on-push, D-033's accepted
-   gap) + a `repository_dispatch`/webhook path for Sanity
-   rebuild-on-publish + a DAILY `schedule:` cron so Etsy reviews and
-   Square catalog data refresh without a publish (Etsy's API Terms cap
-   displayed non-listing content at 24h stale — the plan's §10
-   2026-08-12 verification row; a weekly cron would violate them).
-   All build secrets (Resend/Turnstile/Square/Etsy) as Actions secrets,
-   ETSY_SOURCE as an Actions variable (fixture until the key clears) —
-   walk Ryan through the imports, verify with a real push-triggered
-   deploy and a studio publish-triggered rebuild.
-3. Studio hosting so Randy has a URL for Phase 2 (recommend: Sanity's
-   hosted studio via `sanity deploy` — zero infra; log the decision).
-4. Verify everything from the public staging URL; decision rows + RESUME
-   as work lands; push.
+THE POLISH PASS (carried since session 2, now spanning 71 pages):
+1. Mobile (~390px) for the homepage, all eight interior pages, /parts,
+   and a PDP — including OPERATING the burger drawer at mobile width,
+   the /reviews Etsy strip, gallery spotlight thumbs, and the quote form
+   with the real Turnstile widget. (Window-resize tooling bottomed out
+   at ~2048px in prior sessions; the in-page-iframe trick worked for
+   /3d-scanning — see RESUME. A real phone against staging also counts,
+   and Ryan has one.)
+2. Reduced motion: emulate prefers-reduced-motion and walk the homepage
+   + one interior page — reveals, hero, spotlight, door end-states.
+3. ?nogl=1 hero fallback, eyeballed.
+4. Side-by-side fidelity vs the live prototype (still up on Vercel),
+   page by page.
+5. A human scroll-through of staging in a FOCUSED tab (automation kept
+   backgrounding tabs; reveals/autoplay were only force-verified).
+6. Small owed fixes as they surface, plus these known ones:
+   apple-touch-icon.png (D-017), the gallery "Ten projects" count vs
+   entry count (D-031 — decide, don't just note), the /reviews PageHero
+   static numbers (D-040 — same).
+7. Confirm with Ryan in the Cloudflare dashboard that the Pages
+   PRODUCTION env now has RESEND_API_KEY / QUOTE_TO_EMAIL /
+   SANITY_API_TOKEN (session 9 found Production nearly empty; Turnstile
+   was fixed then, the rest is unconfirmed — cutover blocker).
+8. Site improvements: Ryan's list, brought to the session.
 
-Out of scope: cutover/DNS, Randy's real Square credentials, the polish
-pass (next session), homepage FAQ, new Etsy surface area (the reviews
-feature is done — only the env flip remains).
+Ground rules unchanged: run-and-look, one section at a time, small
+commits (each push deploys via CI — batch pushes sensibly), decision
+rows + RESUME as work lands.
+
+Out of scope: cutover/DNS, Randy's real Square credentials, homepage
+FAQ (Phase 2), new feature surface area.
 ```

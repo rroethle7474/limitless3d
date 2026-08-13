@@ -150,6 +150,12 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
   validated from the public URL (email + stored draft, Ryan-confirmed). Direct-Upload
   architecture — deploys via wrangler; rebuild-on-publish and deploy-on-push arrive as a
   GitHub Action (open). Real Turnstile keys still open.*
+  *Both gaps closed 2026-08-13 (session 9, D-043/D-044): real Turnstile keys live and
+  negative-tested; CI deploys on push, on Sanity publish (webhook → repository_dispatch,
+  verified live at 24s latency), and on a daily cron (Etsy's 24h staleness ceiling), gated
+  by verify-dist. Etsy reviews flipped to live the same session (D-042 — key approved,
+  shared-secret header, dedupe + rate-limit lessons). Studio hosted at
+  `limitless3d.sanity.studio` (D-041). Remaining before Phase 2: the 1a polish pass.*
 - Square catalog integration (§2) is now pre-cutover scope (2026-08-09, §10): product pages rendered from the Catalog API with Square-hosted checkout links, using the prototype's shop design as reference (snapshot: `shop.html` + `parts-pdp-example.html`).
   *Done 2026-08-12 (session 7, D-034–D-036): inventory extracted verbatim (61 products,
   live storefront API + snapshot editorial), Ryan's sandbox seeded idempotently, /parts +
@@ -247,6 +253,7 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
 
 | Date | Decision |
 |---|---|
+| 2026-08-13 | **Pipeline production-shaped (Phase 1b session 9; D-041–D-044).** Etsy key approved → live flip executed same day (header format settled: `keystring:shared_secret` required; two live-only fixes: featured-pool dedupe — buyers paste one review across two items — and 250ms paging + 429 retry after GitHub runners tripped Etsy's per-second limit that local latency had hidden). Real Turnstile keys in both Pages envs, proven by the garbage-token 403 (the test secret would have passed it) plus a real submission through the real widget. CI: GitHub Action (push / Sanity-publish `repository_dispatch` / daily 09:47 UTC cron / manual) → build → verify-dist gate → wrangler Pages deploy; secrets as Actions secrets imported from files via `gh`, `ETSY_SOURCE` a visible Actions variable set `live` (flip to `fixture` = the Etsy-outage runbook; auto-fallback stays rejected — Ryan probed the fail-loud design and it held: §3b means a red cron run costs nothing user-visible while a silent skip erases the only failure signal). Sanity webhook created via the management API after the manage UI rejected the PAT header; publish→build verified live in 24s; drafts filter confirmed (quote submissions never trigger builds). Studio hosted: `limitless3d.sanity.studio` (`sanity deploy`, appId pinned, auto-updates — Randy's Phase 2 URL; needs a project-member invite). Test drafts purged. Fine-grained PAT `limitless3d-ci` does double duty (gh auth + webhook header) — rotation touches both. |
 | 2026-08-09 | Platform finding: current site is Square Online, not classic Weebly; Weebly is in maintenance mode (sunset in 67 countries; US still online). Rebuild targets a custom site, not classic Weebly. |
 | 2026-08-09 | Architecture: hybrid — custom marketing site + existing Square Online store at `shop.` subdomain. Commerce does not migrate. |
 | 2026-08-09 | No source access to the Vercel prototype; rebuild the design from the live reference with improvements. |
