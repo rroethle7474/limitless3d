@@ -1,0 +1,96 @@
+{
+  "__provenance": "Recorded from the public shop page etsy.com/shop/Limitless3DDesign on 2026-08-12 (session 8; API key pending approval). All review text is verbatim. Shapes mirror Etsy Open API v3 getShop / getReviewsByShop. Replaced by live API data when ETSY_SOURCE=live.",
+  "shop": {
+    "shop_id": 26921666,
+    "shop_name": "Limitless3DDesign",
+    "url": "https://www.etsy.com/shop/Limitless3DDesign",
+    "transaction_sold_count": 3533,
+    "review_average": 4.8,
+    "review_count": null
+  },
+  "reviews": {
+    "count": 576,
+    "results": [
+      {
+        "shop_id": 26921666,
+        "rating": 5,
+        "review": "Good product!",
+        "language": "en-US",
+        "create_timestamp": 1786449600,
+        "created_timestamp": 1786449600
+      },
+      {
+        "shop_id": 26921666,
+        "rating": 5,
+        "review": "Excellent price. Fast Shipping. Amazing packaging. Great quality. Item fits PERFECTLY on my coffee machine water container. The details on the lid are just on another level. Absolutely beautiful!Exceeded my expectations. Thank you so much!!",
+        "language": "en-US",
+        "create_timestamp": 1786190400,
+        "created_timestamp": 1786190400
+      },
+      {
+        "shop_id": 26921666,
+        "rating": 5,
+        "review": "The packing, quality, and description of the item match the picture perfectly. This was the fastest shipping I ever received from a small business, so I am really impressed. There was a minor hiccup with the delivery status/date but I reached out to the seller immediately and got a response within less than 24 hours! Seller was very understanding and considerate in his response to my inquiry, and I responded letting him know his shipment appeared in my mailbox this morning. The packaging was very pristine and I appreciate the thoughtful wrapping paper with the sticker showcasing the small businesses, with the business card inside of it. The lid fits perfectly on my Nespresso Vertuo Pop + and I couldn’t be happier. Can’t wait to share this small business with friends and family, and also to purchase from here in the near future!",
+        "language": "en-US",
+        "create_timestamp": 1785499200,
+        "created_timestamp": 1785499200
+      },
+      {
+        "shop_id": 26921666,
+        "rating": 5,
+        "review": "Shipped and arrived quickly and perfectly fits my Nespresso machine. Great quality too!",
+        "language": "en-US",
+        "create_timestamp": 1784721600,
+        "created_timestamp": 1784721600
+      },
+      {
+        "shop_id": 26921666,
+        "rating": 5,
+        "review": "Fits the old Vertuo Plus perfectly",
+        "language": "en-US",
+        "create_timestamp": 1784721600,
+        "created_timestamp": 1784721600
+      },
+      {
+        "shop_id": 26921666,
+        "rating": 5,
+        "review": "Just what I needed after the original lid was lost.",
+        "language": "en-US",
+        "create_timestamp": 1784289600,
+        "created_timestamp": 1784289600
+      },
+      {
+        "shop_id": 26921666,
+        "rating": 5,
+        "review": "Exactly what i needed! Thanks for making this",
+        "language": "en-US",
+        "create_timestamp": 1784203200,
+        "created_timestamp": 1784203200
+      },
+      {
+        "shop_id": 26921666,
+        "rating": 5,
+        "review": "I accidentally threw my original one away while cleaning and didn't realize it until it was too late. Since Nespresso no longer sells these, this replacement was a lifesaver.",
+        "language": "en-US",
+        "create_timestamp": 1782993600,
+        "created_timestamp": 1782993600
+      },
+      {
+        "shop_id": 26921666,
+        "rating": 5,
+        "review": "Very helpful customer service & high quality",
+        "language": "en-US",
+        "create_timestamp": 1781784000,
+        "created_timestamp": 1781784000
+      },
+      {
+        "shop_id": 26921666,
+        "rating": 5,
+        "review": "Great product and perfect fit!",
+        "language": "en-US",
+        "create_timestamp": 1777550400,
+        "created_timestamp": 1777550400
+      }
+    ]
+  }
+}
