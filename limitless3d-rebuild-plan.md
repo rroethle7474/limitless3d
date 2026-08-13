@@ -193,6 +193,22 @@ Rebuild the prototype's look (structure, palette, typography, section order) fro
    *Re-scoped 2026-08-11 (§10): the build no longer waits on Randy — the catalog demo runs
    on Ryan's own Square sandbox seeded with the public product data; Randy's credentials
    become a cutover-time swap. The subdomain-fallback question stands.*
+   *Cutover paths documented 2026-08-12 (Ryan): the live products carry `square_id: null`
+   (legacy Weebly commerce layer, D-034), so Randy's production Square Catalog is likely
+   empty. **Path A (recommended):** the week of cutover, re-run `scripts/shop/extract.mjs`
+   against the live store (fresh data, not today's snapshot), run `scripts/shop/seed.mjs`
+   with his production token, swap the three `SQUARE_*` env vars. Consequence to walk Randy
+   through: the items appear in his Square Dashboard item library (and POS if he uses it) —
+   which becomes his single place to manage products once the old store retires; until then
+   the old Weebly editor and the catalog are two unsynced sources, an argument for retiring
+   the subdomain store rather than keeping it. **Path B (zero-migration fallback if Randy
+   balks):** build the /parts pages from the same public storefront endpoint the extractor
+   uses (`cdn5.editmysite.com/app/store/api/v28/...`) + `quick_pay` payment links (name +
+   price, no catalog needed). Cutover is then just one production token — but the site
+   would depend on an undocumented internal API of a sunsetting platform (§3b contains a
+   breakage as stale-not-down, not down), Randy edits products in the old editor forever,
+   and the old store becomes permanent infrastructure. Decision point is the Randy
+   walkthrough.*
 8. Etsy reviews auto-pull (§10, 2026-08-09): does Randy want it, and will he register an Etsy
    developer app / API key from the shop account (plus supply the shop id)? Blocks the
    build-time reviews module; manual curation via the §4.2 collection is the fallback.
