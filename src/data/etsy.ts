@@ -109,13 +109,26 @@ if (SOURCE === 'fixture') {
   // Header format settled empirically at the live flip (2026-08-13): Etsy
   // enforces the spec's "keystring:shared_secret" — keystring alone 403s with
   // "Shared secret is required in x-api-key header."
+  // 429 handling exists for CI: GitHub's runners fire the ~6 paging requests
+  // fast enough to trip Etsy's per-second limit (first CI run died on exactly
+  // that; local builds never saw it — network latency was the pacing). Retry
+  // with backoff on 429 only; every other failure stays fail-loud.
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
   const etsyGet = async <T>(pathname: string): Promise<T> => {
-    const res = await fetch(API + pathname, { headers: { 'x-api-key': `${KEY}:${SECRET}` } });
-    const body = (await res.json().catch(() => ({}))) as T & { error?: string };
-    if (!res.ok) {
-      throw new Error(`[etsy] GET ${pathname} → ${res.status}: ${body.error ?? JSON.stringify(body).slice(0, 300)}`);
+    for (let attempt = 0; ; attempt++) {
+      const res = await fetch(API + pathname, { headers: { 'x-api-key': `${KEY}:${SECRET}` } });
+      if (res.status === 429 && attempt < 4) {
+        const wait = Number(res.headers.get('retry-after')) * 1000 || 1000 * 2 ** attempt;
+        console.warn(`[etsy] 429 on ${pathname} — retrying in ${wait}ms`);
+        await sleep(wait);
+        continue;
+      }
+      const body = (await res.json().catch(() => ({}))) as T & { error?: string };
+      if (!res.ok) {
+        throw new Error(`[etsy] GET ${pathname} → ${res.status}: ${body.error ?? JSON.stringify(body).slice(0, 300)}`);
+      }
+      return body;
     }
-    return body;
   };
 
   shop = await etsyGet<EtsyShop>(`/shops/${SHOP_ID}`);
@@ -132,6 +145,7 @@ if (SOURCE === 'fixture') {
   reviewsTotal = first.count;
   allReviews.push(...first.results);
   for (let offset = 100; offset < reviewsTotal && offset < 2000; offset += 100) {
+    await sleep(250); // pace pages under the per-second limit; the 429 retry is the backstop
     const page = await etsyGet<EtsyReviewsPage>(`/shops/${SHOP_ID}/reviews?limit=100&offset=${offset}`);
     if (page.results.length === 0) break;
     allReviews.push(...page.results);
