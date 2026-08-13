@@ -1,0 +1,150 @@
+---
+/**
+ * /parts — the shop grid, per the captured design (D-024 shop.html snapshot).
+ * Products come from the Square catalog at build (src/data/square.ts); copy is
+ * verbatim from the snapshot except the two live counts, which follow the
+ * catalog so they can never lie.
+ */
+import { inferRemoteSize } from 'astro:assets';
+
+import Base from '~/layouts/Base.astro';
+import PageHero from '~/components/PageHero.astro';
+import ProofBar from '~/components/ProofBar.astro';
+import Section from '~/components/Section.astro';
+import SectionHead from '~/components/SectionHead.astro';
+import FeatureCards from '~/components/FeatureCards.astro';
+import PartsGrid from '~/components/PartsGrid.astro';
+import PartCard from '~/components/PartCard.astro';
+import QuoteSection from '~/components/QuoteSection.astro';
+
+import { PARTS } from '~/data/square';
+
+const title = '3D Printed Replacement Parts | Nespresso, Keurig and More | Limitless 3D';
+const description =
+  'Over 60 replacement parts and originals, designed and 3D printed in Neenah, Wisconsin. Drip trays, water tank lids, capsule bins, and more. Shipped nationwide.';
+
+/* The snapshot's hero art is this product's primary photo. */
+const heroPart = PARTS.find((p) => p.slug === 'nespresso-vertuoplus-deluxe-replacement-water-tank-lid');
+const heroSrc = heroPart?.images[0] ?? PARTS[0].images[0];
+const heroSize = await inferRemoteSize(heroSrc);
+
+const FILTERS = [
+  { cat: 'all', label: 'All parts' },
+  { cat: 'vertuo', label: 'Nespresso Vertuo' },
+  { cat: 'original', label: 'Nespresso Original' },
+  { cat: 'accessories', label: 'Coffee accessories' },
+  { cat: 'other', label: 'Keurig and others' },
+  { cat: 'home', label: 'Home and gifts' },
+  { cat: 'baby', label: 'Baby and parenting' },
+] as const;
+
+const CARDS = [
+  {
+    icon: '<path d="M3 16V6h10v10M13 10h4l4 4v2h-8M3 16h2M9 16h4"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',
+    title: 'Shipped nationwide',
+    body: 'Parts go out from Neenah, Wisconsin to anywhere in the country. Local pickup is welcome too.',
+  },
+  {
+    icon: '<path d="M3 15l12-12 6 6-12 12H3v-6zM8 10l2 2M11 7l2 2"/>',
+    title: 'Designed here, printed here',
+    body: 'Every part in this shop was measured, modeled, and printed in our own workshop, not resold.',
+  },
+  {
+    icon: '<path d="M14.7 6.3a4 4 0 105.4 5.4l-9.6 9.6a2.5 2.5 0 01-3.5-3.5l9.6-9.6z"/><circle cx="17.5" cy="6.5" r="0"/>',
+    title: 'Cannot find your part?',
+    body: 'If your machine is not listed, send a photo. Most of these started as one customer asking.',
+  },
+] as const;
+---
+
+<Base {title} {description}>
+  <PageHero
+    crumb="Parts Shop"
+    heading="The part they<br>stopped <em>making</em>."
+    lead="Coffee machines outlive their spare parts. We design and print the piece that failed, so a good machine does not go in the bin over a cracked tray."
+    primary={{ label: 'Browse all parts', href: '#parts' }}
+    ghost={{ label: 'Need something custom?', href: '/#quote' }}
+    image={{ src: heroSrc, width: heroSize.width, height: heroSize.height }}
+    alt="A 3D printed replacement coffee machine part"
+  />
+
+  <ProofBar />
+
+  <Section id="parts">
+    <SectionHead
+      kicker={`${PARTS.length} parts in stock`}
+      heading="Find your part"
+      sub="Filter by machine, then check the photos against the piece in your hand. If you are not sure, send us a photo and we will tell you."
+    />
+
+    <div class="shopbar reveal">
+      {
+        FILTERS.map((f) => (
+          <button data-cat={f.cat} class:list={{ on: f.cat === 'all' }}>
+            {f.label}
+          </button>
+        ))
+      }
+    </div>
+    <div class="shop-count mono"><span class="n">{PARTS.length}</span> parts shown</div>
+
+    <PartsGrid>
+      {PARTS.map((part) => <PartCard {part} />)}
+    </PartsGrid>
+  </Section>
+
+  <Section tint>
+    <FeatureCards cards={CARDS} />
+  </Section>
+
+  <QuoteSection
+    kicker="Not in the shop?"
+    heading="We will make the one you need."
+    body="Send a photo of the broken part and the model of your machine. If we can print it, we will tell you what it costs."
+    selectedService="Repair or replacement part"
+  />
+</Base>
+
+<style>
+  .shopbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .shopbar button {
+    font-family: var(--font-mono);
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+    cursor: pointer;
+    transition: .2s;
+  }
+
+  .shopbar button:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  .shopbar button.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .shop-count {
+    text-align: center;
+    margin-bottom: 34px;
+  }
+</style>
+
+<script>
+  import '~/scripts/shop-filter';
+</script>

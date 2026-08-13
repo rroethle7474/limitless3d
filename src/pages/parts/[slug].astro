@@ -1,0 +1,381 @@
+---
+/**
+ * /parts/<slug> — product detail page per the captured design (D-024
+ * parts-pdp-example.html): sticky contain-fit gallery, price, stock line,
+ * pre-line description, buy panel, trust rows, then a same-machine related
+ * grid. All copy is verbatim from the Square catalog (which carries Randy's
+ * verbatim store copy, D-034).
+ *
+ * Two deliberate deltas from the exemplar, logged in the decision row:
+ *  - a variation select (styled like the quote form's) appears when the item
+ *    has more than one — the exemplar product had none, but 25 products do,
+ *    and each variation carries its own Square-hosted checkout link;
+ *  - "Other parts that fit" really is same-machine (bucket as fallback) —
+ *    the exemplar hardcoded the first four products of the grid.
+ *
+ * Gallery is the D-012 pattern: every image server-rendered stacked, toggled
+ * by class, so each rides the pipeline with a real srcset and no JS-built URL.
+ */
+import { Image, getImage, inferRemoteSize } from 'astro:assets';
+
+import Base from '~/layouts/Base.astro';
+import Section from '~/components/Section.astro';
+import SectionHead from '~/components/SectionHead.astro';
+import PartsGrid from '~/components/PartsGrid.astro';
+import PartCard from '~/components/PartCard.astro';
+import { PARTS, relatedParts, type Part } from '~/data/square';
+import { SOCIAL } from '~/data/site';
+
+export function getStaticPaths() {
+  return PARTS.map((part) => ({ params: { slug: part.slug }, props: { part } }));
+}
+
+interface Props {
+  part: Part;
+}
+
+const { part } = Astro.props;
+const related = relatedParts(part);
+const hasChoices = part.variations.length > 1;
+
+const sizedImages = await Promise.all(
+  part.images.map(async (src) => ({ src, ...(await inferRemoteSize(src)) })),
+);
+
+/* Product structured data, as the exemplar ships — images are our built URLs. */
+const jsonLdImage = await getImage({
+  src: sizedImages[0].src,
+  width: Math.min(1200, sizedImages[0].width),
+  height: Math.round(Math.min(1200, sizedImages[0].width) * (sizedImages[0].height / sizedImages[0].width)),
+});
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: part.name,
+  image: [new URL(jsonLdImage.src, Astro.site).href],
+  description: part.descText,
+  brand: { '@type': 'Brand', name: 'Limitless 3D' },
+  offers: {
+    '@type': 'Offer',
+    url: new URL(`/parts/${part.slug}`, Astro.site).href,
+    priceCurrency: 'USD',
+    price: (part.priceCents / 100).toFixed(2),
+    availability: 'https://schema.org/InStock',
+    seller: { '@type': 'Organization', name: 'Limitless 3D LLC' },
+  },
+};
+---
+
+<Base title={`${part.name} | Limitless 3D`} description={part.metaDescription}>
+  <section class="pdp-sec">
+    <div class="wrap">
+      <div class="crumb reveal">
+        <a href="/">Home</a> / <a href="/parts">Parts Shop</a> / <span>{part.machine}</span>
+      </div>
+
+      <div class="pdp">
+        <div class="pdp-gallery reveal">
+          <div class="pdp-main">
+            {
+              sizedImages.map((img, i) => (
+                <Image
+                  src={img.src}
+                  width={img.width}
+                  height={img.height}
+                  alt={i === 0 ? part.name : ''}
+                  widths={[...new Set([480, 800, Math.min(1200, img.width)])]}
+                  sizes="(max-width: 900px) 92vw, 560px"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  fetchpriority={i === 0 ? 'high' : 'auto'}
+                  class:list={{ on: i === 0 }}
+                />
+              ))
+            }
+          </div>
+          {
+            sizedImages.length > 1 && (
+              <div class="pdp-thumbs">
+                {sizedImages.map((img, i) => (
+                  <button data-index={i} class:list={{ on: i === 0 }} aria-label={`View image ${i + 1}`}>
+                    <Image src={img.src} width={img.width} height={img.height} alt="" widths={[160]} sizes="74px" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            )
+          }
+        </div>
+
+        <div class="pdp-info reveal">
+          <div class="mono accent">{part.machine}</div>
+          <h1>{part.name}</h1>
+          <div class="pdp-price">{part.price}</div>
+          <div class="pdp-stock">Designed and printed in Neenah, WI</div>
+          <div class="pdp-desc">{part.descText}</div>
+
+          {
+            hasChoices && (
+              <label class="pdp-choice">
+                Choose an option
+                <select id="pdp-variation">
+                  {part.variations.map((v, i) => (
+                    <option data-buy-url={v.buyUrl} selected={i === 0}>
+                      {v.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )
+          }
+
+          <div class="pdp-buy">
+            <a
+              id="pdp-buy"
+              class="btn primary wide"
+              href={part.variations[0].buyUrl}
+              target="_blank"
+              rel="noopener"
+            >
+              Buy This Part
+            </a>
+            <a class="btn ghost wide" href="/#quote">Ask a question first</a>
+            <div class="center">
+              <a class="proof-inline" href={SOCIAL.etsyShop} target="_blank" rel="noopener">
+                <b>&#9733;&#9733;&#9733;&#9733;&#9733; 4.8</b> from <b>500+</b> reviews on our Etsy shop
+              </a>
+            </div>
+          </div>
+
+          <div class="pdp-trust">
+            <div>SHIPS FROM <b>NEENAH, WISCONSIN</b></div>
+            <div>DESIGNED AND PRINTED <b>IN OUR OWN SHOP</b></div>
+            <div>NOT SURE IT FITS? <b>SEND US A PHOTO</b></div>
+            <div>PRINTED TO ORDER &middot; <a href="/shipping-and-returns"><b>SHIPPING AND RETURNS</b></a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {
+    related.length > 0 && (
+      <Section tint>
+        <SectionHead kicker="Same machine" heading="Other parts that fit" />
+        <PartsGrid>
+          {related.map((p) => (
+            <PartCard part={p} />
+          ))}
+        </PartsGrid>
+      </Section>
+    )
+  }
+
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</Base>
+
+<style>
+  .pdp-sec {
+    padding-top: 150px;
+  }
+
+  .crumb {
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 26px;
+  }
+
+  .crumb a:hover {
+    color: var(--em-a);
+  }
+
+  .pdp {
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    gap: 52px;
+    align-items: start;
+    padding-bottom: 96px;
+  }
+
+  .pdp-gallery {
+    position: sticky;
+    top: 110px;
+  }
+
+  .pdp-main {
+    position: relative;
+    border-radius: 16px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    box-shadow: var(--card-shadow);
+  }
+
+  /* D-012 stacked gallery: all slides rendered, .on wins. */
+  .pdp-main :global(img) {
+    position: absolute;
+    inset: 22px;
+    width: calc(100% - 44px);
+    height: calc(100% - 44px);
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity .25s ease;
+  }
+
+  .pdp-main :global(img.on) {
+    opacity: 1;
+  }
+
+  .pdp-thumbs {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .pdp-thumbs button {
+    width: 74px;
+    height: 74px;
+    border-radius: 9px;
+    overflow: hidden;
+    border: 2px solid var(--line);
+    background: #fff;
+    padding: 0;
+    cursor: pointer;
+    transition: .2s;
+  }
+
+  .pdp-thumbs button.on {
+    border-color: var(--accent);
+  }
+
+  .pdp-thumbs :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .pdp-info h1 {
+    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+    margin: 14px 0 14px;
+  }
+
+  .pdp-price {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--em-a);
+    margin-bottom: 8px;
+  }
+
+  .pdp-stock {
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 26px;
+  }
+
+  .pdp-desc {
+    color: var(--muted);
+    margin-bottom: 28px;
+    white-space: pre-line;
+  }
+
+  /* Variation picker — mirrors the quote form's field vocabulary. */
+  .pdp-choice {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: .66rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 22px;
+  }
+
+  .pdp-choice select {
+    width: 100%;
+    margin-top: 7px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-head);
+    font-size: .95rem;
+    transition: border-color .2s;
+  }
+
+  .pdp-choice select:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .pdp-buy {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 26px;
+  }
+
+  .pdp-buy .center {
+    margin-top: 4px;
+  }
+
+  .proof-inline {
+    display: inline-block;
+    font-size: .9rem;
+    color: var(--muted);
+  }
+
+  .proof-inline b {
+    color: var(--em-a);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .proof-inline:hover {
+    color: var(--text);
+  }
+
+  .pdp-trust {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    border-top: 1px solid var(--line);
+    padding-top: 22px;
+  }
+
+  .pdp-trust div {
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    letter-spacing: .08em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .pdp-trust b {
+    color: var(--em-a);
+    font-weight: 500;
+  }
+
+  @media (max-width: 900px) {
+    .pdp {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .pdp-gallery {
+      position: static;
+    }
+  }
+</style>
+
+<script>
+  import '~/scripts/pdp';
+</script>

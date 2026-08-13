@@ -68,6 +68,10 @@ async function sq(pathname, init = {}) {
     ...init,
     headers: {
       Authorization: `Bearer ${TOKEN}`,
+      // Pinned: without an explicit version the account default applies, and an
+      // old default silently DROPS newer fields like description_html (learned
+      // the hard way — items seeded without descriptions, no error anywhere).
+      'Square-Version': '2025-01-23',
       ...(init.body && !(init.body instanceof FormData)
         ? { 'Content-Type': 'application/json' }
         : {}),

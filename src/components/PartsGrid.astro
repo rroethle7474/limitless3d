@@ -1,0 +1,31 @@
+---
+/**
+ * The product-card grid (`.pgrid`, D-024): 4-up, 3-up under 1024px, 2-up under
+ * 760px. Owns only the wrapper — cards are slotted PartCard components.
+ */
+---
+
+<div class="pgrid">
+  <slot />
+</div>
+
+<style>
+  .pgrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 1024px) {
+    .pgrid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .pgrid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+  }
+</style>

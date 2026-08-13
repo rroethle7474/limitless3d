@@ -1,0 +1,113 @@
+---
+/**
+ * One product card (`.pcard`, D-024): square contain-fit photo, machine label,
+ * name, price. `data-cats` drives the /parts shopbar filter. The photo is the
+ * item's primary Square image, re-hosted through the Sharp pipeline at build.
+ */
+import { Image } from 'astro:assets';
+
+import type { Part } from '~/data/square';
+
+interface Props {
+  part: Part;
+}
+
+const { part } = Astro.props;
+---
+
+<a class="pcard reveal" href={`/parts/${part.slug}`} data-cats={part.bucket}>
+  <div class="ph">
+    <Image
+      src={part.images[0]}
+      inferSize
+      alt={part.name}
+      widths={[360, 600]}
+      sizes="(max-width: 760px) 45vw, (max-width: 1024px) 30vw, 280px"
+      loading="lazy"
+    />
+  </div>
+  <div class="pin">
+    <div class="machine">{part.machine}</div>
+    <h3>{part.name}</h3>
+    <div class="price">{part.price}</div>
+  </div>
+</a>
+
+<style>
+  .pcard {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    transition: transform .22s ease, border-color .22s ease;
+  }
+
+  .pcard:hover {
+    transform: translateY(-4px);
+    border-color: rgba(94, 23, 235, .5);
+  }
+
+  .ph {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: var(--panel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    overflow: hidden;
+  }
+
+  .ph :global(img) {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transition: transform .4s ease;
+  }
+
+  .pcard:hover .ph :global(img) {
+    transform: scale(1.03);
+  }
+
+  .pin {
+    padding: 16px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    text-align: center;
+  }
+
+  h3 {
+    font-size: .92rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .machine {
+    font-family: var(--font-mono);
+    font-size: .62rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .price {
+    margin-top: auto;
+    padding-top: 10px;
+    font-weight: 700;
+    color: var(--em-a);
+    font-size: 1rem;
+  }
+
+  @media (max-width: 760px) {
+    .pin {
+      padding: 13px;
+    }
+  }
+</style>

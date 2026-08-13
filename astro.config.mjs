@@ -21,7 +21,13 @@ export default defineConfig({
     // Owner-managed photos (gallery, service pages) live in Sanity. Authorizing the
     // domain makes Astro FETCH them at build and run them through the same Sharp
     // pipeline — dist/ still serves local optimized files, nothing hotlinks the CDN.
-    domains: ['cdn.sanity.io'],
+    // The two S3 hosts are Square catalog images (sandbox now, production at cutover),
+    // fetched by the /parts pages under the same zero-hotlink rule (D-031 pattern).
+    domains: [
+      'cdn.sanity.io',
+      'items-images-sandbox.s3.us-west-2.amazonaws.com',
+      'items-images-production.s3.us-west-2.amazonaws.com',
+    ],
   },
 
   vite: {
