@@ -7,6 +7,7 @@ import SectionHead from '~/components/SectionHead.astro';
 import FeatureCards from '~/components/FeatureCards.astro';
 import QuoteSection from '~/components/QuoteSection.astro';
 import { REVIEWS } from '~/data/cms';
+import { ETSY_AGGREGATE, ETSY_ATTRIBUTION, ETSY_RECENT } from '~/data/etsy';
 import { SOCIAL } from '~/data/site';
 
 import skiBoot from '~/assets/work/ski-boot.jpg';
@@ -58,6 +59,31 @@ const expectations = [
   />
 
   <ProofBar />
+
+  <Section tint id="fresh">
+    <SectionHead
+      kicker="Straight from Etsy"
+      heading="The latest five-star reviews"
+      sub={`Pulled automatically from our Etsy shop — the newest five-star reviews, word for word. The full picture: ${ETSY_AGGREGATE.reviewsTotal} reviews, ${ETSY_AGGREGATE.rating.toFixed(1)} stars average.`}
+    />
+    <div class="rcards">
+      {
+        ETSY_RECENT.map((r) => (
+          <div class="rcard reveal">
+            <span class="stars" role="img" aria-label="Five out of five">★★★★★</span>
+            <blockquote>“{r.text}”</blockquote>
+            <div class="who">Verified Etsy review · {r.when}</div>
+          </div>
+        ))
+      }
+    </div>
+    <div class="etsy-more">
+      <a class="mono" href={ETSY_AGGREGATE.shopUrl} target="_blank" rel="noopener">
+        READ EVERY REVIEW ON ETSY &rarr;
+      </a>
+    </div>
+    <p class="etsy-legal reveal">{ETSY_ATTRIBUTION}</p>
+  </Section>
 
   <Section id="word">
     <SectionHead
@@ -152,6 +178,30 @@ const expectations = [
     .rcards {
       grid-template-columns: 1fr;
     }
+  }
+
+  /* ---- Etsy strip extras (the cards themselves are `.rcards`) ----
+     The link echoes ProofBar's `.proof-link`; the legal line is the
+     attribution Etsy's API Terms require, verbatim from etsy.ts. */
+  .etsy-more {
+    text-align: center;
+    margin-top: 26px;
+  }
+
+  .etsy-more a {
+    color: var(--muted);
+    font-size: .68rem;
+  }
+
+  .etsy-more a:hover {
+    color: var(--em-a);
+  }
+
+  .etsy-legal {
+    text-align: center;
+    color: var(--faint);
+    font-size: .72rem;
+    margin-top: 14px;
   }
 
   /* ---- leave a review ----

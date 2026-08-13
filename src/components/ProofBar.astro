@@ -1,12 +1,19 @@
 ---
 import { STATS } from '~/data/cms';
+import { ETSY_STAT_VALUES } from '~/data/etsy';
 import { SOCIAL } from '~/data/site';
+
+/* Live Etsy values take over the singleton rows they cover (rating /
+   reviews / orders); every other row — Star Seller today, anything Randy
+   adds later — renders exactly as edited in Sanity. */
+const live: Record<string, string | undefined> = ETSY_STAT_VALUES;
+const stats = STATS.map((s) => ({ label: s.label, value: live[s.key] ?? s.value }));
 ---
 
 <div class="proof">
   <div class="wrap proof-in reveal">
     {
-      STATS.map((s) => (
+      stats.map((s) => (
         <div class="proof-item">
           <b>{s.value}</b>
           <span>{s.label}</span>

@@ -141,15 +141,19 @@ export const REVIEWS = rawTestimonials.filter((t) => !t.quoteBand);
  * Homepage stats (plan §4.3) + business info (plan §4.4)
  * ------------------------------------------------------------------------- */
 
-const rawStats = await client.fetch<{ stats: { value: string; label: string }[] } | null>(
-  `*[_id == "siteStats"][0] { stats }`,
-);
+const rawStats = await client.fetch<{
+  stats: { _key: string; value: string; label: string }[];
+} | null>(`*[_id == "siteStats"][0] { stats }`);
 
-/** Headline numbers for the proof bar. */
-export const STATS: readonly { value: string; label: string }[] = need(
+/**
+ * Headline numbers for the proof bar. `key` is the singleton row's _key —
+ * ProofBar uses it to let live Etsy values take over the rows they cover
+ * (rating / reviews / orders) while everything else stays owner-edited.
+ */
+export const STATS: readonly { key: string; value: string; label: string }[] = need(
   rawStats?.stats,
   'the "Homepage stats" singleton',
-).map(({ value, label }) => ({ value, label }));
+).map(({ _key, value, label }) => ({ key: _key, value, label }));
 
 const rawBiz = need(
   await client.fetch<{
