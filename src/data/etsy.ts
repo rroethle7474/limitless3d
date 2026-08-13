@@ -19,9 +19,9 @@
  * shop page labels its average "Average item review" and computes it
  * recency-weighted, so we surface Etsy's number (Shop.review_average) rather
  * than a self-computed mean that could disagree with — or overstate — what a
- * visitor sees when they click through. (Whether review_average matches the
- * page's displayed value is confirmed at the live flip; the conservative
- * floor-mean fallback below only fires if Etsy serves null.)
+ * visitor sees when they click through. (Confirmed at the live flip
+ * 2026-08-13: review_average 4.84 renders "4.8", matching the page; the
+ * conservative floor-mean fallback below only fires if Etsy serves null.)
  *
  * Display freshness: Etsy's API Terms cap displayed non-listing content at
  * 24h stale — the CI session owes a DAILY scheduled rebuild (plan §10).
@@ -95,17 +95,22 @@ if (SOURCE === 'fixture') {
   allReviews = fixture.reviews.results;
 } else {
   const KEY = env.ETSY_API_KEY;
+  const SECRET = env.ETSY_SHARED_SECRET;
   const SHOP_ID = env.ETSY_SHOP_ID;
-  if (!KEY || !SHOP_ID) {
+  if (!KEY || !SECRET || !SHOP_ID) {
     throw new Error(
-      '[etsy] ETSY_API_KEY / ETSY_SHOP_ID missing (expected in .dev.vars or env) — ' +
-        'refusing to build without them. (While the key is pending approval, set ETSY_SOURCE=fixture.)',
+      '[etsy] ETSY_API_KEY / ETSY_SHARED_SECRET / ETSY_SHOP_ID missing (expected in ' +
+        '.dev.vars or env) — refusing to build without them. (Without an approved key, ' +
+        'set ETSY_SOURCE=fixture.)',
     );
   }
 
   const API = 'https://openapi.etsy.com/v3/application';
+  // Header format settled empirically at the live flip (2026-08-13): Etsy
+  // enforces the spec's "keystring:shared_secret" — keystring alone 403s with
+  // "Shared secret is required in x-api-key header."
   const etsyGet = async <T>(pathname: string): Promise<T> => {
-    const res = await fetch(API + pathname, { headers: { 'x-api-key': KEY } });
+    const res = await fetch(API + pathname, { headers: { 'x-api-key': `${KEY}:${SECRET}` } });
     const body = (await res.json().catch(() => ({}))) as T & { error?: string };
     if (!res.ok) {
       throw new Error(`[etsy] GET ${pathname} → ${res.status}: ${body.error ?? JSON.stringify(body).slice(0, 300)}`);
@@ -175,10 +180,12 @@ export const ETSY_STAT_VALUES: Record<'rating' | 'reviews' | 'orders', string> =
  * Featured pool — recent 5★ reviews, verbatim, sized to fit an rcard
  * ------------------------------------------------------------------------- */
 
-/** Selection rules (decision row, session 8): 5★ · has text · 40–340 chars
- * (never truncate: a review either fits the card whole or isn't featured) ·
- * English · not a duplicate of an owner-curated Sanity testimonial · newest
- * first · top 4. */
+/** Selection rules (decision row, session 8; dedupe added at the live flip):
+ * 5★ · has text · 40–340 chars (never truncate: a review either fits the card
+ * whole or isn't featured) · English · not a duplicate of an owner-curated
+ * Sanity testimonial · deduped within the pool (buyers who order two items
+ * paste the same text on each — the live API really does this; newest kept) ·
+ * newest first · top 4. */
 const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 const curated = [QUOTE_BAND, ...REVIEWS].map((t) => normalize(t.quote));
 const isCurated = (text: string) => {
@@ -204,6 +211,17 @@ export const ETSY_RECENT: EtsyRecentReview[] = allReviews
       !isCurated(r.review),
   )
   .sort((a, b) => b.create_timestamp - a.create_timestamp)
+  .filter(
+    (() => {
+      const seen = new Set<string>();
+      return (r: EtsyReview & { review: string }) => {
+        const n = normalize(r.review);
+        if (seen.has(n)) return false;
+        seen.add(n);
+        return true;
+      };
+    })(),
+  )
   .slice(0, 4)
   .map((r) => ({
     text: r.review,
