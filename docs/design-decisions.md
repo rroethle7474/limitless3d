@@ -70,18 +70,35 @@ Verified in session 2 (Chrome, desktop viewport, per page):
   but `innerWidth` doesn't change). Phero stacks art-first, stats 2-up, cards 1-up, burger
   shows, form single-column.
 
-**Still unverified — carry-overs and new:**
+**All five carried verification items were closed in session 10 (2026-08-18) — the 1a
+polish pass:**
 
-1. **Mobile for the other seven interior pages and the homepage.** Only scanning has been seen
-   narrow, and only in an iframe. The burger drawer has still never been *operated* at mobile
-   width.
-2. **Reduced motion.** Still unexercised anywhere.
-3. **`?nogl=1` hero fallback.** Still not visually confirmed.
-4. **Side-by-side fidelity check** against the live prototype — all checking so far is against
-   the snapshot/reference, not eyeballed next to the real thing. Now spans nine pages.
-5. **Interior pages in a *focused* (not automation-backgrounded) tab** — reveals and spotlight
-   autoplay were force-verified via DOM class toggles; a human scroll-through is still the real
-   test.
+1. **Mobile (~390px), all 11 page types** via an in-page iframe harness (resize tooling still
+   floors at ~2048px): homepage + eight interior pages + /parts + a variation PDP. Operated,
+   not just looked at: burger open → scrim close → drawer-link navigation, gallery thumb jump,
+   /parts filter (61→4→61), PDP variation select swapping the buy href, FAQ toggle. Zero
+   layout defects; automated horizontal-overflow probe clean on every page (the door wall's
+   edge bleed is design, parent-clipped).
+2. **Reduced motion** via headless Chrome `--force-prefers-reduced-motion` full-page captures
+   (homepage + /3d-scanning): all end-states correct — hero parks at COMPLETE with drag
+   retained, reveals visible through the CSS `.reveal{opacity:1}` net, door open, spotlight
+   static on 01/06, service visuals static frames. Note: the homepage can't be captured with
+   a tall headless window (the 100svh hero eats the whole height) — puppeteer-core
+   `fullPage` from the scratchpad was the working method.
+3. **`?nogl=1`** eyeballed: canvas + scan caption removed, static brand SVG in place.
+4. **Side-by-side vs the live Vercel prototype** (headless captures composited pairwise):
+   home/scanning/printing/design/gallery compared — matched throughout; remainder waived by
+   Ryan mid-pass ("we are producing a better version"). Found and fixed the two real
+   regressions (D-046). Deliberate deltas confirmed: live proof-bar numbers, no footer
+   Privacy link, added photo field, Etsy strip.
+5. **Focused-tab scroll-through of staging** done in the live browser: reveals animate on
+   natural scroll, spotlight autoplays (01→06 observed), door tiles all load, and the real
+   Turnstile widget rendered and auto-solved ("Success!") on the staging quote form.
+
+**Open after session 10:** the Production-env dashboard check with Ryan (cutover blocker —
+RESEND_API_KEY / QUOTE_TO_EMAIL / SANITY_API_TOKEN), Ryan's improvements list, and an
+optional real-phone pass on staging (nice-to-have; the layout half is covered by the iframe
+pass, Turnstile by the focused-tab observation).
 
 **Phase 1b session 3 (2026-08-09): the quote backend is live** — D-005's stub is dead.
 `functions/api/quote.ts` (contract D-026), Turnstile with test keys (D-029), Resend with
