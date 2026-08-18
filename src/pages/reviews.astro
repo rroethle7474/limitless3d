@@ -19,6 +19,19 @@ const description =
 /** Where the two "Leave a review" buttons point. Etsy is the shop URL from site.ts. */
 const GOOGLE_REVIEW_URL = 'https://www.google.com/search?q=Limitless+3D+Neenah+WI';
 
+/* The hero's numbers follow the live Etsy aggregate so they can never overstate
+   (D-045, closing D-040's drift note). "Over N" uses the largest round figure
+   strictly below the real count, so the claim stays true the day it renders and
+   every day after until the next build. At today's numbers the output is
+   byte-identical to the prototype's hardcoded copy. */
+const heroRating = ETSY_AGGREGATE.rating.toFixed(1);
+const heroCustomers = Math.max(100, Math.floor((ETSY_AGGREGATE.reviewsTotal - 1) / 100) * 100);
+const THOUSANDS = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const heroOrdersWord = THOUSANDS[Math.floor((ETSY_AGGREGATE.ordersTotal - 1) / 1000)] ?? '';
+const heroOrders = heroOrdersWord
+  ? `more than ${heroOrdersWord} thousand orders shipped`
+  : `${ETSY_AGGREGATE.ordersTotal.toLocaleString('en-US')} orders shipped`;
+
 /* The cards come from Sanity (every testimonial not flagged for the quote
    band), in editor-set order. Quotes are stored bare; the template re-adds
    the “ ” marks. */
@@ -50,8 +63,8 @@ const expectations = [
 <Base title={title} description={description}>
   <PageHero
     crumb="Reviews"
-    heading="4.8 stars from<br />over <em>500</em> customers."
-    lead="Four years on Etsy, more than three thousand orders shipped, and Star Seller recognition for on time delivery and quick replies. The parts speak for themselves."
+    heading={`${heroRating} stars from<br />over <em>${heroCustomers}</em> customers.`}
+    lead={`Four years on Etsy, ${heroOrders}, and Star Seller recognition for on time delivery and quick replies. The parts speak for themselves.`}
     primary={{ label: 'Get a Quote', href: '/#quote' }}
     ghost={{ label: 'Read all the reviews', href: SOCIAL.etsyShop }}
     image={skiBoot}

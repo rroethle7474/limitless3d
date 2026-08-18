@@ -19,6 +19,11 @@ const description =
 // The spotlight entries (homepage six + four more) come from Sanity, in editor-set
 // order. Alt text is ours, not the prototype's (D-014) — required in the schema.
 
+// The heading counts the entries so an eleventh gallery entry can't make it lie (D-045).
+// Spelled out through twenty to keep today's copy byte-identical; numerals past that.
+const WORDS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen', 'Twenty'];
+const projectCount = WORDS[GALLERY.length] ?? String(GALLERY.length);
+
 const pattern = [
   {
     icon: '<path d="M14.7 6.3a4 4 0 105.4 5.4l-9.6 9.6a2.5 2.5 0 01-3.5-3.5l9.6-9.6z"/><circle cx="17.5" cy="6.5" r="0"/>',
@@ -52,7 +57,7 @@ const pattern = [
   <BuildLog
     entries={GALLERY}
     kicker="The build log"
-    heading="Ten projects, start to finish"
+    heading={`${projectCount} projects, start to finish`}
     sub="Tap a thumbnail to jump to a project, or let it run."
   />
 
