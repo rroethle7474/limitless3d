@@ -160,11 +160,14 @@
   border-block: 1px solid var(--line);
 }
 
-@layer components {
-  .mono.accent {
-    color: var(--em-a);
-  }
+/* Unlayered on purpose: `mono` is a @utility, and Tailwind's utilities layer cascades
+   after `@layer components`, so a layered `.mono.accent` loses to the utility's
+   `color: var(--faint)` despite higher specificity. Unlayered rules beat all layers. */
+.mono.accent {
+  color: var(--em-a);
+}
 
+@layer components {
   /* ---- buttons ---- */
   .btn {
     display: inline-block;

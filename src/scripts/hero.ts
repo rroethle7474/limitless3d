@@ -284,18 +284,24 @@ export function initHero(): void {
   rig.add(group, shadow);
   scene.add(rig);
 
+  /* The THEMES intensities are the prototype's numbers verbatim, authored against a
+     legacy-lighting three build that scaled every light by PI internally. r155 flipped
+     that default and r165 removed it, so the same numbers render visibly darker — the
+     rim glow all but disappears. Scale at assignment to keep the table's provenance. */
+  const LEGACY_LIGHT_SCALE = Math.PI;
+
   function applySceneTheme() {
     const T =
       THEMES[document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'];
     amb.color.setHex(T.amb[0]);
-    amb.intensity = T.amb[1];
+    amb.intensity = T.amb[1] * LEGACY_LIGHT_SCALE;
     key.color.setHex(T.key[0]);
-    key.intensity = T.key[1];
+    key.intensity = T.key[1] * LEGACY_LIGHT_SCALE;
     rim.color.setHex(T.rim[0]);
-    rim.intensity = T.rim[1];
+    rim.intensity = T.rim[1] * LEGACY_LIGHT_SCALE;
     rim.distance = T.rim[2];
     fill.color.setHex(T.fill[0]);
-    fill.intensity = T.fill[1];
+    fill.intensity = T.fill[1] * LEGACY_LIGHT_SCALE;
     fill.distance = T.fill[2];
     ptsMat.color.setHex(T.pts);
     ptsMat.blending = T.ptsBlend === 'add' ? AdditiveBlending : NormalBlending;
